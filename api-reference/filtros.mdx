@@ -1,0 +1,468 @@
+---
+title: "Filtros (Filters)"
+description: "Todos los filtros disponibles para modificar el comportamiento del plugin"
+---
+
+# Filtros
+
+Los filtros permiten modificar valores y comportamientos del plugin antes de que se procesen. Utiliza `add_filter()` para interceptar y cambiar datos.
+
+## Filtros de sincronización
+
+### thi_allow_image_sync_when_unhealthy
+
+Permite sincronización de imágenes incluso cuando la salud del servidor es deficiente.
+
+<CodeGroup>
+```php Filtro
+$allow = apply_filters('thi_allow_image_sync_when_unhealthy', false);
+```
+
+```php Ejemplo
+add_filter('thi_allow_image_sync_when_unhealthy', function($allow) {
+    // Permitir siempre, sin importar salud del servidor
+    return true;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `false` |
+| **Tipo de retorno** | boolean |
+| **Descripción** | Por defecto, las imágenes no se sincronizan si hay problemas de memoria o CPU. Usa este filtro para ignorar estas advertencias. |
+| **Ubicación** | `/src/Images/ImageProcessor.php` |
+
+<Warning>
+Habilitar esto en servidores con recursos limitados puede causar errores o timeout.
+</Warning>
+
+---
+
+### thi_server_health_check_enabled
+
+Habilita o deshabilita los chequeos de salud del servidor.
+
+<CodeGroup>
+```php Filtro
+$enabled = apply_filters('thi_server_health_check_enabled', true);
+```
+
+```php Ejemplo
+add_filter('thi_server_health_check_enabled', function($enabled) {
+    // Deshabilitar en ambiente de desarrollo
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        return false;
+    }
+    return $enabled;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` |
+| **Tipo de retorno** | boolean |
+| **Descripción** | Controla si el plugin verifica memoria, CPU y espacio en disco antes de sincronizar. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+## Filtros de recursos del servidor
+
+### thi_memory_warning_threshold
+
+Establece el umbral de porcentaje de memoria para advertencias.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_memory_warning_threshold', 85.0);
+```
+
+```php Ejemplo
+add_filter('thi_memory_warning_threshold', function($threshold) {
+    // Más conservador: advertencia a 75%
+    return 75.0;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `85.0` |
+| **Tipo de retorno** | float |
+| **Rango válido** | 50.0 - 95.0 |
+| **Descripción** | Porcentaje de memoria utilizada que genera una advertencia. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+### thi_memory_critical_threshold
+
+Establece el umbral crítico de porcentaje de memoria.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_memory_critical_threshold', 95.0);
+```
+
+```php Ejemplo
+add_filter('thi_memory_critical_threshold', function($threshold) {
+    // Detener sincronización a 90%
+    return 90.0;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `95.0` |
+| **Tipo de retorno** | float |
+| **Rango válido** | 80.0 - 99.0 |
+| **Descripción** | Porcentaje de memoria que detiene la sincronización. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+### thi_load_warning_threshold_normalized
+
+Umbral de carga de CPU normalizada para advertencia.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_load_warning_threshold_normalized', 1.2);
+```
+
+```php Ejemplo
+add_filter('thi_load_warning_threshold_normalized', function($threshold) {
+    // En sistemas de 8 núcleos, advertencia a carga 8.0
+    return 1.0;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `1.2` |
+| **Tipo de retorno** | float |
+| **Descripción** | Se multiplica por el número de núcleos CPU. En servidor de 4 núcleos = carga 4.8. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+### thi_load_critical_threshold_normalized
+
+Umbral crítico de carga de CPU normalizada.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_load_critical_threshold_normalized', 2.0);
+```
+
+```php Ejemplo
+add_filter('thi_load_critical_threshold_normalized', function($threshold) {
+    // Más tolerante: dejar en 2.0
+    return 2.0;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `2.0` |
+| **Tipo de retorno** | float |
+| **Descripción** | Carga normalizada que detiene la sincronización. En servidor de 4 núcleos = carga 8.0. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+<Tip>
+Para contenedores Docker, este límite se fija en 1.5 automáticamente.
+</Tip>
+
+---
+
+### thi_disk_warning_gb
+
+Espacio en disco (en GB) que genera advertencia.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_disk_warning_gb', 5.0);
+```
+
+```php Ejemplo
+add_filter('thi_disk_warning_gb', function($threshold) {
+    // Advertencia más sensible: 2 GB disponibles
+    return 2.0;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `5.0` GB |
+| **Tipo de retorno** | float |
+| **Descripción** | Espacio en disco disponible mínimo recomendado. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+### thi_disk_critical_gb
+
+Espacio en disco (en GB) que detiene la sincronización.
+
+<CodeGroup>
+```php Filtro
+$threshold = apply_filters('thi_disk_critical_gb', 1.0);
+```
+
+```php Ejemplo
+add_filter('thi_disk_critical_gb', function($threshold) {
+    // Ser más conservador: 500 MB
+    return 0.5;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `1.0` GB |
+| **Tipo de retorno** | float |
+| **Descripción** | Espacio en disco mínimo absoluto requerido para sincronización. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+## Filtros de verificación de salud
+
+### thi_server_health_check_memory_enabled
+
+Habilita verificación de memoria.
+
+```php
+$enabled = apply_filters('thi_server_health_check_memory_enabled', true);
+```
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` |
+| **Tipo de retorno** | boolean |
+
+---
+
+### thi_server_health_check_load_enabled
+
+Habilita verificación de carga de CPU.
+
+```php
+$enabled = apply_filters('thi_server_health_check_load_enabled', true);
+```
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` |
+| **Tipo de retorno** | boolean |
+
+---
+
+### thi_server_health_check_load_hard_fail
+
+Detiene completamente sincronización si carga es crítica.
+
+<CodeGroup>
+```php Filtro
+$hard_fail = apply_filters('thi_server_health_check_load_hard_fail', true);
+```
+
+```php Ejemplo
+add_filter('thi_server_health_check_load_hard_fail', function($hard_fail) {
+    // Permitir sincronización incluso con carga alta
+    return false;
+});
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` (excepto Docker: `false`) |
+| **Tipo de retorno** | boolean |
+| **Descripción** | En Docker, la carga se ignora automáticamente. |
+| **Ubicación** | `/src/Health/HealthMonitor.php` |
+
+---
+
+### thi_server_health_check_disk_enabled
+
+Habilita verificación de espacio en disco.
+
+```php
+$enabled = apply_filters('thi_server_health_check_disk_enabled', true);
+```
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` |
+| **Tipo de retorno** | boolean |
+
+---
+
+## Filtros de WordPress
+
+El plugin utiliza filtros estándar de WordPress para integración:
+
+### wp_image_editors
+
+Modifica editores de imagen disponibles.
+
+```php
+add_filter('wp_image_editors', function($editors) {
+    // Usar ImageMagick en lugar de GD
+    return array_merge(['imagick'], $editors);
+});
+```
+
+---
+
+### option_houzez_options
+
+Filtra opciones de Houzez cargadas.
+
+```php
+add_filter('option_houzez_options', function($options) {
+    // Modificar configuración de Houzez antes de uso
+    return $options;
+});
+```
+
+---
+
+### get_post_metadata
+
+Filtra metadatos de propiedades.
+
+```php
+add_filter('get_post_metadata', function($value, $post_id, $meta_key) {
+    if (strpos($meta_key, 'tokko_') === 0) {
+        // Procesar metadatos de Tokko
+    }
+    return $value;
+}, 10, 3);
+```
+
+---
+
+### houzez_meta_search_filter
+
+Personaliza búsqueda de metadatos en Houzez.
+
+```php
+add_filter('houzez_meta_search_filter', function($filter, $meta_key) {
+    // Extender opciones de búsqueda
+    return $filter;
+}, 10, 2);
+```
+
+---
+
+### houzez/search_composer/fields
+
+Modifica campos disponibles en composer de búsqueda.
+
+```php
+add_filter('houzez/search_composer/fields', function($fields) {
+    // Agregar campos personalizados
+    $fields['custom_field'] = [
+        'label' => 'Campo personalizado',
+        'type' => 'text'
+    ];
+    return $fields;
+});
+```
+
+---
+
+### posts_where
+
+Modifica cláusula WHERE de consultas de propiedades.
+
+```php
+add_filter('posts_where', function($where, $query) {
+    if ($query->get('post_type') === 'property') {
+        // Agregar condiciones personalizadas
+    }
+    return $where;
+}, 10, 2);
+```
+
+---
+
+### posts_results
+
+Filtra resultados de consultas de propiedades.
+
+```php
+add_filter('posts_results', function($posts, $query) {
+    if ($query->get('post_type') === 'property') {
+        // Procesar resultados de propiedades
+    }
+    return $posts;
+}, 10, 2);
+```
+
+---
+
+### query_vars
+
+Registra variables de consulta personalizadas.
+
+```php
+add_filter('query_vars', function($vars) {
+    $vars[] = 'tokko_property_id';
+    return $vars;
+});
+```
+
+---
+
+## Mejores prácticas
+
+<Note>
+**Retorna siempre el valor filtrado**, incluso si no lo modificas. Los filtros deben ser predecibles.
+</Note>
+
+```php
+// ✅ CORRECTO
+add_filter('thi_memory_warning_threshold', function($threshold) {
+    if (some_condition()) {
+        return 80.0;
+    }
+    return $threshold; // Siempre retorna el valor
+});
+
+// ❌ INCORRECTO
+add_filter('thi_memory_warning_threshold', function($threshold) {
+    if (some_condition()) {
+        return 80.0;
+    }
+    // Sin retorno del valor original
+});
+```
+
+<Tip>
+**Verifica validez de datos** al retornar valores filtrados para evitar comportamientos inesperados.
+</Tip>
+
+```php
+add_filter('thi_memory_warning_threshold', function($threshold) {
+    $new_threshold = floatval($threshold);
+
+    // Validar rango
+    if ($new_threshold < 50.0) {
+        $new_threshold = 50.0;
+    }
+    if ($new_threshold > 95.0) {
+        $new_threshold = 95.0;
+    }
+
+    return $new_threshold;
+});
+```

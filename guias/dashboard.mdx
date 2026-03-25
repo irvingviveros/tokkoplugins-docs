@@ -1,0 +1,606 @@
+---
+title: "Dashboard"
+description: "Panel de control con estadísticas, analíticas y monitoreo de sincronización"
+---
+
+# Dashboard
+
+El Dashboard de Tokko Plugins proporciona una vista centralizada de toda la actividad de sincronización, estadísticas de propiedades y salud del sistema. Desde aquí puedes monitorear, analizar y controlar todo lo que sucede en tu integración.
+
+## Acceso al Dashboard
+
+### Ubicación
+
+```
+WordPress > Tokko Plugins > Dashboard
+```
+
+O desde el menú lateral del administrador, haz clic en "Tokko Plugins" > "Dashboard".
+
+### Requisitos
+
+- Rol de administrador de WordPress
+- Tokko Plugins v3.0.0+
+- Acceso a la API de Tokko Broker
+
+## Vista General
+
+### Panel Principal
+
+El Dashboard mostrará al abrirlo:
+
+```
+Dashboard de Tokko Plugins
+├── Estadísticas en Vivo
+├── Actividad Reciente
+├── Gráficos de Rendimiento
+├── Estado del Sistema
+└── Acciones Rápidas
+```
+
+**Clase:** `THI_Enhanced_Dashboard`
+
+El dashboard es completamente responsive y funciona en escritorio y móvil.
+
+## Estadísticas de Propiedades
+
+### Tarjetas de Resumen
+
+El dashboard muestra 4 tarjetas principales:
+
+| Tarjeta | Descripción |
+|---------|------------|
+| **Total Propiedades** | Todas las propiedades sincronizadas |
+| **Propiedades Activas** | Publicadas y visibles en el sitio |
+| **Propiedades Pendientes** | En proceso de sincronización |
+| **Propiedades Archivadas** | Propiedades inactivas/vendidas |
+
+```
+Total: 1,234
+├── Activas: 1,100 (89%)
+├── Pendientes: 34 (3%)
+└── Archivadas: 100 (8%)
+```
+
+### Colores Indicadores
+
+```
+🟢 Verde → Status OK / Activa
+🟡 Amarillo → Pendiente / En proceso
+🔴 Rojo → Error / Archivada
+⚪ Gris → Sin datos / Inactiva
+```
+
+Cada tarjeta es clickeable y abre un filtro automático en el listado de propiedades.
+
+## Analítica de Propiedades
+
+### Gráficos de Distribución
+
+**Por Tipo:**
+
+```
+Departamento     ████████████ 45%
+Casa             ███████ 26%
+Oficina          ██ 8%
+Comercio         ██ 7%
+Terreno          ██ 5%
+Otros            █ 9%
+```
+
+Haz clic en cualquier segmento para filtrar ese tipo.
+
+**Por Ubicación:**
+
+```
+Buenos Aires     ██████████████████ 72%
+CABA             ████████ 28%
+Otro             - 0%
+```
+
+**Por Rango de Precio:**
+
+```
+$0-100k          ██ 8%
+$100k-250k       ██████ 22%
+$250k-500k       ████████ 29%
+$500k-1M         █████ 19%
+$1M+             ███ 22%
+```
+
+### Interpretación
+
+Usa estos gráficos para:
+- Identificar tipos de propiedades más comunes
+- Analizar distribución geográfica
+- Detectar vacíos de mercado
+- Evaluar estrategia de precios
+
+## Cronograma de Sincronización
+
+### Timeline Visual
+
+El dashboard muestra un timeline de sincronizaciones:
+
+```
+Hoy
+├─ 14:32 ✅ Sincronización completada (450 props)
+├─ 08:15 ✅ Sincronización completada (438 props)
+│
+Ayer
+├─ 20:45 ✅ Sincronización completada (445 props)
+├─ 14:30 ✅ Sincronización completada (442 props)
+└─ 08:00 ✅ Sincronización completada (440 props)
+```
+
+Cada entrada muestra:
+- Hora exacta
+- Estado (✅ OK, ⚠️ Parcial, ❌ Error)
+- Número de propiedades procesadas
+- Duración de sincronización
+
+### Cliquea para Detalles
+
+Haz clic en cualquier sincronización para ver:
+
+```
+Sincronización #1234
+├── Duración: 2m 34s
+├── Propiedades procesadas: 450
+├── Imágenes descargadas: 1,245
+├── Errores: 3
+├── Advertencias: 12
+└── Detalles: Ver log completo
+```
+
+## Indicadores de Rendimiento
+
+### Métricas Clave
+
+**Velocidad de Sincronización:**
+
+```
+Promedio: 2.5 propiedades/segundo
+Máximo: 3.1 props/seg
+Mínimo: 1.8 props/seg
+
+(En base a últimas 10 sincronizaciones)
+```
+
+**Tasa de Éxito:**
+
+```
+Última 24h: 99.2%
+Última semana: 98.9%
+Última mes: 98.7%
+```
+
+**Tiempo Estimado:**
+
+```
+Próxima sincronización: en 14m 32s
+Duración estimada: 2m 45s
+Basado en: 1,234 propiedades
+```
+
+## Salud del Sistema
+
+### Indicadores del Servidor
+
+**Memoria:**
+
+```
+Usada: 256 MB / 512 MB (50%)
+├─ 🟢 OK (< 70%)
+└─ Recomendación: Aumentar si >85%
+```
+
+**CPU:**
+
+```
+Uso actual: 35%
+├─ 🟢 Bajo
+└─ Promedio últimas 2h: 42%
+```
+
+**Disco:**
+
+```
+/wp-content/uploads: 2.3 GB / 10 GB (23%)
+├─ 🟢 OK
+└─ Imágenes de propiedad: 1.8 GB
+```
+
+**Tiempo de Respuesta:**
+
+```
+API Tokko Broker: 245 ms
+└─ 🟢 Excelente (< 500ms)
+
+WordPress: 142 ms
+└─ 🟢 Rápido (< 200ms)
+```
+
+### Recomendaciones Automáticas
+
+El sistema analiza salud y sugiere optimizaciones:
+
+```
+⚠️ Memoria alcanzará límite en ~5 sincronizaciones
+   → Acción: Aumenta memory_limit a 1024M en wp-config.php
+
+⚠️ Cache está deshabilitado
+   → Acción: Activa W3 Total Cache para mejor rendimiento
+
+ℹ️ 1.2 GB de imágenes huérfanas detectadas
+   → Acción: Ejecuta limpieza automática
+```
+
+## Historial de Sincronización
+
+### Ver Todos los Intentos
+
+En "Historial de Sincronización" puedes ver:
+
+```
+Fecha/Hora          Estado    Props   Imágenes  Duración
+2024-03-25 14:32    ✅ OK     450     1245      2m 34s
+2024-03-25 08:15    ✅ OK     438     1100      2m 15s
+2024-03-24 20:45    ✅ OK     445     1200      2m 40s
+2024-03-24 14:30    ⚠️ Parcial 442     1050      3m 12s
+2024-03-24 08:00    ✅ OK     440     1180      2m 25s
+```
+
+### Filtrar Historial
+
+```
+Por estado: [✅ OK] [⚠️ Parcial] [❌ Error]
+Por fecha: [Últimas 24h] [7 días] [30 días]
+```
+
+### Exportar Datos
+
+Descarga historial en CSV:
+
+```
+Dashboard > Historial > Exportar a CSV
+```
+
+Incluye todas las sincronizaciones del mes actual.
+
+## Historial de Errores
+
+### Errores Detectados
+
+El dashboard registra todos los errores encontrados:
+
+```
+ID    Tipo              Mensaje                    Fecha      Estado
+1245  Descarga Imagen   No se pudo descargar...   Hoy 14:32  Pendiente
+1244  Timeout           API timeout en props...   Hoy 08:15  Resuelto
+1243  Validación        Precio inválido: ABC      Ayer 20:45 Ignorado
+```
+
+### Detalles del Error
+
+Haz clic en cualquier error para ver:
+
+```
+Error #1245
+├── Tipo: Descarga de Imagen
+├── Propiedad: ID 12345
+├── URL: https://tokko-api.../imagen.jpg
+├── Error: "Connection timeout"
+├── Intentos: 3 / 5
+├── Próximo intento: en 15 minutos
+└── Acción: [Reintentar ahora] [Ignorar] [Investigar]
+```
+
+### Exportar Errores
+
+Para análisis profundo:
+
+```
+Dashboard > Historial de Errores > Exportar a CSV
+```
+
+Útil para identificar patrones de error.
+
+## Monitoreo en Tiempo Real
+
+### Sincronización Activa
+
+Cuando está en proceso:
+
+```
+Sincronización en curso...
+█████████░░░░░░░░░░ 50%
+
+Procesadas: 625 / 1,250 propiedades
+Tiempo transcurrido: 1m 30s
+Tiempo estimado restante: 1m 45s
+Velocidad: 2.6 props/segundo
+
+Detalles:
+├─ Descargas: 450 imágenes
+├─ Actualizadas: 300 propiedades
+├─ Nuevas: 325 propiedades
+└─ Errores: 2 (será reintentado)
+```
+
+### Heartbeat / Latido
+
+El sistema envía un "latido" cada 30 segundos:
+
+```
+Última actividad: hace 8 segundos ✅
+Estado: Sincronización activa
+ETA: 1m 45s restantes
+```
+
+Esto te permite ver que el plugin está funcionando sin congelarse.
+
+## Acciones Rápidas
+
+### Botones de Control
+
+```
+[↻ Sincronizar Ahora]
+[⬇️ Descargar Imágenes]
+[🧹 Limpiar Errores]
+[📋 Ver Configuración]
+[⚙️ Avanzado]
+```
+
+### Sincronización Manual
+
+Haz clic en "Sincronizar Ahora" para:
+
+```
+1. Iniciar sincronización inmediata
+2. No esperar al siguiente ciclo programado
+3. Ver progreso en tiempo real
+4. Cancelar si algo va mal
+```
+
+### Descarga de Imágenes
+
+```
+[⬇️ Descargar Imágenes Faltantes]
+
+Analiza qué imágenes están en Tokko
+pero no en WordPress media library.
+Descarga automáticamente.
+
+Útil después de:
+- Agregar nuevas propiedades
+- Restaurar base de datos
+- Migración de servidor
+```
+
+### Limpiar Errores Antiguos
+
+```
+[🧹 Limpiar Errores]
+
+Opción 1: Borrar errores > 30 días
+Opción 2: Borrar errores > 7 días
+Opción 3: Borrar todos los errores
+
+⚠️ Esta acción no se puede deshacer.
+Exporta CSV primero si los necesitas.
+```
+
+## Configuración del Dashboard
+
+### Personalizar Vistas
+
+**Opción:** `thi_dashboard_layout`
+
+```php
+thi_dashboard_layout = 'default'  // Distribución estándar
+thi_dashboard_layout = 'compact'  // Más compacta
+thi_dashboard_layout = 'detailed' // Más detalles
+```
+
+### Intervalo de Actualización
+
+**Opción:** `thi_dashboard_refresh_interval`
+
+```php
+thi_dashboard_refresh_interval = 30  // Segundos (por defecto)
+thi_dashboard_refresh_interval = 10  // Actualización frecuente
+thi_dashboard_refresh_interval = 60  // Actualización lenta
+```
+
+### Mostrar/Ocultar Secciones
+
+```
+☑️ Estadísticas
+☑️ Gráficos
+☑️ Timeline
+☑️ Indicadores Sistema
+☑️ Historial
+☑️ Errores
+```
+
+Desmarca secciones que no necesites para vista más limpia.
+
+## Iconografía y Componentes
+
+### Iconos SVG
+
+El dashboard usa iconos SVG nativos (sin dependencias):
+
+```
+✅ Sincronización exitosa
+⚠️ Advertencia/parcial
+❌ Error/fallida
+🟢 OK/Sano
+🟡 Precaución
+🔴 Crítico
+↻ Sincronizar
+⬇️ Descargar
+🧹 Limpiar
+```
+
+### Tarjetas Modernas
+
+Diseño responsive con tarjetas:
+
+```
+┌─────────────────────────────┐
+│  📊 Total Propiedades       │
+│  1,234                      │
+│  ↑ 12 nuevas esta semana    │
+└─────────────────────────────┘
+```
+
+Cada tarjeta es clickeable y muestra detalles al hacer hover.
+
+## Notificaciones
+
+### Sistema de Alertas
+
+El dashboard notifica sobre:
+
+```
+✅ Sincronización completada
+⚠️ Errores encontrados (3)
+❌ Sincronización fallida
+ℹ️ Mantenimiento del sistema
+⏰ Próxima sincronización en...
+```
+
+### Tipo de Notificaciones
+
+```
+En Pantalla:
+- Toast (arriba derecha) - 5 segundos
+
+En Dashboard:
+- Banner persistente - hasta descartar
+
+Por Email (opcional):
+- Errores críticos
+- Sincronización fallida
+```
+
+## Compatibilidad Móvil
+
+### Responsive Design
+
+El dashboard funciona perfectamente en:
+
+```
+📱 Mobile (320px+)
+  └─ Tarjetas apiladas verticalmente
+  └─ Gráficos adaptativos
+  └─ Botones para toque
+
+📱 Tablet (768px+)
+  └─ Diseño de 2 columnas
+  └─ Gráficos más grandes
+
+💻 Desktop (1024px+)
+  └─ Diseño completo
+  └─ Gráficos interactivos
+```
+
+### Uso en Móvil
+
+```
+- Swipe para cambiar gráficos
+- Tap en tarjetas para detalles
+- Scroll vertical para historial
+- Botones grandes para acciones
+```
+
+## Solución de Problemas
+
+### Dashboard en Blanco
+
+<Steps>
+  <Step title="Limpia Cache">
+    Desactiva caché de plugins (W3 Total, WP Super Cache)
+  </Step>
+  <Step title="Recarga Forzada">
+    Presiona Ctrl+Shift+R (o Cmd+Shift+R en Mac)
+  </Step>
+  <Step title="Verifica Permisos">
+    Asegúrate que eres administrador de WordPress
+  </Step>
+  <Step title="Revisa Logs">
+    Busca errores en /wp-content/debug.log
+  </Step>
+</Steps>
+
+### Datos No Se Actualizan
+
+```php
+// Verifica:
+1. Sincronización está habilitada
+2. CRON de WordPress está activo
+3. API Key de Tokko es válida
+4. No hay firewall bloqueando Tokko
+
+// Para debugging:
+wp cron test  // Verifica CRON
+```
+
+### Dashboard Lento
+
+```php
+// Si dashboard tarda en cargar:
+1. Reduce intervalo de actualización
+2. Activa caché de WordPress
+3. Desactiva gráficos no usados
+4. Aumenta memory_limit en wp-config.php
+```
+
+### Gráficos No Aparecen
+
+```php
+// Verifica:
+1. JavaScript no bloqueado
+2. Consola del navegador sin errores (F12)
+3. Plugin Chart.js no esté conflictando
+4. Navegador actualizado
+```
+
+## Mejores Prácticas
+
+### Monitoreo Regular
+
+✅ **Revisa dashboard:**
+- Después de cada sincronización
+- Al menos 1 vez por día
+- Antes de cambios importantes
+
+❌ **No:**
+- Ignores errores por días
+- Confíes solo en notificaciones
+- Asumas que todo está bien
+
+### Análisis de Datos
+
+```
+Datos útiles:
+- Patrones de error: ¿Suceden siempre a cierta hora?
+- Velocidad de sincronización: ¿Ha aumentado?
+- Distribución de propiedades: ¿Balanced?
+- Tasa de éxito: ¿Está mejorando?
+```
+
+### Exporta Regularmente
+
+```
+Mensual:
+1. Exporta historial de sincronización
+2. Exporta errores si hay
+3. Guarda para registros
+```
+
+---
+
+**Fin de Guías Principales:** Ya has cubierto todos los aspectos clave de Tokko Plugins. Para soporte adicional, visita [Centro de Ayuda](/) o contacta a soporte@tokkoplugins.com.

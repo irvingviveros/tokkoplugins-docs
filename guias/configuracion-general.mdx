@@ -1,0 +1,275 @@
+---
+title: "Configuración General"
+description: "Todas las opciones de configuración del plugin explicadas en detalle"
+---
+
+# Configuración General
+
+Tokko Plugins ofrece un panel de control completo para personalizar la integración entre tu CRM de Tokko Broker y tu sitio WordPress con Houzez. Aquí encontrarás todas las opciones disponibles organizadas por categoría.
+
+## Acceso al Panel de Configuración
+
+Para acceder a las opciones del plugin:
+
+<Steps>
+  <Step title="Ingresa a WordPress">
+    Accede al panel de administración de tu WordPress
+  </Step>
+  <Step title="Abre Tokko Plugins">
+    En el menú lateral, busca **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Navega por las pestañas">
+    Encontrarás diferentes secciones para cada aspecto de la configuración
+  </Step>
+</Steps>
+
+## Configuración General
+
+### API Key de Tokko Broker
+- **Opción:** `thi_api_key`
+- **Descripción:** Clave de autenticación para conectar con tu CRM de Tokko Broker
+- **Obligatorio:** Sí
+- **Valor por defecto:** Vacío
+- **Instrucciones:** Obtén tu clave desde Tokko Broker y pégala aquí. Consulta la [guía de API Key](./api-key.mdx) para más detalles.
+
+<Tip>
+Prueba la conexión haciendo clic en el botón "Probar Conexión" después de ingresar tu API Key.
+</Tip>
+
+### Idioma del Plugin
+- **Opción:** `thi_plugin_language`
+- **Descripción:** Selecciona el idioma de la interfaz del plugin
+- **Valores disponibles:**
+  - `en_US` - Inglés (Estados Unidos)
+  - `es_MX` - Español (México)
+- **Valor por defecto:** `en_US`
+
+<Info>
+Esta opción no afecta el idioma de las propiedades sincronizadas, solo la interfaz del plugin.
+</Info>
+
+---
+
+## Sincronización
+
+### Frecuencia de Sincronización
+- **Opción:** `thi_sync_option`
+- **Descripción:** Define con qué frecuencia se sincronizarán las propiedades desde Tokko Broker
+- **Valores disponibles:**
+  - `disabled` - Sincronización deshabilitada (solo manual)
+  - `hourly` - Cada hora
+  - `every_6_hours` - Cada 6 horas
+  - `every_12_hours` - Cada 12 horas
+  - `daily` - Una vez al día
+  - `weekly` - Una vez a la semana
+  - `biweekly` - Cada dos semanas
+  - `monthly` - Una vez al mes
+  - `custom` - Intervalo personalizado
+- **Valor por defecto:** `daily`
+
+<Warning>
+Sincronizar cada hora consume más recursos de servidor. Usa esta opción solo si tus propiedades cambian constantemente.
+</Warning>
+
+### Intervalo Personalizado (minutos)
+- **Opción:** `thi_custom_interval_value`
+- **Descripción:** Define un intervalo personalizado en minutos cuando seleccionas "Intervalo personalizado"
+- **Rango válido:** 5 a 43,200 minutos (5 minutos a 30 días)
+- **Valor por defecto:** 1440 (24 horas)
+
+<Info>
+- **5 minutos** = sincronización cada 5 minutos (máxima frecuencia)
+- **1440 minutos** = sincronización diaria
+- **10,080 minutos** = sincronización semanal
+- **43,200 minutos** = sincronización mensual (máxima pausa)
+</Info>
+
+### Generar Miniaturas
+- **Opción:** `thi_generate_thumbnails`
+- **Descripción:** Genera automáticamente miniaturas optimizadas para todas las imágenes de propiedades
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Habilitado
+
+<Tip>
+Las miniaturas mejoran la velocidad de carga del sitio. Recomendamos mantener esta opción habilitada.
+</Tip>
+
+### Sincronizar Emprendimientos
+- **Opción:** `thi_sync_developments`
+- **Descripción:** Incluye proyectos inmobiliarios (desarrollos) en la sincronización
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+---
+
+## Configuración de Direcciones
+
+### Usar Dirección como Título de Propiedad
+- **Opción:** `thi_use_address_as_title`
+- **Descripción:** Usa la dirección completa como título principal de la propiedad en lugar de un título personalizado
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+### Ocultar Dirección de la Propiedad
+- **Opción:** `thi_hide_property_address`
+- **Descripción:** Oculta la dirección exacta en la vista pública (útil para propiedades con restricciones de privacidad)
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+<Warning>
+Si ocultas la dirección, los usuarios no podrán ver la ubicación exacta de la propiedad ni usarla en búsquedas geográficas.
+</Warning>
+
+### Habilitar Mapa por Defecto
+- **Opción:** `thi_default_map_enabled`
+- **Descripción:** Muestra el mapa de ubicación por defecto cuando se carga una propiedad
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Habilitado
+
+---
+
+## URLs y Redirecciones
+
+### URL Secundaria Habilitada
+- **Opción:** `thi_enable_secondary_url`
+- **Descripción:** Permite que las propiedades tengan una URL secundaria además de la principal
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+### Redirigir a Tokko Broker
+- **Opción:** `thi_enable_tokko_broker_url`
+- **Descripción:** Redirige a los usuarios al anuncio original en Tokko Broker cuando hacen clic en un enlace específico
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+---
+
+## Agentes
+
+### Sincronizar Información de Agentes
+- **Opción:** `thi_enable_agent_sync`
+- **Descripción:** Sincroniza automáticamente los datos de agentes desde Tokko Broker
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+### Descargar Imágenes de Agentes
+- **Opción:** `thi_download_agent_images`
+- **Descripción:** Descarga y almacena automáticamente las fotos de perfil de los agentes
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+### WhatsApp para Móvil del Agente
+- **Opción:** `thi_agent_mobile_is_whatsapp`
+- **Descripción:** Trata el número móvil del agente como un contacto de WhatsApp
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+<Info>
+Habilita esta opción si tus agentes usan WhatsApp para comunicarse con clientes.
+</Info>
+
+### Auto-asignar Agente
+- **Opción:** `thi_auto_assign_agent_id`
+- **Descripción:** Asigna automáticamente un agente predeterminado a todas las nuevas propiedades sincronizadas
+- **Valor:** ID del agente (número entero)
+- **Valor por defecto:** Vacío (sin asignación automática)
+
+<Tip>
+Obtén el ID del agente desde tu panel de Tokko Broker.
+</Tip>
+
+---
+
+## Integración de Contactos
+
+### Habilitar Integración de Contactos con CRM
+- **Opción:** `thi_enable_contact_integration`
+- **Descripción:** Los contactos generados en el sitio se envían automáticamente a tu CRM de Tokko Broker
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+<Warning>
+Asegúrate de que tu API Key tenga permisos para crear contactos en Tokko Broker antes de habilitar esta opción.
+</Warning>
+
+---
+
+## Búsqueda Mejorada
+
+### Habilitar Búsqueda Mejorada
+- **Opción:** `thi_enhanced_search_enabled`
+- **Descripción:** Activa un motor de búsqueda avanzado con filtros más precisos
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+### Campos de Búsqueda Mejorada
+- **Opción:** `thi_enhanced_search_fields`
+- **Descripción:** Define qué campos de propiedad aparecen en la búsqueda mejorada
+- **Valores:** Array de campos disponibles
+- **Campos comunes:**
+  - `bedrooms` - Dormitorios
+  - `bathrooms` - Baños
+  - `rooms` - Ambientes
+  - `price` - Precio
+  - `property_type` - Tipo de propiedad
+  - `property_status` - Estado
+
+---
+
+## Control Deslizante de Rango de Antigüedad
+
+### Color del Control Deslizante
+- **Opción:** `thi_age_range_slider_color`
+- **Descripción:** Personaliza el color del control deslizante de antigüedad
+- **Valor:** Código hexadecimal de color
+- **Valor por defecto:** `#007bff` (azul)
+
+### Etiqueta del Control Deslizante
+- **Opción:** `thi_age_range_slider_label`
+- **Descripción:** Texto personalizado para la etiqueta del control deslizante
+- **Valor:** Texto libre
+- **Valor por defecto:** "Años de Antigüedad"
+
+### Mapa Dividido en el Control Deslizante
+- **Opción:** `thi_age_range_slider_half_map_enabled`
+- **Descripción:** Muestra el mapa dividido (split view) cuando se usa el control deslizante
+- **Valores:** Habilitado / Deshabilitado
+- **Valor por defecto:** Deshabilitado
+
+<Info>
+El mapa dividido permite al usuario comparar propiedades de diferentes antigüedades lado a lado.
+</Info>
+
+---
+
+## Consejos de Configuración
+
+<Steps>
+  <Step title="Comienza con valores por defecto">
+    La mayoría de las opciones tienen valores recomendados que funcionan bien para la mayoría de sitios.
+  </Step>
+  <Step title="Prueba cambios en un entorno de prueba">
+    Realiza cambios en un servidor de desarrollo antes de aplicarlos a producción.
+  </Step>
+  <Step title="Monitorea el rendimiento">
+    Después de cambiar la frecuencia de sincronización, verifica el uso de recursos de tu servidor.
+  </Step>
+  <Step title="Revisa los reportes de sincronización">
+    Consulta regularmente los reportes para asegurarte de que todo funciona correctamente.
+  </Step>
+</Steps>
+
+---
+
+## Límites por Plan
+
+| Función | Plan Gratis | Plan Premium |
+|---------|-----------|------------|
+| Propiedades máximas | 100 | Ilimitadas |
+| Desarrollos máximos | 2 | Ilimitados |
+| Sincronización automática | Diaria | Cada hora |
+| Integraciones de contactos | Limitadas | Ilimitadas |
+
+<Tip>
+Consulta nuestro [plan de precios](https://tokkoplugins.com/pricing) para más detalles sobre las diferencias entre planes.
+</Tip>

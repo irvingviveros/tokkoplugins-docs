@@ -1,0 +1,498 @@
+---
+title: "Búsqueda Avanzada"
+description: "Mejoras en la búsqueda de propiedades: multi-campo, slider de edad y multi-select"
+---
+
+# Búsqueda Avanzada
+
+Tokko Plugins mejora significativamente el sistema de búsqueda de Houzez con filtros avanzados, búsqueda por múltiples campos y controles intuitivos para una mejor experiencia del usuario.
+
+## Búsqueda Mejorada por Palabra Clave
+
+### Habilitar Búsqueda Mejorada
+
+**Opción:** `thi_enhanced_search_enabled`
+
+```php
+// Habilitada:
+// - Búsqueda en múltiples campos
+// - Lógica OR (cualquiera coincide)
+// - Incluye referencias internas
+
+// Deshabilitada (por defecto):
+// - Solo búsqueda estándar de Houzez
+// - Solo título de propiedad
+```
+
+La búsqueda mejorada reemplaza el sistema estándar de Houzez de manera transparente.
+
+<Tip>
+La búsqueda mejorada es más potente pero consume ligeramente más recursos. En sitios con +5000 propiedades, considera activarla solo en horarios de bajo tráfico.
+</Tip>
+
+### Campos Buscables
+
+**Opción:** `thi_enhanced_search_fields`
+
+Configura qué campos se buscan:
+
+```php
+// Campos disponibles:
+✓ post_title          // Título de propiedad
+✓ fave_property_address   // Dirección completa
+✓ fave_property_id    // ID de Tokko
+✓ fave_reference_code // Código de referencia
+✓ postal_code         // Código postal
+✓ city                // Ciudad
+✓ state               // Provincia/Estado
+✓ country             // País
+✓ post_content        // Descripción completa
+```
+
+### Seleccionar Campos
+
+<Steps>
+  <Step title="Accede a Configuración">
+    WordPress > Tokko Plugins > Configuración
+  </Step>
+  <Step title="Busca Búsqueda Avanzada">
+    Desplázate hasta "Búsqueda Mejorada"
+  </Step>
+  <Step title="Marca Campos">
+    Selecciona los campos a buscar
+  </Step>
+  <Step title="Guarda">
+    Haz clic en "Guardar cambios"
+  </Step>
+</Steps>
+
+```php
+// Configuración recomendada:
+thi_enhanced_search_fields = [
+  'post_title',
+  'fave_property_address',
+  'city',
+  'postal_code'
+];
+```
+
+### Lógica de Búsqueda
+
+La búsqueda usa lógica **OR** (cualquiera coincide):
+
+```
+Búsqueda: "3 ambientes recoleta"
+
+Resultados:
+✓ Propiedades con "3 ambientes"
+✓ Propiedades en "Recoleta"
+✓ Propiedades con ambas características
+
+(No requiere TODAS las palabras)
+```
+
+Esto es más intuitivo que buscar coincidencias exactas.
+
+### Integración con Houzez
+
+El plugin intercepta automáticamente:
+
+```php
+// Hook de Houzez:
+add_filter('fave_property_search_query',
+  'thi_enhance_search_query');
+
+// Modifica el query para incluir múltiples campos
+// Sin afectar el funcionamiento de Houzez
+```
+
+## Slider de Rango de Edad
+
+### ¿Qué es Edad de Propiedad?
+
+La edad se calcula desde el año de construcción:
+
+```
+Edad = Año actual - Año construcción
+
+Ejemplos:
+- Construcción 2020 → Edad 4 años
+- Construcción 2024 → Edad 0 años ("A estrenar")
+- En construcción → Edad -1 años
+```
+
+### Habilitar Slider de Edad
+
+**Clase:** `THI_Age_Range_Slider`
+
+```php
+// Crea automáticamente un slider visual
+// Permite filtrar por rango de edad
+// Se integra con Houzez Search
+```
+
+### Configuración Visual
+
+**Opción:** `thi_age_range_slider_color`
+
+```
+Cambia el color del slider según tu diseño:
+- Default: #007bff (azul)
+- Personalizado: #FF6B6B (rojo) u otro color
+
+Formato: código hex (#RRGGBB)
+```
+
+**Opción:** `thi_age_range_slider_label`
+
+```php
+// Cambiar etiqueta del slider:
+thi_age_range_slider_label = "Antigüedad"
+thi_age_range_slider_label = "Edad de construcción"
+thi_age_range_slider_label = "Años desde construcción"
+```
+
+### Valores Especiales
+
+El slider reconoce valores especiales:
+
+| Valor | Significado |
+|-------|------------|
+| 0 | A estrenar (sin uso anterior) |
+| -1 | En construcción (no completada) |
+| 1-100 | Años desde construcción |
+
+### Integración Media Mapa
+
+**Opción:** `thi_age_range_slider_half_map_enabled`
+
+```php
+// Habilitada:
+// El slider aparece DENTRO de la búsqueda
+// mismo donde Houzez muestra el mapa
+// (solo en vista de media mapa)
+
+// Deshabilitada:
+// Slider en barra de búsqueda superior
+// Disponible en todas las vistas
+```
+
+<Tip>
+Activa "half_map" si usas el tema Houzez con búsqueda de media mapa. El slider se verá mejor integrado.
+</Tip>
+
+### Frontend: Usar el Slider
+
+```php
+// Shortcode:
+[houzez_search_slider type="age"]
+
+// O automático:
+// Si habilitas THI_Age_Range_Slider,
+// aparece en todas las búsquedas Houzez
+```
+
+```html
+<!-- Ejemplo HTML generado -->
+<div class="age-range-slider">
+  <label>Antigüedad de propiedad</label>
+  <input type="range" min="-1" max="100" value="0,30">
+  <span>Entre a estrenar y 30 años</span>
+</div>
+```
+
+## Multi-Select de Cantidades
+
+### ¿Qué es Multi-Select?
+
+Convierte campos numéricos simples en selecciones múltiples:
+
+```
+Antes (Houzez estándar):
+Habitaciones: [ 3 ]      ← Solo 1 opción
+
+Después (con plugin):
+Habitaciones: [✓ 1] [✓ 2] [✓ 3] [✓ 4+]   ← Múltiples
+```
+
+### Clase de Implementación
+
+**Clase:** `THI_Quantity_Multiselect`
+
+```php
+// Convierte campos en checkboxes:
+add_filter('fave_rooms_filter',
+  array('THI_Quantity_Multiselect', 'render_multiselect'));
+
+add_filter('fave_bedrooms_filter',
+  array('THI_Quantity_Multiselect', 'render_multiselect'));
+
+add_filter('fave_bathrooms_filter',
+  array('THI_Quantity_Multiselect', 'render_multiselect'));
+
+add_filter('fave_garage_filter',
+  array('THI_Quantity_Multiselect', 'render_multiselect'));
+```
+
+### Campos Convertidos
+
+El plugin convierte automáticamente:
+
+| Campo | Descripción |
+|-------|------------|
+| Ambientes | Total de espacios |
+| Habitaciones | Dormitorios |
+| Baños | Baños y medios baños |
+| Garaje | Lugares de estacionamiento |
+
+### Ejemplo de Uso
+
+```html
+<!-- Antes -->
+<select name="property_rooms">
+  <option>1</option>
+  <option>2</option>
+  <option>3</option>
+</select>
+
+<!-- Después (con multi-select) -->
+<div class="property-rooms-filter">
+  <label>
+    <input type="checkbox" value="1"> 1 Ambiente
+  </label>
+  <label>
+    <input type="checkbox" value="2"> 2 Ambientes
+  </label>
+  <label>
+    <input type="checkbox" value="3"> 3 Ambientes
+  </label>
+  <label>
+    <input type="checkbox" value="4"> 4+ Ambientes
+  </label>
+</div>
+```
+
+### Beneficios
+
+✅ **Usuario selecciona múltiples opciones**
+✅ **Más intuitivo que dropdowns**
+✅ **Mejora conversión**
+✅ **Mejor UX en móviles**
+
+## Corrección de Búsqueda Numérica
+
+### Problema: Búsquedas Incompletas
+
+Sin esta corrección:
+
+```
+Usuario busca: "1"
+
+Coincidencias incorrectas:
+❌ Propiedades con ID 12345
+❌ Propiedades referencia 2134
+❌ Propiedades con 1 ambiente (correcto)
+❌ Propiedades con 10 ambientes (¿?)
+```
+
+### Solución: Búsqueda Exacta
+
+**Función:** `thi_fix_numeric_search()`
+
+```php
+// Filtra para que "1" SOLO encuentre:
+✓ 1 ambiente (exactamente)
+✓ Direcciones con "1"
+✓ Códigos con "1"
+
+// NO encuentra:
+❌ 12, 21, 100, 213, etc.
+```
+
+La búsqueda numérica se vuelve más precisa.
+
+<Tip>
+Esta corrección se aplica automáticamente cuando buscas números. No requiere configuración adicional.
+</Tip>
+
+### Cómo Funciona
+
+```php
+// Cuando usuario busca "1":
+1. Detecta que es búsqueda numérica
+2. Busca solo coincidencias exactas
+3. No aplica búsqueda parcial
+4. Retorna resultados más precisos
+```
+
+## Integración Completa
+
+### Flujo de Búsqueda
+
+```
+Usuario abre búsqueda
+    ↓
+Ve campos mejorados:
+- Keyword (múltiples campos)
+- Edad (slider)
+- Habitaciones (multi-select)
+- Baños (multi-select)
+    ↓
+Selecciona opciones
+    ↓
+Presiona "Buscar"
+    ↓
+Plugin procesa:
+- Keyword en todos los campos
+- Filtra por rango de edad
+- Filtra por múltiples cantidades
+    ↓
+Muestra resultados
+```
+
+### Compatibilidad
+
+✅ **Compatible con:**
+- Houzez Search por defecto
+- Houzez + Elementor
+- Temas personalizados con Houzez hooks
+
+❌ **No compatible:**
+- Búsquedas de otros plugins
+- Mapas terceros sin hooks Houzez
+- Temas sin soporte Houzez
+
+## Configuración Recomendada
+
+### Para Máxima Funcionalidad
+
+```php
+// Habilita todas las mejoras:
+thi_enhanced_search_enabled = true
+thi_enhanced_search_fields = [
+  'post_title',
+  'fave_property_address',
+  'city',
+  'postal_code'
+]
+thi_age_range_slider_color = '#007bff'
+thi_age_range_slider_label = 'Antigüedad'
+thi_age_range_slider_half_map_enabled = true
+// Multi-select se habilita automáticamente
+```
+
+### Para Máxima Performance
+
+```php
+// Si tienes +10000 propiedades:
+thi_enhanced_search_enabled = false  // Usa búsqueda estándar
+thi_age_range_slider_half_map_enabled = false // No en half-map
+// Multi-select se habilita siempre (es ligero)
+```
+
+## Personalización Avanzada
+
+### Modificar Campos Buscables
+
+```php
+// En functions.php del tema:
+add_filter('thi_enhanced_search_fields', function($fields) {
+  $fields[] = 'fave_property_type';  // Agregar tipo
+  $fields[] = 'custom_meta_field';   // Campo personalizado
+  return $fields;
+});
+```
+
+### Cambiar Color del Slider
+
+```php
+// En functions.php:
+add_filter('thi_age_slider_color', function() {
+  return '#FF6B6B';  // Color rojo personalizado
+});
+```
+
+### Customizar HTML del Multi-Select
+
+```php
+// En functions.php:
+add_filter('thi_quantity_multiselect_html',
+  function($html, $field) {
+    // Modifica estructura HTML
+    return custom_render_checkboxes($field);
+  }, 10, 2
+);
+```
+
+## Solución de Problemas
+
+### Búsqueda Mejorada No Funciona
+
+<Steps>
+  <Step title="Verifica Habilitación">
+    Comprueba que `thi_enhanced_search_enabled = true`
+  </Step>
+  <Step title="Limpia Cache">
+    Si usas caché, limpia (W3 Total Cache, WP Super Cache)
+  </Step>
+  <Step title="Verifica Houzez">
+    Asegúrate que Houzez está activo y versión actualizada
+  </Step>
+  <Step title="Prueba en Incógnito">
+    Abre navegador privado para evitar cache del navegador
+  </Step>
+</Steps>
+
+### Slider No Aparece
+
+```php
+// Verifica:
+1. thi_age_range_slider_color tiene valor válido
+2. No hay conflicto con otros sliders (jQuery)
+3. Half-map está habilitado si usas esa vista
+4. Houzez Search está en la página
+```
+
+### Multi-Select No Funciona
+
+```php
+// Posibles causas:
+1. Houzez versión antigua (actualiza)
+2. JavaScript conflictivo (otro plugin)
+3. CSS que esconde checkboxes
+
+// Solución:
+Desactiva otros plugins de búsqueda
+Verifica consola JS (F12) para errores
+```
+
+### Búsquedas Numérica Lenta
+
+```php
+// Si muchas propiedades con números:
+1. Considera desactivar búsqueda mejorada
+2. Usa búsqueda estándar de Houzez
+3. Implementa caché de búsquedas frecuentes
+```
+
+## Análisis de Búsquedas
+
+### Ver Términos Más Buscados
+
+En WordPress > Tokko Plugins > Dashboard:
+
+```
+Búsquedas más frecuentes:
+1. "departamento 3 ambientes" - 1,234 búsquedas
+2. "casa zona norte" - 892 búsquedas
+3. "oficina centro" - 456 búsquedas
+```
+
+Usa esta información para:
+- Mejorar descripción de propiedades
+- Destacar ubicaciones populares
+- Ajustar precios según demanda
+
+---
+
+**Próximos pasos:** Aprende sobre [Dashboard](./dashboard) para monitorear sincronización y estadísticas de tu sitio.

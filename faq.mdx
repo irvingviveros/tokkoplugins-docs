@@ -1,0 +1,440 @@
+---
+title: "Preguntas Frecuentes"
+description: "Respuestas a las preguntas más comunes sobre Tokko Plugins"
+icon: "circle-question"
+---
+
+import { Accordion, AccordionItem } from "@mintlify/components";
+
+Encuentra respuestas a las preguntas más frecuentes sobre el plugin Tokko Plugins - TokkoBroker Integration Professional.
+
+## General
+
+<Accordion>
+  <AccordionItem title="¿Qué es Tokko Plugins y qué hace?">
+    Tokko Plugins es un plugin profesional de WordPress que integra tu sitio inmobiliario con **Tokko Broker**, la plataforma CRM y gestión inmobiliaria. Sincroniza automáticamente propiedades, desarrollos, agentes y datos relacionados desde Tokko Broker a tu sitio WordPress con tema Houzez.
+
+    **Funcionalidades principales:**
+    - Sincronización automática de propiedades
+    - Sincronización de desarrollos (emprendimientos)
+    - Descarga de imágenes y galerías
+    - Busqueda avanzada multi-campo
+    - Envío de leads al CRM Tokko
+    - Gestión de agentes
+    - Auto-archivado de propiedades inactivas
+    - URLs personalizadas
+    - Dashboard completo con reportes
+  </AccordionItem>
+
+  <AccordionItem title="¿Es un plugin oficial de Tokko Broker?">
+    No, Tokko Plugins es un plugin **no oficial** desarrollado por Irving Viveros. Sin embargo, funciona perfectamente con la API oficial de Tokko Broker y es completamente seguro de usar.
+
+    El plugin utiliza las credenciales y API oficial de Tokko Broker para sincronizar datos, pero es un producto independiente.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo usar este plugin sin el tema Houzez?">
+    No, este plugin **requiere obligatoriamente** que tengas el tema Houzez activo en tu WordPress. Tokko Plugins fue diseñado específicamente para integrarse con la arquitectura y funcionalidades de Houzez.
+
+    Si no tienes Houzez, deberás adquirirlo primero antes de usar Tokko Plugins.
+  </AccordionItem>
+
+  <AccordionItem title="¿Cuáles son los requisitos técnicos mínimos?">
+    - **WordPress:** 6.0 o superior
+    - **PHP:** 8.0 o superior
+    - **Tema:** Houzez activo (obligatorio)
+    - **Extensiones PHP:** cURL
+    - **Servidor:** 256MB de memoria RAM mínimo
+    - **Conexión:** HTTPS habilitado
+
+    Verifica estos requisitos en **Tokko Plugins > Estado del Sistema**.
+  </AccordionItem>
+
+  <AccordionItem title="¿Cómo obtengo una API Key de Tokko Broker?">
+    **Pasos:**
+    1. Inicia sesión en tu cuenta Tokko Broker
+    2. Ve a **Configuración > Integraciones**
+    3. Busca la sección **API Keys** o **Webhooks**
+    4. Crea una nueva API Key (o copia la existente)
+    5. Copia la clave completa (asegúrate de no dejar espacios)
+    6. Pega en **Tokko Plugins > Configuración > Credenciales**
+
+    Si no encuentras la sección de API, contacta con soporte Tokko Broker - requiere que tu cuenta tenga permisos de administrador.
+  </AccordionItem>
+</Accordion>
+
+## Sincronización
+
+<Accordion>
+  <AccordionItem title="¿Con qué frecuencia se sincroniza automáticamente?">
+    Por defecto, la sincronización se ejecuta **cada 5 minutos** mediante WP-Cron. El plugin verifica si hay nuevas propiedades o cambios en Tokko Broker.
+
+    Puedes ajustar la frecuencia en **Configuración > Avanzado** según tus necesidades. También puedes iniciar una sincronización manual en cualquier momento.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo sincronizar manualmente en cualquier momento?">
+    Sí, puedes iniciar una sincronización manual cuando lo desees:
+    1. Ve a **Tokko Plugins > Sincronizar**
+    2. Haz clic en **Iniciar Sincronización**
+    3. Monitorea el progreso en tiempo real
+
+    La primera sincronización puede tardar más tiempo dependiendo del número de propiedades.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué sucede con las propiedades eliminadas en Tokko Broker?">
+    Las propiedades eliminadas se **auto-archivan** automáticamente en tu sitio WordPress. No se eliminan físicamente de la base de datos, sino que se marcan como archivadas.
+
+    **Beneficios:**
+    - Se conservan los datos históricos
+    - No pierdes información si la propiedad se reactiva
+    - Las propiedades archivadas no aparecen en búsquedas por defecto
+    - Puedes deshabilitar esta función en **Configuración**
+
+    Puedes restaurar propiedades archivadas si vuelven a Tokko Broker.
+  </AccordionItem>
+
+  <AccordionItem title="¿Se sincronizan imágenes y tours virtuales?">
+    **Imágenes:** Sí, se descargan automáticamente en lotes de 10 imágenes. Se genera una galería con miniaturas.
+
+    **Vídeos:** Se incrustan desde Tokko Broker (si están disponibles en la API).
+
+    **Tours Virtuales (360°):** Sí, si están configurados en Tokko Broker y tienen URL pública.
+
+    La descarga de imágenes puede deshabilitarse en **Configuración > Avanzado** si prefieres optimizar el servidor.
+  </AccordionItem>
+
+  <AccordionItem title="¿Cuántas propiedades puedo sincronizar según el plan?">
+    - **Plan Starter (Gratis):** Hasta **100 propiedades**
+    - **Plan Professional ($9.99/mes):** **Ilimitadas**
+    - **Plan PRO+ ($299.99 de una sola vez):** **Ilimitadas**
+
+    Si alcanzas el límite de tu plan, las propiedades nuevas no se sincronizarán hasta que upgraes tu plan.
+  </AccordionItem>
+
+  <AccordionItem title="¿Cuánto tarda la primera sincronización?">
+    La duración depende de:
+    - **Número de propiedades:** 5-10 segundos por propiedad en promedio
+    - **Cantidad de imágenes:** Descarga en lotes de 10
+    - **Recursos del servidor:** Memoria y CPU disponibles
+    - **Conexión a Internet:** Velocidad de descarga
+
+    **Ejemplo:** 50 propiedades con 20 imágenes cada una pueden tardar 15-30 minutos en completarse.
+
+    Puedes cancelar o pausar la sincronización en cualquier momento.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué es 'Sincronización Inteligente'?">
+    La **Sincronización Inteligente** es una característica que solo procesa propiedades que han cambiado desde la última sincronización.
+
+    **Cómo funciona:**
+    - El plugin registra timestamps de cambios en la tabla `wp_thi_property_timestamps`
+    - En cada sincronización, compara el timestamp de Tokko Broker con el almacenado
+    - Solo descarga propiedades modificadas
+
+    **Ventajas:**
+    - Sincronizaciones mucho más rápidas
+    - Menor consumo de ancho de banda
+    - Menos carga en el servidor
+    - Ideal para sitios con muchas propiedades
+
+    Está habilitada por defecto en v3.0.0+.
+  </AccordionItem>
+</Accordion>
+
+## Características
+
+<Accordion>
+  <AccordionItem title="¿Puedo enviar leads directamente a Tokko Broker CRM?">
+    Sí, pero **solo en los planes Premium y PRO+**. El plan Starter no incluye esta funcionalidad.
+
+    **Cómo funciona:**
+    1. Los visitantes completan el formulario de contacto en una propiedad
+    2. Los datos se envían automáticamente al CRM Tokko Broker
+    3. Aparecen en tus leads en Tokko como nuevo contacto
+    4. Puedes hacer seguimiento automático
+
+    **Plan Starter:** Los formularios se guardan en WordPress solamente (sin envío a Tokko).
+  </AccordionItem>
+
+  <AccordionItem title="¿Soporta múltiples monedas?">
+    Sí, el plugin detecta y sincroniza automáticamente la moneda de cada propiedad en Tokko Broker. Houzez maneja la visualización de múltiples monedas en el sitio.
+
+    Verifica la configuración de monedas en **Houzez > Monedas** para asegurar que todas las divisas estén registradas.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo personalizar los campos de búsqueda?">
+    Sí, el plugin incluye búsqueda avanzada **multi-campo**:
+    - Búsqueda por palabra clave
+    - Filtros por tipo de propiedad
+    - Rango de precios ajustable
+    - Rango de edad de la propiedad (slider)
+    - Selección múltiple de cantidad (cuartos, baños, etc.)
+    - Ubicación y proximidad
+
+    Estos filtros se pueden activar/desactivar y personalizar según tus necesidades en **Configuración > Búsqueda**.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo ocultar las direcciones de las propiedades?">
+    Sí, es una opción de privacidad que puedes habilitar:
+    1. Ve a **Tokko Plugins > Configuración > Privacidad**
+    2. Activa **Ocultar direcciones exactas**
+    3. Las propiedades mostrarán solo la ciudad/región, no la dirección completa
+
+    Esto es útil para propiedades de lujo o cuando el propietario lo solicita.
+  </AccordionItem>
+
+  <AccordionItem title="¿Es compatible con Elementor?">
+    Sí, Tokko Plugins es compatible con sitios construidos con Elementor. Funciona perfectamente con los widgets de Houzez que se integran en Elementor.
+
+    Puedes usar:
+    - Widget de búsqueda de propiedades
+    - Widget de galería de propiedades
+    - Widget de agentes
+    - Embeds de propiedades
+
+    Houzez proporciona estos widgets nativamente.
+  </AccordionItem>
+
+  <AccordionItem title="¿Soporta WPML (traducción multi-idioma)?">
+    Parcialmente. El plugin es compatible con WPML de forma limitada:
+    - Los campos de Tokko Broker se sincronizan correctamente
+    - Los campos personalizados se registran para traducción en WPML
+    - Los títulos y descripciones pueden traducirse en WPML
+
+    **Limitación:** Las imágenes y metadatos no se traducen automáticamente (solo los textos).
+
+    Para mejor compatibilidad, configura las traducciones manualmente o usa un plugin adicional de traducción automática.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo auto-asignar agentes a nuevas propiedades?">
+    Sí, a partir de v3.0.0 esta característica está disponible:
+    1. Ve a **Tokko Plugins > Configuración > Agentes**
+    2. Habilita **Auto-asignar agentes**
+    3. Selecciona los agentes y criterios (por región, tipo de propiedad, etc.)
+    4. Las nuevas propiedades se asignarán automáticamente
+
+    Esto es útil para distribuir la carga de trabajo automáticamente.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué es un 'Desarrollo' (Emprendimiento)?">
+    Los Desarrollos son proyectos inmobiliarios grandes que pueden incluir múltiples propiedades o lotes. Tokko Broker los gestiona como entidades separadas.
+
+    **Tokko Plugins soporta:**
+    - Sincronización de desarrollos como custom post type
+    - Galería de imágenes del desarrollo
+    - Descripción y detalles del proyecto
+    - Listado de lotes/unidades dentro del desarrollo
+    - Asociación con agentes responsables
+
+    La sincronización de desarrollos está disponible en todos los planes.
+  </AccordionItem>
+</Accordion>
+
+## Precios
+
+<Accordion>
+  <AccordionItem title="¿Existe una versión gratuita del plugin?">
+    Sí, **Tokko Plugins Starter** es completamente gratis e incluye:
+    - Sincronización de hasta 100 propiedades
+    - Sincronización de hasta 2 desarrollos
+    - Sincronización de agentes
+    - Auto-archivado de propiedades
+    - URLs personalizadas
+    - Mapas y geolocalización
+    - Búsqueda básica
+
+    No requiere tarjeta de crédito para empezar. Es perfecto para agentes y oficinas pequeñas.
+  </AccordionItem>
+
+  <AccordionItem title="¿Puedo cambiar entre planes (upgrade/downgrade)?">
+    Sí, puedes cambiar de plan en cualquier momento desde tu cuenta WordPress:
+    1. Ve a **Tokko Plugins > Suscripción**
+    2. Selecciona el nuevo plan
+    3. Completa el pago (si es un upgrade)
+    4. Los cambios se aplican inmediatamente
+
+    **Downgrade:** Puedes reducir el plan, pero puede afectar funcionalidades (ej: reducir a 100 propiedades si tienes más).
+  </AccordionItem>
+
+  <AccordionItem title="¿Hay prueba gratuita disponible?">
+    Sí, el plugin ofrece una **prueba de 14 días** para los planes Premium y PRO+:
+    - Acceso completo a todas las características
+    - Requiere una **tarjeta de pago válida** (no se realiza cargo inicial)
+    - Después de 14 días, se cobra automáticamente o se baja a Starter
+    - Puedes cancelar en cualquier momento
+
+    La prueba está gestionada por **Freemius** (sistema de licencias oficial).
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué métodos de pago aceptan?">
+    Tokko Plugins utiliza **Freemius** para gestionar pagos. Los métodos aceptados incluyen:
+    - Tarjetas de crédito (Visa, Mastercard, American Express)
+    - PayPal
+    - Stripe
+    - Métodos regionales según tu ubicación
+
+    Todos los pagos son seguros y encriptados. Tus datos financieros se procesar a través de Freemius.
+  </AccordionItem>
+
+  <AccordionItem title="¿Cuál es la diferencia entre Professional y PRO+?">
+    **Plan Professional ($9.99/mes o $94.99/año):**
+    - Propiedades ilimitadas
+    - Envío de leads a Tokko CRM
+    - Email support (máximo 2 días de respuesta)
+    - Todos los features del Starter
+
+    **Plan PRO+ ($299.99 de una sola vez - Lifetime):**
+    - TODO lo de Professional
+    - **Soporte prioritario** (respuesta en horas, no días)
+    - **Acceso anticipado** a nuevas características
+    - **Consultoría con especialista Houzez** incluida
+    - **Descuentos** en futuros addons y extensiones
+    - Una sola compra: uso de por vida
+
+    PRO+ es ideal si quieres soporte premium y planeas usar el plugin a largo plazo.
+  </AccordionItem>
+
+  <AccordionItem title="¿Hay diferencia en el precio mensual vs anual?">
+    Sí, hay un descuento al pagar anualmente:
+    - **Plan Professional Mensual:** $9.99/mes = $119.88/año
+    - **Plan Professional Anual:** $94.99/año = **ahorro de $24.89 (21%)**
+
+    El plan anual es más económico si usas el plugin durante todo el año.
+  </AccordionItem>
+
+  <AccordionItem title="¿Hay garantía de reembolso?">
+    Sí, Freemius (nuestro procesador de pagos) ofrece una **garantía estándar de 14 días**.
+
+    Si el plugin no cumple tus expectativas durante los primeros 14 días:
+    1. Ve a **Tokko Plugins > Suscripción**
+    2. Solicita un reembolso
+    3. Se procesará automáticamente sin preguntas
+    4. Tu acceso se desactivará después del reembolso
+
+    Los reembolsos se devuelven al mismo método de pago original.
+  </AccordionItem>
+</Accordion>
+
+## Técnico
+
+<Accordion>
+  <AccordionItem title="¿El plugin crea custom post types?">
+    No, Tokko Plugins **no crea custom post types**. En su lugar, utiliza el post type **'property'** (propiedad) que ya es nativo del tema Houzez.
+
+    Esto significa:
+    - Las propiedades se integran perfectamente con Houzez
+    - Todas las funciones de Houzez funcionan sin modificaciones
+    - El plugin es ligero y no contamina la base de datos
+
+    Los desarrollos se crean como un custom post type separado si es necesario.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué tablas de base de datos crea el plugin?">
+    El plugin crea/utiliza muy pocas tablas:
+
+    - **wp_thi_property_timestamps:** Almacena timestamps de cambios para Sincronización Inteligente
+    - Opciones en **wp_options:** Configuración y estado del plugin
+
+    Esto mantiene la base de datos limpia y eficiente. Las propiedades se guardan como posts de WordPress estándar.
+  </AccordionItem>
+
+  <AccordionItem title="¿Es compatible con plugins de caché?">
+    Sí, es totalmente compatible con plugins de caché populares:
+    - **WP Super Cache**
+    - **W3 Total Cache**
+    - **LiteSpeed Cache**
+    - **WP Rocket**
+    - **Cache Enabler**
+
+    El plugin es diseñado para trabajar con caché. Las propiedades se cachean correctamente y los formularios de contacto se actualizan en tiempo real.
+
+    **Recomendación:** Excluye las URLs de sincronización de AJAX del caché para mejor rendimiento.
+  </AccordionItem>
+
+  <AccordionItem title="¿Funciona en hosting compartido?">
+    **Sí, generalmente sí**, pero depende del proveedor:
+
+    **Requisitos mínimos en hosting compartido:**
+    - PHP 8.0+
+    - 256MB de memoria
+    - Extensión cURL habilitada
+    - HTTPS
+    - Acceso a wp-cron o cron real del sistema
+
+    **Si el hosting no lo soporta:**
+    - Cambiar a un hosting mejor (recomendado)
+    - Usar un VPS o hosting administrado
+    - Contactar con el soporte del hosting
+
+    Muchos hosts baratos no cumplen con los requisitos mínimos.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué es el límite de circuito (Circuit Breaker)?">
+    El Circuit Breaker es un mecanismo de seguridad que pausa la sincronización si detecta demasiados errores:
+
+    **Cuándo se activa:**
+    - 5+ errores de API consecutivos
+    - 10+ errores de descarga de imágenes
+    - Recursos del servidor agotados
+
+    **Qué sucede:**
+    1. La sincronización se pausa automáticamente
+    2. El plugin espera 2 horas antes de reintentar
+    3. Recibe una notificación del problema
+    4. Puedes reintentar manualmente
+
+    Esto previene que el servidor se colapse por errores repetidos.
+  </AccordionItem>
+
+  <AccordionItem title="¿Debo hacer respaldo de la base de datos antes de usar el plugin?">
+    **Sí, es recomendable:**
+    1. Haz un respaldo completo de WordPress antes de instalar
+    2. Haz un respaldo antes de la primera sincronización
+    3. Mantén respaldos regulares (semanalmente)
+
+    Puedes usar plugins como:
+    - **UpdraftPlus**
+    - **BackWPup**
+    - **Jetpack Backup**
+    - **Backup by Backup**
+
+    El plugin no elimina datos, pero es buena práctica tener respaldos.
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué es Action Scheduler y por qué aparece en mi WordPress?">
+    **Action Scheduler** es una librería de WordPress que gestiona trabajos programados (como la sincronización).
+
+    Tokko Plugins la utiliza para:
+    - Programar sincronizaciones automáticas
+    - Procesar trabajos en segundo plano
+    - Garantizar que tareas se ejecuten incluso si WP-Cron falla
+
+    Es un estándar de la industria utilizado por WooCommerce, Jetpack y otros plugins principales. Es completamente seguro.
+
+    Puedes monitorear las tareas en **Herramientas > Action Scheduler** (WordPress 6.3+).
+  </AccordionItem>
+
+  <AccordionItem title="¿Qué ocurre si desactivo o elimino el plugin?">
+    **Desactivar:**
+    - Las propiedades permanecen en WordPress
+    - Las configuraciones se guardan
+    - Puedes reactivarlo sin problemas
+    - La sincronización se detiene
+
+    **Eliminar (Delete):**
+    - Las propiedades permanecen en WordPress
+    - Las configuraciones se eliminan
+    - Puedes reinstalar sin perder datos
+    - La tabla wp_thi_property_timestamps se elimina
+
+    **Importante:** Las propiedades NO se eliminan porque pertenecen a Houzez, no al plugin.
+  </AccordionItem>
+</Accordion>
+
+## Aún Tienes Preguntas
+
+Si tu pregunta no está respondida aquí, consulta:
+1. **Guía completa:** Ve a [Documentación Principal](/docs)
+2. **Solución de Problemas:** Ve a [Troubleshooting](/docs/troubleshooting)
+3. **Contacta Soporte:** En **Tokko Plugins > Soporte**
+   - Plan Professional: Email (máximo 2 días)
+   - Plan PRO+: Prioritario (respuesta en horas)

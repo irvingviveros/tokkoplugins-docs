@@ -1,0 +1,294 @@
+---
+title: "Conexión con Tokko Broker"
+description: "Cómo obtener y configurar tu API Key de Tokko Broker"
+---
+
+# Conexión con Tokko Broker
+
+La API Key es la credencial que permite que Tokko Plugins se comunique de forma segura con tu CRM de Tokko Broker. Sin ella, el plugin no puede sincronizar propiedades, agentes ni contactos.
+
+## Obtener tu API Key
+
+### Paso 1: Accede a Tokko Broker
+
+<Steps>
+  <Step title="Abre tu navegador">
+    Ve a la URL de tu cuenta de Tokko Broker (normalmente algo como `https://tuempresa.tokkobroker.com`)
+  </Step>
+  <Step title="Inicia sesión">
+    Ingresa con tus credenciales de administrador
+  </Step>
+</Steps>
+
+### Paso 2: Navega a la Sección de Integraciones
+
+<Steps>
+  <Step title="Abre el menú de administración">
+    En Tokko Broker, busca **Administración** o **Settings** (Configuración)
+  </Step>
+  <Step title="Selecciona Integraciones">
+    Dentro del menú de administración, busca la opción **Integraciones** o **API**
+  </Step>
+  <Step title="Encuentra las Claves de API">
+    Aquí deberás ver tus claves de API disponibles. Si no tienes ninguna, crea una nueva.
+  </Step>
+</Steps>
+
+### Paso 3: Copia tu API Key
+
+<Steps>
+  <Step title="Localiza tu clave activa">
+    Busca la clave que deseas usar (puede haber múltiples claves para diferentes propósitos)
+  </Step>
+  <Step title="Copia el valor">
+    Haz clic en el botón de copiar o selecciona manualmente el texto de la clave
+  </Step>
+  <Step title="Guarda en un lugar seguro">
+    Almacena la clave en un lugar seguro; la necesitarás para configurar el plugin
+  </Step>
+</Steps>
+
+<Warning>
+**Seguridad:** Nunca compartas tu API Key públicamente. Mantenla confidencial al igual que una contraseña.
+</Warning>
+
+---
+
+## Configurar la API Key en WordPress
+
+### Ingresa tu API Key
+
+<Steps>
+  <Step title="Accede al panel de WordPress">
+    Ingresa a la administración de tu sitio WordPress
+  </Step>
+  <Step title="Abre Tokko Plugins">
+    En el menú lateral, selecciona **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Busca el campo API Key">
+    En la sección **Configuración General**, encontrarás el campo **API Key de Tokko Broker**
+  </Step>
+  <Step title="Pega tu clave">
+    Haz clic en el campo y pega la API Key que copiaste de Tokko Broker
+  </Step>
+  <Step title="Guarda los cambios">
+    Haz clic en el botón **Guardar Configuración** o **Save Settings**
+  </Step>
+</Steps>
+
+---
+
+## Probar la Conexión
+
+Después de ingresar tu API Key, es importante verificar que la conexión funciona correctamente.
+
+### Ejecutar Prueba de Conexión
+
+<Steps>
+  <Step title="Ubica el botón de prueba">
+    En la sección de API Key, encontrarás un botón **Probar Conexión** o **Test Connection**
+  </Step>
+  <Step title="Haz clic en el botón">
+    El sistema intentará conectarse a Tokko Broker usando tu clave
+  </Step>
+  <Step title="Espera el resultado">
+    Verás un mensaje indicando si la conexión fue exitosa o si hubo un error
+  </Step>
+</Steps>
+
+### Resultado Exitoso
+
+Si la conexión es exitosa, verás un mensaje verde similar a:
+
+```
+✓ Conexión exitosa con Tokko Broker
+Información de cuenta: Tu Empresa - Plan Premium
+Últimas propiedades sincronizadas: 245
+```
+
+<Info>
+Este mensaje confirma que:
+- Tu API Key es válida
+- El plugin puede comunicarse con Tokko Broker
+- Tu cuenta está activa y tiene permiso para acceder a los datos
+</Info>
+
+### Errores Comunes de Conexión
+
+#### Error: "API Key inválida"
+
+**Causa:** La clave ingresada no es reconocida por Tokko Broker.
+
+**Solución:**
+- Verifica que hayas copiado la clave completa sin espacios
+- Asegúrate de no haber agregado espacios al principio o al final
+- Vuelve a copiar la clave desde Tokko Broker
+- Intenta pegar en un editor de texto primero para verificar
+
+#### Error: "No autorizado (401)"
+
+**Causa:** La API Key existe pero no tiene permisos suficientes.
+
+**Solución:**
+- Verifica en Tokko Broker que la clave tenga permisos de lectura y escritura
+- Algunos permisos pueden estar deshabilitados (ej: solo lectura)
+- Contacta a tu administrador de Tokko Broker para aumentar los permisos
+- Crea una nueva clave con todos los permisos necesarios
+
+#### Error: "Servidor no encontrado"
+
+**Causa:** No se puede alcanzar el servidor de Tokko Broker.
+
+**Solución:**
+- Verifica tu conexión a internet
+- Asegúrate de que Tokko Broker no está en mantenimiento
+- Comprueba que no haya restricciones de firewall
+- Espera unos minutos e intenta de nuevo
+- Si persiste, contacta al soporte de Tokko Broker
+
+#### Error: "Límite de solicitudes excedido (429)"
+
+**Causa:** Has excedido el número de llamadas a la API permitidas.
+
+**Solución:**
+- Espera entre 5-15 minutos antes de intentar de nuevo
+- Reduce la frecuencia de sincronización automática
+- Evita hacer múltiples pruebas de conexión consecutivas
+- Consulta tus límites de API en Tokko Broker
+
+#### Error: "Conexión expirada (timeout)"
+
+**Causa:** La solicitud tardó demasiado en completarse.
+
+**Solución:**
+- Intenta más tarde (el servidor de Tokko Broker podría estar congestionado)
+- Verifica tu ancho de banda disponible
+- Revisa la salud de tu servidor WordPress
+- Si el problema persiste, aumenta el tiempo de espera en configuración
+
+---
+
+## Renovar o Cambiar tu API Key
+
+### Cuándo Renovar tu API Key
+
+Deberías renovar tu API Key en estos casos:
+
+- **Cambio de personal:** Si alguien que tenía acceso ya no trabaja contigo
+- **Suspicaz seguridad:** Si sospechas que la clave ha sido comprometida
+- **Política de seguridad:** Si tu empresa requiere rotación periódica de credenciales
+- **Migración de sistemas:** Cuando cambias de hosting o servidor
+
+### Pasos para Renovar
+
+<Steps>
+  <Step title="Genera una nueva clave en Tokko Broker">
+    En la sección de Integraciones de Tokko Broker, crea una nueva API Key
+  </Step>
+  <Step title="Actualiza en WordPress">
+    Reemplaza la clave antigua con la nueva en la configuración de Tokko Plugins
+  </Step>
+  <Step title="Prueba la conexión">
+    Verifica que la nueva clave funciona correctamente
+  </Step>
+  <Step title="Desactiva la clave antigua">
+    En Tokko Broker, desactiva o elimina la clave anterior
+  </Step>
+</Steps>
+
+<Warning>
+No desactives la clave antigua hasta confirmar que la nueva funciona correctamente. De lo contrario, perderás la sincronización de propiedades.
+</Warning>
+
+---
+
+## Permisos Necesarios de la API Key
+
+Tu API Key debe tener estos permisos habilitados en Tokko Broker:
+
+| Permiso | Descripción | Obligatorio |
+|---------|------------|-----------|
+| Lectura de Propiedades | Ver y sincronizar propiedades | Sí |
+| Lectura de Imágenes | Descargar fotos de propiedades | Sí |
+| Lectura de Agentes | Sincronizar información de agentes | No* |
+| Escritura de Contactos | Crear contactos desde el sitio | No* |
+| Lectura de Desarrollos | Sincronizar proyectos inmobiliarios | No* |
+
+**Los campos marcados como "No" son opcionales según tu configuración.*
+
+<Info>
+Si planeas usar funciones adicionales (agentes, contactos, desarrollos), asegúrate de que tu API Key tenga los permisos correspondientes.
+</Info>
+
+---
+
+## Seguridad y Mejores Prácticas
+
+### Protege tu API Key
+
+<Steps>
+  <Step title="Guarda en lugar seguro">
+    No almacenes la clave en archivos de texto sin encriptar o en correos electrónicos
+  </Step>
+  <Step title="Usa variables de entorno">
+    Para instalaciones avanzadas, considera usar archivo `.env` con variables de entorno
+  </Step>
+  <Step title="Limita el acceso">
+    Solo los administradores de WordPress deben acceder a la configuración del plugin
+  </Step>
+  <Step title="Monitorea el uso">
+    Revisa los logs de sincronización para detectar actividad inusual
+  </Step>
+</Steps>
+
+### Auditoría de API
+
+Tokko Broker mantiene un registro de todas las llamadas realizadas con tu API Key. Puedes revisar:
+
+- Número de solicitudes realizadas
+- Datos accedidos
+- Errores o intentos fallidos
+- Horarios de acceso
+
+Revisa estos registros regularmente para detectar accesos no autorizados.
+
+---
+
+## Solucionar Problemas Avanzados
+
+### Conexión funciona pero la sincronización falla
+
+Si la prueba de conexión es exitosa pero las propiedades no se sincronizan:
+
+1. Verifica que tu API Key tenga **permisos de lectura de propiedades**
+2. Comprueba que existan propiedades activas en Tokko Broker
+3. Revisa el log de sincronización para más detalles
+4. Intenta sincronizar manualmente desde el panel
+
+### Múltiples API Keys
+
+Si tienes varias API Keys en Tokko Broker:
+
+- Solo puedes usar una por vez en el plugin
+- Elige la que tenga todos los permisos necesarios
+- Si necesitas cambiar, actualiza en configuración e intenta de nuevo
+
+### Contactar al Soporte
+
+Si después de seguir estos pasos aún tienes problemas:
+
+<Steps>
+  <Step title="Reúne información">
+    Ten lista tu API Key (sin compartirla), el mensaje de error exacto y capturas de pantalla
+  </Step>
+  <Step title="Contacta a Tokko">
+    Dirígete a [soporte.tokkobroker.com](https://soporte.tokkobroker.com)
+  </Step>
+  <Step title="Proporciona detalles">
+    Describe qué intentabas hacer y qué error recibiste
+  </Step>
+</Steps>
+
+<Tip>
+Tener tu API Key configurada correctamente es el primer paso para que todo el plugin funcione. Si tienes dudas, no dudes en contactar al soporte.
+</Tip>

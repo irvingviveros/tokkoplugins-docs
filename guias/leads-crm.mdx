@@ -1,0 +1,472 @@
+---
+title: "Leads y CRM"
+description: "Envío automático de consultas desde Houzez hacia Tokko Broker CRM"
+---
+
+# Leads y CRM
+
+Tokko Plugins integra automáticamente los formularios de contacto de Houzez con el CRM de Tokko Broker, enviando cada consulta de propiedad directamente a tu sistema de gestión de clientes.
+
+## ¿Qué es la Integración de Leads?
+
+La integración de leads es una característica que envía automáticamente:
+
+✅ **Información del Cliente**
+- Nombre completo
+- Email
+- Teléfono
+- Mensaje
+
+✅ **Información de Propiedad**
+- ID de propiedad consultada
+- Tipo de propiedad
+- Ubicación
+- Precio
+
+✅ **Al Sistema**
+- Tokko Broker CRM
+- En tiempo real
+- Sin intervención manual
+
+## Requisitos
+
+### Plan de Suscripción
+
+<Warning>
+La integración de leads es **EXCLUSIVA DEL PLAN PREMIUM**. Se requiere una suscripción activa a Tokko Plugins Pro para usar esta característica.
+</Warning>
+
+### Configuración Requerida
+
+Antes de activar, asegúrate de tener:
+
+1. **WordPress con Houzez** instalado y activado
+2. **Tokko Plugins** versión 3.0.0+
+3. **API Key de Tokko Broker** con acceso a contactos (leads)
+4. **Formularios de contacto** en Houzez configurados
+
+## Habilitar la Integración
+
+### Paso 1: Accede a Configuración
+
+<Steps>
+  <Step title="Dashboard de WordPress">
+    Ve a WordPress > Tokko Plugins > Configuración
+  </Step>
+  <Step title="Busca Leads">
+    Desplázate hasta "Integración de Leads y CRM"
+  </Step>
+  <Step title="Habilita Integración">
+    Marca la opción `thi_enable_contact_integration`
+  </Step>
+</Steps>
+
+**Opción:** `thi_enable_contact_integration`
+
+```php
+// Habilitada:
+// - Cada formulario enviado se envía a Tokko CRM
+// - Se registra el envío en logs
+
+// Deshabilitada:
+// - Formularios funcionan solo en Houzez
+// - No se envían a Tokko Broker
+```
+
+### Paso 2: Guarda y Prueba
+
+<Steps>
+  <Step title="Guarda Cambios">
+    Haz clic en "Guardar cambios"
+  </Step>
+  <Step title="Ve a una Propiedad">
+    Abre una propiedad en el frontend
+  </Step>
+  <Step title="Completa el Formulario">
+    Rellena el formulario de contacto con datos de prueba
+  </Step>
+  <Step title="Envía">
+    Haz clic en enviar
+  </Step>
+  <Step title="Verifica en Tokko">
+    Ve a Tokko Broker > Contactos/Leads para confirmar
+  </Step>
+</Steps>
+
+## Cómo Funciona
+
+### Flujo de Datos
+
+```
+Usuario en WordPress
+         ↓
+    Completa formulario
+         ↓
+    Houzez form submission
+         ↓
+    Hook: houzez_after_agent_form_submission
+         ↓
+    Tokko_Contact_Integration
+         ↓
+    API Tokko: submitContact()
+         ↓
+    Tokko Broker CRM
+         ↓
+    Lead registrado
+```
+
+### Evento de WordPress
+
+El plugin se engancha en el evento de Houzez:
+
+```php
+add_action('houzez_after_agent_form_submission',
+  'thi_handle_contact_submission', 10, 3);
+
+// Parámetros:
+// $form_data - Datos del formulario
+// $property_id - ID de la propiedad
+// $agent_id - ID del agente (si aplica)
+```
+
+## Datos Enviados
+
+### Estructura del Lead
+
+Cuando un usuario envía el formulario, se envía:
+
+```php
+array(
+  'name' => 'Juan García',           // Nombre completo
+  'email' => 'juan@email.com',       // Email
+  'phone' => '+54 9 11 2345-6789',   // Teléfono
+  'message' => 'Consulta sobre...',  // Mensaje
+  'property_id' => '12345',          // ID Tokko
+  'property_title' => 'Depto 3am',   // Título
+  'property_price' => '250000',      // Precio
+  'property_type' => 'Departamento',  // Tipo
+  'property_location' => 'Buenos...',// Ubicación
+  'agent_id' => '789',               // Agent ID
+  'source' => 'website'              // Origen (siempre 'website')
+)
+```
+
+### Campos Opcionales
+
+```php
+// Se envían si están disponibles:
+'additional_phone' => '...',     // Teléfono alternativo
+'company' => '...',              // Empresa del cliente
+'address' => '...',              // Dirección del cliente
+'notes' => '...',                // Notas adicionales
+```
+
+## Clase de Integración
+
+### Tokko_Contact_Integration
+
+**Ubicación:** `includes/class-tokko-contact-integration.php`
+
+```php
+class Tokko_Contact_Integration {
+
+  /**
+   * Maneja el envío de formulario de Houzez
+   */
+  public static function handle_submission($form_data, $property_id, $agent_id) {
+    // Valida datos
+    // Prepara payload
+    // Envía a Tokko API
+    // Registra resultado
+  }
+
+  /**
+   * Envía el contacto a Tokko CRM
+   */
+  private static function send_to_tokko($contact_data) {
+    // Llama TokkoAPI::submitContact()
+    // Maneja errores
+    // Registra en logs
+  }
+}
+```
+
+### Método de API
+
+**Clase:** `TokkoAPI`
+**Método:** `submitContact()`
+
+```php
+/**
+ * Envía un nuevo contacto al CRM de Tokko
+ *
+ * @param array $contact_data Datos del contacto
+ * @return array Respuesta de API
+ */
+public static function submitContact($contact_data) {
+  $endpoint = '/crm/contact/create';
+
+  return self::make_request('POST', $endpoint, $contact_data);
+}
+```
+
+## Manejo de Errores
+
+### Fallos de Envío
+
+Si el envío a Tokko falla:
+
+```php
+// El plugin:
+1. Registra el error en logs
+2. Muestra mensaje al usuario
+3. Guarda el lead localmente (pendiente)
+4. Reintentos automáticos cada 5 minutos
+```
+
+<Note>
+Los leads pendientes se resuelven automáticamente cuando Tokko API vuelve a estar disponible. No se pierde información.
+</Note>
+
+### Verificar Logs
+
+Para ver qué ocurrió:
+
+```bash
+# Logs de WordPress
+tail -f /var/www/html/wp-content/debug.log | grep "contact_integration"
+
+# O accede a:
+# WordPress > Tokko Plugins > Dashboard > Historial de Errores
+```
+
+## Validación de Datos
+
+### Validaciones Automáticas
+
+El plugin valida antes de enviar:
+
+```php
+✓ Email tiene formato válido
+✓ Nombre no está vacío
+✓ Teléfono tiene formato válido (si se envía)
+✓ Property ID existe en WordPress
+✓ Mensaje no está vacío
+✓ No es spam detectado
+```
+
+### Sanitización
+
+Todos los datos se limpian antes de enviar:
+
+```php
+// Escapa caracteres especiales
+sanitize_text_field($name)
+sanitize_email($email)
+wp_kses_post($message)
+```
+
+Esto previene inyecciones y protege tu CRM.
+
+## Formularios de Contacto
+
+### Formularios Soportados
+
+El plugin funciona con:
+
+✅ **Houzez Built-in Forms**
+- Formulario de contacto de propiedad
+- Formulario de agente
+- Formulario de solicitud de información
+
+✅ **Houzez + Elementor**
+- Formularios generados con Elementor
+- Con hook de Houzez integrado
+
+### Configuración del Formulario
+
+En Houzez, asegúrate que:
+
+```
+☑ Mostrar formulario de contacto
+☑ Usar email de agente
+☑ Guardar en Houzez (WordPress)
+  + Enviar a Tokko (habilitado en Plugins)
+```
+
+## Reasignación de Leads
+
+### Asignar a Agente Diferente
+
+Si un lead debe ir a otro agente:
+
+```php
+// En el formulario de WordPress, puedes:
+1. Cambiar el field agent_id antes de enviar
+2. En Tokko CRM, reasignar después de recibir
+```
+
+<Note>
+La reasignación en Tokko CRM es recomendada ya que todos los leads quedan como "sin asignar" inicialmente.
+</Note>
+
+## Integración con Zapier
+
+### Conecta Otros Sistemas
+
+Además de Tokko, puedes enviar leads a:
+
+- Google Sheets (registro de contactos)
+- Slack (notificación inmediata)
+- Email (notificación al agente)
+- WhatsApp (mensaje automático)
+
+```php
+// Ejemplo: Envía a Slack también
+add_action('thi_contact_submitted', function($contact_data) {
+  send_to_slack_webhook($contact_data);
+});
+```
+
+## Estadísticas de Leads
+
+### Dashboard de Leads
+
+En WordPress > Tokko Plugins > Dashboard puedes ver:
+
+- Total de leads enviados (hoy/semana/mes)
+- Tasa de conversión
+- Agente con más leads
+- Propiedades más consultadas
+- Fuentes de contacto
+
+### Exportar Datos
+
+Exporta leads a CSV:
+
+```
+Dashboard > Leads > Exportar a CSV
+```
+
+Esto incluye todos los contactos enviados a Tokko.
+
+## Privacidad y GDPR
+
+### Consentimiento
+
+El plugin requiere que habilites una casilla de consentimiento:
+
+```html
+<input type="checkbox" required>
+Autorizo el tratamiento de mis datos personales
+```
+
+<Warning>
+Bajo GDPR y leyes de privacidad, DEBES solicitar consentimiento explícito antes de enviar datos. El plugin ayuda pero la responsabilidad es tuya.
+</Warning>
+
+### Datos Sensibles
+
+El plugin NO envía:
+- Contraseñas
+- Información bancaria
+- Datos de tarjeta de crédito
+
+### Derecho al Olvido
+
+Los usuarios pueden solicitar que se eliminen sus datos:
+
+```
+Proceso:
+1. Solicitud a tu sitio WordPress
+2. Elimina datos en WordPress
+3. Solicita eliminación en Tokko Broker manualmente
+```
+
+## Solución de Problemas
+
+### Los Leads No Se Envían
+
+<Steps>
+  <Step title="Verifica Habilitación">
+    Comprueba que `thi_enable_contact_integration` esté ON
+  </Step>
+  <Step title="Verifica API Key">
+    En Configuración > Tokko API, verifica la clave es válida
+  </Step>
+  <Step title="Revisa Logs">
+    Busca errores en WordPress Debug Log
+  </Step>
+  <Step title="Prueba Formulario">
+    Completa y envía el formulario en el frontend
+  </Step>
+</Steps>
+
+### Error "API Key No Válida"
+
+```php
+// Verifica:
+1. La API key está completa (sin espacios)
+2. Tiene permisos para "CRM" en Tokko
+3. No ha expirado en el panel de Tokko
+4. El usuario API tiene acceso a contactos
+```
+
+### Mensaje "Formulario No Enviado"
+
+```php
+// Posibles causas:
+1. Email inválido
+2. Teléfono con formato incorrecto
+3. Mensaje vacío
+4. Conexión a internet lenta/caída
+
+// Solución:
+Revisa el log de errores en Debug Log
+```
+
+### Leads Duplicados
+
+Si ves leads duplicados en Tokko:
+
+```php
+// Posibles causas:
+1. Usuario hizo clic varias veces en enviar
+2. Página se recargó durante envío
+3. Reintentos automáticos se activaron
+
+// Solución:
+Implementa validación de cliente-side en JavaScript
+para deshabilitar botón después de primer clic
+```
+
+## Mejores Prácticas
+
+### Optimización
+
+✅ **Haz:**
+- Mantén API key actualizada
+- Monitorea logs regularmente
+- Revisa leads en Tokko frecuentemente
+- Responde rápido a leads nuevos
+
+❌ **Evita:**
+- Cambiar API key sin avisar al plugin
+- Deshabilitar integración sin guardar leads
+- Datos incompletos en formularios
+- Ignorar errores por mucho tiempo
+
+### Comunicación
+
+```php
+// Después de enviar, muestra:
+"Gracias por tu consulta.
+ Nos contactaremos en breve."
+
+// NO:
+"Datos enviados al servidor"  // Demasiado técnico
+```
+
+---
+
+**Próximos pasos:** Aprende sobre [Búsqueda Avanzada](./busqueda-avanzada) para mejorar la experiencia de búsqueda de tus visitantes.

@@ -1,0 +1,369 @@
+---
+title: "Solución de Problemas"
+description: "Guía para resolver los problemas más comunes del plugin Tokko Plugins"
+icon: "wrench"
+---
+
+import { Accordion, AccordionItem } from "@mintlify/components";
+
+Esta guía te ayudará a diagnosticar y resolver los problemas más comunes que puedas encontrar al usar el plugin Tokko Plugins - TokkoBroker Integration Professional.
+
+## Problemas de Conexión
+
+<Accordion>
+  <AccordionItem title="API Key inválida o no funciona">
+    **Síntomas:** El plugin no puede conectarse con Tokko Broker, error de autenticación.
+
+    **Soluciones:**
+    1. Verifica que tu API Key sea correcta en **Tokko Plugins > Configuración > API**
+    2. Asegúrate de copiar la clave completa sin espacios adicionales
+    3. Verifica que la clave no haya sido revocada en tu cuenta Tokko Broker
+    4. Intenta regenerar la API Key desde el panel Tokko Broker
+    5. Limpia la caché del navegador y vuelve a intentar
+  </AccordionItem>
+
+  <AccordionItem title="Error de conexión con Tokko Broker (timeout, SSL)">
+    **Síntomas:** "Connection timeout", "SSL certificate error", "Unable to reach server"
+
+    **Soluciones:**
+    1. Verifica tu conexión a Internet
+    2. Comprueba que tu servidor pueda hacer solicitudes HTTPS salientes
+    3. Si el error persiste, contacta a tu proveedor de hosting para verificar:
+       - Que no haya restricciones de firewall
+       - Que los certificados SSL estén actualizados
+    4. Intenta desactivar temporalmente plugins de seguridad (WordPress firewall)
+    5. Verifica que el estado del servidor Tokko Broker no esté caído (verifica en status.tokko.com)
+  </AccordionItem>
+
+  <AccordionItem title="cURL extension not available">
+    **Síntomas:** Error "cURL is not installed" o similar en los logs.
+
+    **Soluciones:**
+    1. La extensión cURL es requerida por el plugin
+    2. Contacta a tu proveedor de hosting y solicita que instale la extensión PHP cURL
+    3. Alternativamente, usa wp_remote_get() si tu hosting lo permite
+    4. Verifica la versión de PHP (se requiere 8.0+)
+  </AccordionItem>
+</Accordion>
+
+## Problemas de Sincronización
+
+<Accordion>
+  <AccordionItem title="La sincronización no inicia">
+    **Síntomas:** El botón "Iniciar Sincronización" no responde, nada sucede.
+
+    **Checklist de diagnóstico:**
+    - [ ] ¿Está el tema Houzez activo? Verifica en **Apariencia > Temas**
+    - [ ] ¿Es válida la API Key? Prueba la conexión en **Configuración > Herramientas**
+    - [ ] ¿Está habilitado WP-Cron? Ejecuta `wp cron test` o verifica en **Tokko Plugins > Estado del Sistema**
+    - [ ] ¿Hay permisos suficientes en tu cuenta Tokko Broker?
+    - [ ] Desactiva plugins que conflictúen (cache, firewall, security)
+    - [ ] Revisa los logs en **Tokko Plugins > Historial de Errores**
+  </AccordionItem>
+
+  <AccordionItem title="La sincronización se detiene a mitad de camino">
+    **Síntomas:** El progreso se congela, la sincronización falla sin completarse.
+
+    **Causas posibles y soluciones:**
+    1. **Circuito de seguridad activado:** El plugin pausa la sincronización si detecta problemas
+       - Espera 2 horas para que se restablezca automáticamente
+       - O reinicia la sincronización manualmente
+
+    2. **Límite de memoria excedido:**
+       - Aumenta `memory_limit` en wp-config.php a 256MB o 512MB
+       - Reduce el tamaño del lote de propiedades a procesar
+
+    3. **Timeout de ejecución:**
+       - Aumenta `max_execution_time` en php.ini a 300 segundos o más
+       - Usa sincronización inteligente para procesar solo cambios recientes
+
+    4. **Recursos del servidor insuficientes:**
+       - Verifica el Estado del Sistema en el dashboard
+       - Revisa si hay alertas de memoria, CPU o disco
+  </AccordionItem>
+
+  <AccordionItem title="Las propiedades no aparecen después de sincronizar">
+    **Síntomas:** La sincronización se completa, pero las propiedades no aparecen en el sitio.
+
+    **Investigación:**
+    1. Verifica el Informe de Sincronización (**Tokko Plugins > Informes**)
+    2. Busca propiedades manualmente en **Propiedades > Todas las Propiedades**
+    3. Revisa el estado de publicación: ¿están en borrador, privadas o programadas?
+    4. Comprueba los filtros de búsqueda: algunos pueden estar ocultando las propiedades
+    5. Limpia la caché del sitio y del navegador
+    6. Revisa el Historial de Errores para mensajes específicos
+  </AccordionItem>
+
+  <AccordionItem title="Los datos mapeados son incorrectos">
+    **Síntomas:** Los campos de Tokko Broker no se mapean correctamente a Houzez.
+
+    **Soluciones:**
+    1. Verifica el mapeo de campos en **Tokko Plugins > Configuración > Mapeo de Campos**
+    2. Comprueba que los nombres de campos en Tokko Broker coincidan con los esperados
+    3. Si usas campos personalizados, asegúrate de que estén configurados en Houzez
+    4. Realiza una sincronización limpia (sincroniza solo 1 propiedad para probar)
+    5. Revisa los logs para errores específicos de mapeo
+  </AccordionItem>
+
+  <AccordionItem title="Error 'Sync already running'">
+    **Síntomas:** "La sincronización ya está en progreso", aunque no haya proceso activo.
+
+    **Soluciones rápidas:**
+    1. **Espera automática:** El sistema libera el bloqueo después de 2 horas
+    2. **Liberar bloqueo manual:** Ejecuta en la consola del navegador (DevTools):
+       ```javascript
+       fetch('/wp-admin/admin-ajax.php', {
+         method: 'POST',
+         credentials: 'include',
+         body: new FormData(Object.assign(document.createElement('form'), {
+           innerHTML: '<input name="action" value="thi_release_sync_lock">'
+         }))
+       }).then(r => r.json()).then(d => console.log(d));
+       ```
+    3. **Alternativa:** Accede a la base de datos y busca en `wp_options` una entrada con "thi_sync_lock", luego elimínala
+    4. Si persiste, revisa los logs de Action Scheduler en **Herramientas > Action Scheduler**
+  </AccordionItem>
+
+  <AccordionItem title="Error en la verificación de salud del servidor">
+    **Síntomas:** Alertas de "Memoria insuficiente", "CPU elevada" o "Disco bajo".
+
+    **Interpretación de umbrales:**
+    - **Memoria:** Alerta en 85%, crítica en 95%
+    - **CPU:** Alerta con carga 1.2x, crítica en 2.0x
+    - **Disco:** Alerta cuando quedan menos de 5GB, crítica en 1GB
+
+    **Acciones correctivas:**
+    1. **Memoria:** Aumenta PHP memory_limit o reduce procesos concurrentes
+    2. **CPU:** Limita el tamaño del lote de sincronización, sincroniza en horas de bajo tráfico
+    3. **Disco:** Libera espacio o aumenta la capacidad del servidor
+    4. Contacta a tu proveedor de hosting si los recursos son insuficientes
+  </AccordionItem>
+</Accordion>
+
+## Problemas de Imágenes
+
+<Accordion>
+  <AccordionItem title="Las imágenes no se descargan">
+    **Síntomas:** Las propiedades no tienen imágenes, galerías vacías.
+
+    **Checklist:**
+    1. Verifica que las URLs de imágenes en Tokko Broker sean válidas y accesibles
+    2. Aumenta PHP memory_limit (se requiere memoria para procesar imágenes)
+    3. Aumenta max_execution_time para descargas largas
+    4. Revisa si hay errores en el Historial de Errores relacionados con descargas de imágenes
+    5. Comprueba que el servidor tenga acceso de escritura a wp-content/uploads
+    6. Si las URLs están truncadas, verifica la configuración de Tokko Broker
+  </AccordionItem>
+
+  <AccordionItem title="Las miniaturas no se generan">
+    **Síntomas:** Las imágenes se cargan pero las miniaturas están vacías.
+
+    **Soluciones:**
+    1. Verifica que GD esté instalado (preferido) o Imagick:
+       - Revisa en **Herramientas > Estado del Sitio > Servidor**
+    2. Asegúrate de que los permisos de wp-content/uploads sean correctos (755)
+    3. Aumenta PHP memory_limit a 256MB+
+    4. Si GD no está disponible, contacta a tu hosting
+    5. **Workaround:** Desactiva la generación de miniaturas en **Configuración > Avanzado**
+  </AccordionItem>
+
+  <AccordionItem title="El orden de la galería es incorrecto">
+    **Síntomas:** Las imágenes aparecen en orden diferente al de Tokko Broker.
+
+    **Soluciones:**
+    1. Las imágenes se descargan en el orden que proporciona Tokko Broker
+    2. Verifica el orden en tu cuenta Tokko Broker
+    3. Reordena manualmente en **Propiedades > Editar > Galería** si es necesario
+    4. Realiza una nueva sincronización de esa propiedad para re-descargar
+  </AccordionItem>
+
+  <AccordionItem title="La imagen destacada no se establece">
+    **Síntomas:** Se descargan imágenes pero ninguna se marca como destacada.
+
+    **Soluciones:**
+    1. Verifica que Tokko Broker tenga una imagen marcada como principal/destacada
+    2. Comprueba la configuración en **Tokko Plugins > Mapeo de Campos** para "Imagen Destacada"
+    3. Si está deshabilitada, actívala y realiza nueva sincronización
+    4. Establece manualmente en **Propiedades > Editar > Imagen Destacada** si es necesario
+  </AccordionItem>
+</Accordion>
+
+## Problemas de URLs
+
+<Accordion>
+  <AccordionItem title="Los permalinks se rompen después de habilitar URLs personalizadas">
+    **Síntomas:** Error 404 al acceder a propiedades, URLs no funcionan.
+
+    **Solución inmediata:**
+    1. Ve a **Ajustes > Permalinks**
+    2. Haz clic en **Guardar Cambios** (sin cambiar nada)
+    3. Esto reconstruye las reglas de reescritura automáticamente
+    4. Los URLs personalizados deberían funcionar ahora
+
+    **Si persiste:**
+    1. Verifica que tu .htaccess sea escribible (permisos 644)
+    2. Si usas Nginx, asegúrate de que los rewrites estén configurados correctamente
+    3. Desactiva y reactiva el plugin para que regenere las reglas
+  </AccordionItem>
+
+  <AccordionItem title="Errores 404 en páginas de propiedades">
+    **Síntomas:** Las propiedades existen pero devuelven 404.
+
+    **Checklist:**
+    1. Verifica que el tema Houzez esté activo
+    2. Comprueba que el post type "property" no esté configurado como no público
+    3. Reconstruye permalinks (ve a **Ajustes > Permalinks > Guardar**)
+    4. Si usas URLs personalizadas, verifica que el slug base sea válido
+    5. Revisa el estado de la propiedad: ¿está publicada?
+  </AccordionItem>
+
+  <AccordionItem title="La redirección a TokkoBroker no funciona">
+    **Síntomas:** El botón "Ver en Tokko Broker" no redirige correctamente.
+
+    **Soluciones:**
+    1. Verifica que la propiedad tenga un ID válido en Tokko Broker
+    2. Comprueba que la URL base de Tokko Broker sea correcta en **Configuración**
+    3. Revisa que el navegador no esté bloqueando la redirección (popup blocker)
+    4. Limpia la caché del navegador y del sitio
+  </AccordionItem>
+</Accordion>
+
+## Problemas de Rendimiento
+
+<Accordion>
+  <AccordionItem title="La sincronización tarda demasiado">
+    **Síntomas:** El proceso de sincronización es muy lento.
+
+    **Optimizaciones:**
+    1. Usa **Sincronización Inteligente:** Solo procesa propiedades modificadas (basada en timestamps)
+    2. Reduce el tamaño del lote en **Configuración > Avanzado** (predeterminado: 10)
+    3. Programa las sincronizaciones para horas de bajo tráfico (madrugada)
+    4. Desactiva la descarga de imágenes si no es necesaria
+    5. Aumenta los recursos del servidor (memoria, CPU)
+  </AccordionItem>
+
+  <AccordionItem title="Las páginas del admin son lentas">
+    **Síntomas:** El dashboard de Tokko Plugins, la lista de propiedades o el editor son lentos.
+
+    **Soluciones:**
+    1. Desactiva **Analítica del Dashboard** en **Configuración > Avanzado** si no la usas
+    2. Limita el número de propiedades mostradas por página
+    3. Desactiva plugins que generen muchas queries (contadores de visitas, estadísticas)
+    4. Aumenta PHP memory_limit
+    5. Considera usar un plugin de caché (WP Super Cache, W3 Total Cache)
+  </AccordionItem>
+
+  <AccordionItem title="Agotamiento de memoria durante la sincronización">
+    **Síntomas:** "Fatal error: Allowed memory size exhausted"
+
+    **Soluciones:**
+    1. Aumenta `memory_limit` en wp-config.php:
+       ```php
+       define('WP_MEMORY_LIMIT', '512M');
+       ```
+    2. Reduce el tamaño del lote de propiedades a sincronizar
+    3. Sincroniza en lotes pequeños en lugar de todas a la vez
+    4. Activa **Sincronización Inteligente** para procesar solo cambios
+    5. Si el hosting no permite aumentar memoria, contacta al proveedor
+  </AccordionItem>
+</Accordion>
+
+## Diagnóstico del Sistema
+
+<Accordion>
+  <AccordionItem title="Cómo acceder a la página de Estado del Sistema">
+    **Ubicación:** **Tokko Plugins > Estado del Sistema**
+
+    **Información que encontrarás:**
+    - Versión de WordPress y PHP
+    - Estado del tema Houzez
+    - Conexión con Tokko Broker
+    - Recursos del servidor (memoria, CPU, disco)
+    - Estado de WP-Cron
+    - Última sincronización realizada
+    - Número de propiedades sincronizadas
+    - Herramientas de prueba y diagnóstico
+  </AccordionItem>
+
+  <AccordionItem title="Cómo leer el Historial de Errores">
+    **Ubicación:** **Tokko Plugins > Historial de Errores**
+
+    **Características:**
+    - Lista de los últimos errores ocurridos
+    - Timestamp de cada error
+    - Tipo de error (sincronización, imagen, API, etc.)
+    - Mensaje descriptivo
+    - Stack trace para desarrolladores
+    - Filtros por fecha y tipo
+  </AccordionItem>
+
+  <AccordionItem title="Exportar Historial de Errores a CSV">
+    **Pasos:**
+    1. Ve a **Tokko Plugins > Historial de Errores**
+    2. Filtra los errores que desees exportar (por fecha, tipo)
+    3. Haz clic en el botón **Descargar CSV**
+    4. Abre el archivo en Excel o Google Sheets para análisis
+    5. Puedes compartir el CSV con soporte para ayuda
+  </AccordionItem>
+
+  <AccordionItem title="Verificar el estado de Action Scheduler">
+    **Ubicación:** **Herramientas > Action Scheduler** (desde WordPress 6.3)
+
+    **Qué revisar:**
+    - Si hay acciones pendientes relacionadas con Tokko Plugins
+    - Si hay acciones fallidas o atrapadas
+    - La próxima sincronización programada
+    - El estado de WP-Cron
+
+    **Si ves acciones atrapadas:**
+    1. Haz clic en el botón **Ejecutar Ahora** junto a la acción
+    2. Si continúa fallando, investiga el error en el Historial
+    3. Reinicia el WP-Cron
+  </AccordionItem>
+
+  <AccordionItem title="Alternativas a WP-Cron (cron real)">
+    **Problema:** WP-Cron solo se ejecuta cuando hay visitantes.
+
+    **Soluciones:**
+
+    **Opción 1: Usar Cron del Sistema**
+    1. Deshabilita WP-Cron en wp-config.php:
+       ```php
+       define('DISABLE_WP_CRON', true);
+       ```
+    2. Agrega una entrada en el crontab del servidor:
+       ```bash
+       */5 * * * * curl https://tudominio.com/wp-cron.php?doing_wp_cron > /dev/null 2>&1
+       ```
+    3. Contacta a tu hosting para configurar esto
+
+    **Opción 2: Servicio Externo**
+    1. Usa un servicio como Cron-Job.org o EasyCron
+    2. Configura para que llame a tu sitio cada 5 minutos
+    3. Verifica que la sincronización se ejecute regularmente
+
+    **Opción 3: Loopback Request**
+    - Las sincronizaciones usan AJAX y pueden iniciarse con una simple solicitud HTTP
+  </AccordionItem>
+</Accordion>
+
+## Necesitas Más Ayuda
+
+Si después de revisar esta guía el problema persiste:
+
+1. **Recopila información:**
+   - Versión de WordPress y PHP
+   - Estado del Sistema (screenshot o texto)
+   - Historial de Errores (exporta a CSV)
+   - Detalles específicos del error
+
+2. **Contacta con soporte:**
+   - **Plan Starter/Professional:** Email support (máximo 2 días de respuesta)
+   - **Plan PRO+:** Soporte prioritario (respuesta en horas)
+   - Acceso desde **Tokko Plugins > Soporte**
+
+3. **Proporciona:**
+   - Descripción del problema
+   - Pasos para reproducir
+   - Historial de errores
+   - Estado del sistema

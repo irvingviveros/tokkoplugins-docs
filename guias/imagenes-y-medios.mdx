@@ -1,0 +1,281 @@
+---
+title: "Imágenes y Medios"
+description: "Gestión de galerías, imágenes destacadas, videos y tours virtuales"
+---
+
+# Imágenes y Medios
+
+La gestión completa de medios es fundamental para presentar propiedades atractivas en tu sitio web. Tokko Plugins sincroniza automáticamente imágenes, videos y tours virtuales desde Tokko Broker hacia tu biblioteca de medios de WordPress.
+
+## Sincronización de Imágenes
+
+### Flujo de Sincronización
+
+Las imágenes se descargan directamente de la API de Tokko y se almacenan en la biblioteca de medios de WordPress:
+
+<Steps>
+  <Step title="Tokko Broker CRM">
+    Imágenes almacenadas en los servidores de Tokko con URLs directas
+  </Step>
+  <Step title="Descarga a WordPress">
+    El plugin descarga cada imagen a través de `wp_remote_get()`
+  </Step>
+  <Step title="Procesamiento">
+    Las imágenes se optimizan y se generan miniaturas
+  </Step>
+  <Step title="Galería">
+    Las imágenes se organizan como galería de propiedades
+  </Step>
+</Steps>
+
+### Selección de Imagen Destacada
+
+La primera imagen de la galería se asigna automáticamente como imagen destacada (featured image) de la propiedad:
+
+```php
+// La primera imagen en fave_image_urls se convierte en:
+set_post_thumbnail($post_id, $attachment_id);
+```
+
+<Tip>
+Para cambiar manualmente la imagen destacada, ve a la edición de la propiedad en WordPress y selecciona una imagen diferente de la galería.
+</Tip>
+
+## Gestión de Galerías
+
+### Campos de Metadatos
+
+El plugin utiliza dos campos meta para gestionar las imágenes:
+
+| Campo | Descripción |
+|-------|------------|
+| `fave_image_urls` | URLs originales de Tokko (usado para sincronizar) |
+| `fave_synced_images` | IDs de adjuntos de WordPress después de la sincronización |
+
+<Note>
+Estos campos se sincronizan automáticamente. No modifiques manualmente `fave_synced_images` ya que se sobrescribirá en la próxima sincronización.
+</Note>
+
+### Límites de Procesamiento
+
+El plugin procesa imágenes en lotes para evitar sobrecargar tu servidor:
+
+```
+MAX_IMAGES_PER_BATCH = 10
+```
+
+Si una propiedad tiene más de 10 imágenes, se procesarán en múltiples ciclos de sincronización.
+
+## Opciones de Calidad
+
+### Configuración de Calidad de Imagen
+
+Controla la calidad de descarga desde Tokko:
+
+**Opción:** `thi_image_quality`
+- **Optimized** (por defecto): Imágenes comprimidas, descarga rápida
+- **Original**: Imágenes en máxima calidad, archivos más grandes
+
+<Warning>
+Las imágenes "Original" consumirán más espacio de almacenamiento. Úsalas solo si necesitas máxima calidad para presentaciones especiales.
+</Warning>
+
+### Generación de Miniaturas
+
+Habilita la generación automática de miniaturas:
+
+**Opción:** `thi_generate_thumbnails`
+- Genera múltiples tamaños: thumbnail, medium, large, full
+- Mejora la velocidad de carga en diferentes dispositivos
+- Compatible con ImageMagick y GD Library
+
+<Tip>
+GD Library suele ser más rápida que ImageMagick. El plugin automáticamente selecciona GD si está disponible.
+</Tip>
+
+## Normalización de Imágenes
+
+### Corrección Automática
+
+El plugin corrige automáticamente extensiones truncadas que pueden venir de Tokko:
+
+```
+.jp → .jpg
+.pn → .png
+.gi → .gif
+```
+
+Esta normalización previene errores de descarga por extensiones inválidas.
+
+## Gestión de Imágenes Obsoletas
+
+### Limpieza Automática
+
+Cuando una propiedad se actualiza y se eliminan imágenes de Tokko, el plugin:
+
+1. Detecta qué imágenes ya no están en `fave_image_urls`
+2. Desvincula los adjuntos del post de WordPress
+3. Opcionalmente elimina el archivo del servidor
+
+<Note>
+Los adjuntos se desvinculan pero no se eliminan automáticamente para evitar pérdida accidental de datos. Configura en `thi_auto_delete_orphaned_images` si deseas eliminar archivos huérfanos.
+</Note>
+
+## Sistema de Fallback
+
+El plugin utiliza un sistema inteligente de fallback para garantizar que siempre haya una imagen disponible:
+
+```
+Orden de prioridad:
+1. Full (imagen completa)
+2. Large (imagen grande)
+3. Medium-Large (mediano-grande)
+4. Medium (mediano)
+5. Thumbnail (miniatura)
+6. Imagen por defecto del sitio
+```
+
+Este sistema asegura que tus propiedades siempre tengan una imagen visible, incluso si el servidor WordPress no pudo generar ciertos tamaños.
+
+## Sincronización de Videos
+
+### Video URLs
+
+Las URLs de video se sincronizan automáticamente desde Tokko Broker:
+
+**Campo:** `fave_video_url`
+
+El plugin admite:
+- YouTube embeds
+- Vimeo embeds
+- URLs directas a videos MP4/WebM
+
+<CodeGroup>
+```php Estructura Meta
+fave_video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+// O
+fave_video_url: "https://vimeo.com/123456789"
+```
+</CodeGroup>
+
+## Tours Virtuales
+
+### Proveedores Soportados
+
+El plugin integra tours virtuales de más de 28 proveedores diferentes:
+
+<Tabs>
+  <Tab title="Populares">
+    - **Matterport** - Tours 3D profesionales
+    - **3Dprop** - Recorridos interactivos
+    - **Visita 360** - Tours panorámicos
+    - **Roundme** - Plataforma de visualización
+  </Tab>
+  <Tab title="Adicionales">
+    - Virtual Staging
+    - Google Street View
+    - Walk Through Pro
+    - EasyTour360
+    - Y muchos más...
+  </Tab>
+</Tabs>
+
+### Almacenamiento de Tours
+
+**Campo:** `fave_virtual_tour`
+
+```php
+// Formato de almacenamiento
+fave_virtual_tour: {
+  "provider": "matterport",
+  "url": "https://my.matterport.com/show/?m=...",
+  "embed_code": "<iframe src='...'></iframe>"
+}
+```
+
+<Tip>
+Los tours virtuales de Matterport se integran directamente sin necesidad de código adicional. El plugin detecta automáticamente el proveedor.
+</Tip>
+
+## Planos y Blueprints
+
+### Mapeo de Planos
+
+Los planos de propiedades se almacenan en:
+
+**Campo:** `fave_property_plan` (o similar según tu tema)
+
+El plugin sincroniza:
+- Imágenes de planos 2D
+- Distribución de espacios
+- Áreas totales
+
+<Note>
+Los planos se tratan como imágenes regulares en el flujo de sincronización, pero se pueden mostrar en una sección separada del frontend.
+</Note>
+
+## Preferencia de Editor de Imágenes
+
+### Configuración del Servidor
+
+El plugin detecta y utiliza automáticamente:
+
+1. **GD Library** (preferencia)
+   - Más rápida
+   - Menor consumo de memoria
+
+2. **ImageMagick**
+   - Mejor calidad en algunos casos
+   - Soporte para más formatos
+
+Si ambas están disponibles, GD se usa por defecto. Puedes cambiar esto en la configuración del servidor.
+
+## Solución de Problemas
+
+### Imágenes No Se Descargan
+
+<Steps>
+  <Step title="Verificar Conectividad">
+    Asegúrate que tu servidor pueda acceder a los servidores de Tokko (sin firewall bloqueante)
+  </Step>
+  <Step title="Revisar Permisos">
+    La carpeta `/wp-content/uploads/` debe tener permisos 755
+  </Step>
+  <Step title="Verificar Cuota">
+    Revisa que tengas espacio suficiente en tu servidor
+  </Step>
+</Steps>
+
+### Imágenes Borrosas o Pixeladas
+
+<Warning>
+Si las imágenes se ven borrosas, probablemente estés usando la opción "Optimized". Cambia a "Original" para mejor calidad.
+</Warning>
+
+### Miniaturas No Se Generan
+
+```bash
+# Verifica los permisos del directorio temporal
+chmod 755 /wp-content/uploads/
+
+# Comprueba que GD o ImageMagick está instalado
+php -i | grep -A 20 GD
+```
+
+### Imágenes Truncadas
+
+El plugin detiene y reinicia automáticamente descargas interrumpidas. Si persiste:
+
+1. Aumenta el timeout en `wp-config.php`:
+   ```php
+   define('ALTERNATE_WP_CRON', true);
+   ```
+
+2. Verifica el log de WordPress:
+   ```
+   /wp-content/debug.log
+   ```
+
+---
+
+**Próximos pasos:** Aprende sobre [SEO y URLs Personalizadas](./seo-urls) para optimizar la visibilidad de tus propiedades.

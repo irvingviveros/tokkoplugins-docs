@@ -1,0 +1,481 @@
+---
+title: "Agentes"
+description: "Sincronización de agentes inmobiliarios desde Tokko Broker"
+---
+
+# Agentes
+
+Tokko Plugins sincroniza automáticamente los agentes inmobiliarios desde Tokko Broker hacia WordPress, creando perfiles completos con información de contacto, fotos y asignación de propiedades.
+
+## ¿Por Qué Sincronizar Agentes?
+
+Tener agentes en tu sitio web ofrece múltiples ventajas:
+
+✅ **Confianza**: Los clientes conocen al equipo
+✅ **Contacto Directo**: Información de contacto visible
+✅ **SEO**: Páginas personales mejoran posicionamiento
+✅ **Asignación**: Cada propiedad vinculada a su agente
+✅ **Performance**: Los compradores pueden contactar directamente
+
+## Habilitar Sincronización
+
+### Configuración Inicial
+
+**Opción:** `thi_enable_agent_sync`
+
+<Steps>
+  <Step title="Accede a Configuración">
+    WordPress > Tokko Plugins > Configuración
+  </Step>
+  <Step title="Busca Agentes">
+    Desplázate hasta "Sincronización de Agentes"
+  </Step>
+  <Step title="Habilita Sincronización">
+    Marca la opción `thi_enable_agent_sync`
+  </Step>
+  <Step title="Configura Descargas de Imágenes">
+    Marca `thi_download_agent_images` para sincronizar fotos
+  </Step>
+  <Step title="Guarda Cambios">
+    Haz clic en "Guardar cambios"
+  </Step>
+  <Step title="Ejecuta Sincronización Manual">
+    Ve a Tokko Plugins > Dashboard > Sincronizar Agentes
+  </Step>
+</Steps>
+
+<Note>
+Los agentes se crean automáticamente en WordPress basados en los "productores" (producers) en Tokko Broker.
+</Note>
+
+## Creación de Agentes
+
+### Mapeo Automático
+
+**Clase:** `THI_Agent_Manager`
+
+El plugin crea automáticamente un agente WordPress (CPT "agent") por cada productor en Tokko:
+
+```php
+// Mapeo de campos:
+Tokko Field → WordPress Agent Field
+producer_id → fave_agent_id
+producer_name → post_title
+producer_email → fave_agent_email
+producer_phone → fave_agent_phone
+producer_cell → fave_agent_mobile
+producer_photo → fave_agent_image
+producer_description → post_content
+producer_role → fave_agent_role
+```
+
+### Estructura de Datos
+
+Cada agente incluye:
+
+| Campo | Descripción |
+|-------|------------|
+| ID del Agente | Identificador único de Tokko |
+| Nombre | Nombre completo |
+| Email | Correo profesional |
+| Teléfono | Número de oficina |
+| Móvil | Celular o WhatsApp |
+| Foto | Imagen de perfil |
+| Rol | Posición en la agencia |
+| Descripción | Biografía profesional |
+
+## Descarga de Imágenes
+
+### Sincronización Automática
+
+**Opción:** `thi_download_agent_images`
+
+```php
+// Habilitada:
+// - Descarga foto del agente desde Tokko
+// - La guarda en WordPress media library
+// - La asigna como featured image
+
+// Deshabilitada:
+// - Solo guarda la URL de la foto
+// - No ocupa espacio en tu servidor
+```
+
+<Tip>
+Desactiva descargas si tu servidor tiene espacio limitado. Las URLs se pueden mostrar directamente sin descargar localmente.
+</Tip>
+
+### Optimización de Imágenes
+
+Las imágenes de agentes se optimizan automáticamente:
+
+```
+Tamaño máximo: 500x500px
+Calidad: 90%
+Formato: JPEG o PNG según original
+```
+
+Esto mantiene un balance entre calidad y tiempo de carga.
+
+## Integración WhatsApp
+
+### Detectar WhatsApp
+
+**Opción:** `thi_agent_mobile_is_whatsapp`
+
+```php
+// Habilitada:
+// Número móvil se trata como WhatsApp
+// Frontend muestra botón de WhatsApp
+// URL: https://wa.me/{numero}?text=Consulta
+
+// Deshabilitada:
+// Móvil es solo número telefónico
+// Se muestra como enlace tel:
+```
+
+### Ventajas de WhatsApp
+
+✅ **Instantáneo**: Clientes usan aplicación familiar
+✅ **Multimedia**: Pueden compartir videos y fotos
+✅ **Confirmación**: Mensaje de lectura
+✅ **CRM**: Conversaciones en Tokko Broker
+
+### Implementación Frontend
+
+```php
+// En tu plantilla
+if ( function_exists('get_agent_whatsapp_link') ) {
+  $whatsapp_link = get_agent_whatsapp_link($agent_id);
+  echo '<a href="' . $whatsapp_link . '">
+    <i class="fab fa-whatsapp"></i> WhatsApp
+  </a>';
+}
+```
+
+## Asignación Automática
+
+### Asignar Agente a Propiedades
+
+**Opción:** `thi_auto_assign_agent_id`
+
+```php
+// Configura el ID de agente por defecto
+thi_auto_assign_agent_id = 'producer_id_123'
+
+// Cada propiedad nueva se asigna a este agente
+// Si la propiedad viene con agente en Tokko,
+// ese agente tiene prioridad
+```
+
+<Steps>
+  <Step title="Busca el Agente Principal">
+    Ve a WordPress > Agentes
+  </Step>
+  <Step title="Obtén su ID">
+    Edita el agente y copia su ID (en la URL)
+  </Step>
+  <Step title="Configura Asignación">
+    Tokko Plugins > Configuración > thi_auto_assign_agent_id
+  </Step>
+  <Step title="Guarda Cambios">
+    Las nuevas propiedades se asignarán automáticamente
+  </Step>
+</Steps>
+
+<Note>
+La asignación automática es útil cuando tienes un agente principal que maneja la mayoría de propiedades.
+</Note>
+
+## Asignación Manual
+
+### Cambiar Agente de una Propiedad
+
+Para propiedades específicas:
+
+<Steps>
+  <Step title="Edita la Propiedad">
+    WordPress > Propiedades > Editar
+  </Step>
+  <Step title="Busca Campo de Agente">
+    Desplázate a "Información General" o "Agente"
+  </Step>
+  <Step title="Selecciona Agente">
+    Elige de la lista de agentes sincronizados
+  </Step>
+  <Step title="Guarda Cambios">
+    Actualiza la propiedad
+  </Step>
+</Steps>
+
+```php
+// Campo meta usado:
+fave_property_agent_id = 'producer_id_123'
+```
+
+## Relaciones Agente-Propiedad
+
+### Mapeo Automático
+
+**Clase:** `THI_Agent_Sync_Service`
+
+```php
+// Durante sincronización:
+1. Lee agente asignado de la propiedad en Tokko
+2. Busca el agente correspondiente en WordPress
+3. Actualiza meta fave_property_agent_id
+4. Actualiza contador de propiedades del agente
+```
+
+### Contar Propiedades por Agente
+
+```php
+// Meta field:
+fave_agent_property_count = 15
+
+// Se actualiza automáticamente cada sincronización
+// Útil para mostrar "Agente con 15 propiedades"
+```
+
+## Asignación en Lote
+
+### Edición en Lote
+
+Si necesitas cambiar el agente de múltiples propiedades:
+
+<Steps>
+  <Step title="Ve a Propiedades">
+    WordPress > Propiedades
+  </Step>
+  <Step title="Selecciona Propiedades">
+    Marca las casillas de propiedades a cambiar
+  </Step>
+  <Step title="Acciones en Lote">
+    Usa "Acciones en lote" > "Editar"
+  </Step>
+  <Step title="Cambia Agente">
+    En el panel de edición, selecciona nuevo agente
+  </Step>
+  <Step title="Aplica">
+    Haz clic en "Aplicar" para guardar cambios
+  </Step>
+</Steps>
+
+<Warning>
+La edición en lote sobrescribe los valores anteriores. Verifica que selecciones las propiedades correctas.
+</Warning>
+
+## Página de Perfil del Agente
+
+### URL Automática
+
+Cada agente obtiene su página de perfil:
+
+```
+/agente/{nombre-agente}/
+// Ejemplo:
+/agente/juan-martinez/
+/agente/maria-garcia/
+```
+
+### Contenido de la Página
+
+```
+Perfil del Agente
+├── Foto de perfil
+├── Nombre y rol
+├── Descripción/biografía
+├── Información de contacto
+│   ├── Email
+│   ├── Teléfono
+│   ├── WhatsApp (si está habilitado)
+│   └── Redes sociales
+├── Propiedades activas
+└── Formulario de contacto
+```
+
+### Personalización
+
+Crea plantilla personalizada:
+
+```php
+// archivo: single-agent.php
+<?php
+get_header();
+
+while ( have_posts() ) {
+  the_post();
+
+  // Mostrar información del agente
+  $agent_id = get_the_ID();
+  $agent_email = get_post_meta($agent_id, 'fave_agent_email', true);
+  $agent_image = get_the_post_thumbnail($agent_id);
+
+  echo $agent_image;
+  echo '<h1>' . get_the_title() . '</h1>';
+  the_content();
+  echo '<a href="mailto:' . $agent_email . '">Contactar</a>';
+
+  // Mostrar sus propiedades
+  get_template_part('template-parts/agent-properties');
+}
+
+get_footer();
+?>
+```
+
+## Limpieza de Agentes Huérfanos
+
+### Detectar Agentes Sin Propiedades
+
+El plugin identifica automáticamente agentes sin propiedades asignadas:
+
+```php
+// Agentes sin propiedades después de N sincronizaciones
+// (configurable en thi_orphaned_agent_threshold)
+```
+
+### Opciones de Limpieza
+
+**Opción:** `thi_auto_delete_orphaned_agents`
+
+```php
+// Habilitada:
+// - Agentes sin propiedades se marcan como borrador
+// - No se eliminan, solo se ocultan
+
+// Deshabilitada:
+// - Agentes permanecen visibles
+// - Útil para mantener historial de agentes pasados
+```
+
+<Warning>
+Los agentes "huérfanos" (sin propiedades) pueden confundir a los clientes. Se recomienda archivarlos cuando un agente se retira.
+</Warning>
+
+### Archivado Manual
+
+Para retirar un agente sin eliminarlo:
+
+<Steps>
+  <Step title="Edita el Agente">
+    WordPress > Agentes > Selecciona agente
+  </Step>
+  <Step title="Cambia Estado">
+    En la esquina superior derecha, selecciona "Borrador"
+  </Step>
+  <Step title="Guarda Cambios">
+    Haz clic en "Actualizar"
+  </Step>
+</Steps>
+
+El agente seguirá en la base de datos pero no aparecerá en búsquedas públicas.
+
+## Directorio de Agentes
+
+### Página de Listado
+
+El plugin crea automáticamente un directorio:
+
+```
+/agentes/
+├── Listado de todos los agentes
+├── Foto y nombre
+├── Número de propiedades
+├── Botón de contacto
+└── Búsqueda por nombre
+```
+
+### Mostrar Directorio
+
+En tu página de inicio o menú:
+
+```php
+// Shortcode:
+[tokko_agents_directory]
+
+// Parámetros:
+[tokko_agents_directory columns="3" per_page="12"]
+```
+
+### Personalización de Columnas
+
+```php
+// En template:
+<div class="agents-grid" data-columns="3">
+  <?php
+  $agents = get_posts([
+    'post_type' => 'agent',
+    'posts_per_page' => 12,
+    'orderby' => 'meta_value',
+    'meta_key' => 'fave_agent_property_count'
+  ]);
+
+  foreach ( $agents as $agent ) {
+    echo '<div class="agent-card">';
+    echo get_the_post_thumbnail($agent->ID);
+    echo '<h3>' . $agent->post_title . '</h3>';
+    echo '</div>';
+  }
+  ?>
+</div>
+```
+
+## Gestión de Datos de Contacto
+
+### Campos Sincronizados
+
+Todos estos campos se sincronizan desde Tokko:
+
+```php
+fave_agent_email      // Email profesional
+fave_agent_phone      // Teléfono fijo
+fave_agent_mobile     // Celular/WhatsApp
+fave_agent_website    // Sitio web personal
+fave_agent_facebook   // URL Facebook
+fave_agent_instagram  // URL Instagram
+fave_agent_linkedin   // URL LinkedIn
+```
+
+### Privacidad
+
+<Note>
+Los emails de agentes se hacen públicos cuando sincronizas. Asegúrate que todos los agentes están de acuerdo con publicar su contacto.
+</Note>
+
+## Solución de Problemas
+
+### Los Agentes No Se Sincronizan
+
+<Steps>
+  <Step title="Verifica Opción">
+    Comprueba que `thi_enable_agent_sync` esté habilitada
+  </Step>
+  <Step title="Verifica API">
+    Comprueba que tu API key de Tokko incluya acceso a productores
+  </Step>
+  <Step title="Revisa Permisos">
+    En Tokko Broker, asegúrate que los productores estén asignados al usuario API
+  </Step>
+</Steps>
+
+### Las Imágenes No Se Descargan
+
+```php
+// Verifica:
+1. thi_download_agent_images esté habilitada
+2. El servidor tenga permisos en /wp-content/uploads/
+3. Espacio disponible en servidor
+4. URLs de imágenes en Tokko sean válidas
+```
+
+### Propiedades No Se Asignan a Agentes
+
+Comprueba:
+1. Los agentes están sincronizados (aparecen en WordPress > Agentes)
+2. Las propiedades tienen un agente asignado en Tokko Broker
+3. El ID del agente en Tokko coincide con el ID en WordPress
+
+---
+
+**Próximos pasos:** Aprende sobre [Leads y CRM](./leads-crm) para integrar consultas con Tokko Broker.

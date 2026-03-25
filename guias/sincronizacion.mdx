@@ -1,0 +1,479 @@
+---
+title: "Sincronización de Propiedades"
+description: "Cómo funciona la sincronización inteligente de propiedades"
+---
+
+# Sincronización de Propiedades
+
+Tokko Plugins utiliza un motor de sincronización inteligente que detecta cambios en Tokko Broker y los actualiza automáticamente en tu sitio WordPress. Este sistema está optimizado para minimizar el uso de recursos y maximizar la velocidad de procesamiento.
+
+## Cómo Funciona la Sincronización
+
+### Motor de Sincronización Unificado
+
+El motor utiliza un sistema de procesamiento por lotes (batch processing) basado en AJAX con detección inteligente de cambios:
+
+<Steps>
+  <Step title="Detección (Detect)">
+    El sistema compara timestamps y verifica qué propiedades han cambiado en Tokko Broker desde la última sincronización
+  </Step>
+  <Step title="Ejecución de Lotes (Execute Batches)">
+    Procesa múltiples propiedades en paralelo, agrupándolas en lotes para optimizar el uso de recursos del servidor
+  </Step>
+  <Step title="Archivo (Archive)">
+    Archiva las propiedades que han sido eliminadas o marcadas como inactivas en Tokko Broker
+  </Step>
+  <Step title="Finalización (Finalize)">
+    Registra timestamps, genera reportes y limpia recursos temporales
+  </Step>
+</Steps>
+
+### Detección Inteligente de Cambios
+
+En lugar de sincronizar todas las propiedades cada vez, el sistema utiliza **timestamps basados en cambios** para sincronizar solo lo que ha sido modificado:
+
+- Se comparan marcas de tiempo de creación y modificación
+- Solo se procesan propiedades con cambios recientes
+- Se reduce significativamente el ancho de banda y tiempo de procesamiento
+- Los datos de timestamp se almacenan en una tabla personalizada (`wp_thi_property_timestamps`)
+
+<Info>
+Esta estrategia inteligente puede reducir el tiempo de sincronización entre un 70-90% comparado con sincronizaciones completas.
+</Info>
+
+### Mecanismos de Protección (Circuit Breakers)
+
+El plugin incluye limitadores automáticos para proteger tu servidor:
+
+| Limitador | Límite | Acción |
+|-----------|--------|--------|
+| Errores API consecutivos | 5 errores | Pausa sincronización |
+| Errores de imagen consecutivos | 10 errores | Continúa sin imágenes |
+| Memoria disponible | 256 MB mínimo | Frena procesamiento |
+| CPU disponible | 80% máximo | Reduce velocidad |
+| Espacio en disco | 500 MB mínimo | Pausa sincronización |
+
+<Warning>
+Si el sistema detecta condiciones críticas de servidor, pausará la sincronización automáticamente para evitar caídas. Verás una notificación en el panel.
+</Warning>
+
+---
+
+## Qué Se Sincroniza
+
+### Campos de Meta de Propiedades
+
+Tokko Plugins sincroniza automáticamente estos campos de propiedades desde Tokko Broker a Houzez:
+
+<Tabs>
+  <Tab title="Información Básica">
+    - **Dormitorios** (bedrooms)
+    - **Baños** (bathrooms)
+    - **Ambientes/Cuartos** (rooms)
+    - **Garajes** (garage)
+    - **Tamaño Construido** (size) - en metros cuadrados
+    - **Tamaño de Terreno** (land) - en metros cuadrados
+  </Tab>
+  <Tab title="Ubicación y Contacto">
+    - **Dirección** (address)
+    - **Latitud y Longitud** (lat/lng) - para mapas
+    - **Código de Referencia** (reference_code)
+  </Tab>
+  <Tab title="Información Comercial">
+    - **Precio** (price) - sincroniza múltiples operaciones
+    - **Moneda** (currency)
+    - **Gastos/Expensas** (expenses)
+    - **Tipo de Operación:** Venta, Alquiler, Alquiler Temporal
+  </Tab>
+  <Tab title="Características">
+    - **Año de Construcción** (year)
+    - **Estado/Condición** (condition)
+    - **Características Especiales** (features) - piscina, gym, etc.
+    - **Antigüedad** (age) - en años
+  </Tab>
+</Tabs>
+
+### Taxonomías Sincronizadas
+
+Las siguientes categorías y etiquetas se importan automáticamente:
+
+| Taxonomía | Descripción | Ejemplo |
+|-----------|------------|---------|
+| `property_type` | Tipo de propiedad | Departamento, Casa, Local, Terreno |
+| `property_status` | Estado operacional | Venta, Alquiler, Alquiler Temporal, Emprendimiento |
+| `property_feature` | Características | Piscina, Gym, Seguridad 24/7, Parque |
+| `property_label` | Etiquetas personalizadas | Destacado, Nuevo, Oportunidad |
+| `property_country` | País | Argentina, México, etc. |
+| `property_state` | Provincia/Estado | Buenos Aires, CDMX, etc. |
+| `property_city` | Ciudad | CABA, Monterrey, etc. |
+| `property_area` | Barrio/Zona | Recoleta, Condesa, etc. |
+
+### Contenido Multimedia
+
+#### Imágenes
+
+- Se descargan y almacenan automáticamente en tu servidor
+- Se generan **miniaturas optimizadas** para mejorar velocidad (si está habilitado)
+- Se respeta el orden de imágenes de Tokko Broker
+- Las imágenes eliminadas en Tokko Broker se archivan en WordPress
+
+#### Videos
+
+- Se sincronizan enlaces a videos de YouTube o Vimeo
+- Se incrustan automáticamente en la galería de la propiedad
+- El plugin genera vistas previas y miniaturas
+
+#### Tours Virtuales
+
+Tokko Plugins soporta más de **28 proveedores de tours virtuales**:
+
+<Tabs>
+  <Tab title="Principales Proveedores">
+    - **Matterport** - Tours 3D profesionales
+    - **3Dprop** - Recorridos 3D
+    - **Visita360** - Tours 360°
+    - **Roundme** - Tours interactivos
+    - **Zillow 3D** - Recorridos 3D de Zillow
+  </Tab>
+  <Tab title="Otros Soportados">
+    - iGuVi
+    - Kuula
+    - VHT
+    - InstaVR
+    - Vtours
+    - Y más...
+  </Tab>
+</Tabs>
+
+#### Planos
+
+- Se sincronizan planos en PDF o imagen
+- Se almacenan con la información de la propiedad
+- Se muestran en una sección dedicada en el detalle de la propiedad
+
+---
+
+## Mapeo de Campos: Tokko → Houzez
+
+Tokko Plugins realiza un mapeo automático entre los campos de Tokko Broker y los campos estándar de Houzez:
+
+<CodeGroup>
+```json Ejemplo de Mapeo
+{
+  "tokko_field": "houzez_field",
+  "bedrooms": "property_bedrooms",
+  "bathrooms": "property_bathrooms",
+  "rooms": "property_rooms",
+  "size": "property_size",
+  "land": "property_land_area",
+  "price": "property_price",
+  "currency": "property_currency",
+  "year": "property_year_built",
+  "condition": "property_condition",
+  "reference_code": "property_reference",
+  "address": "property_address",
+  "latitude": "property_latitude",
+  "longitude": "property_longitude"
+}
+```
+</CodeGroup>
+
+<Info>
+El mapeo es automático. No necesitas configurar manualmente estos campos. El plugin maneja la compatibilidad entre sistemas.
+</Info>
+
+---
+
+## Sincronización Manual
+
+Si necesitas sincronizar inmediatamente sin esperar a la próxima ejecución programada:
+
+### Sincronizar Todas las Propiedades
+
+<Steps>
+  <Step title="Abre el panel de Tokko Plugins">
+    Ve a **Tokko Plugins** → **Sincronización** en tu WordPress
+  </Step>
+  <Step title="Busca el botón de sincronización">
+    Encontrarás un botón **Sincronizar Ahora** o **Sync Now**
+  </Step>
+  <Step title="Haz clic para iniciar">
+    La sincronización comenzará inmediatamente en segundo plano
+  </Step>
+  <Step title="Espera a que finalice">
+    Verás una barra de progreso indicando el estado
+  </Step>
+</Steps>
+
+### Sincronizar Propiedad Específica
+
+Para sincronizar una propiedad individual:
+
+<Steps>
+  <Step title="Ve a Propiedades">
+    En el menú de WordPress, abre **Propiedades**
+  </Step>
+  <Step title="Selecciona la propiedad">
+    Encuentra la propiedad que deseas sincronizar
+  </Step>
+  <Step title="Busca el botón de sincronización">
+    Debajo del editor, verás **Sincronizar con Tokko**
+  </Step>
+  <Step title="Haz clic para sincronizar">
+    Los datos se actualizarán desde Tokko Broker
+  </Step>
+</Steps>
+
+---
+
+## Controles de Sincronización
+
+### Pausar Sincronización
+
+Si necesitas pausar la sincronización automática temporalmente:
+
+<Steps>
+  <Step title="Abre Configuración">
+    Ve a **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Cambia la frecuencia">
+    Selecciona **Deshabilitado** en "Frecuencia de Sincronización"
+  </Step>
+  <Step title="Guarda los cambios">
+    La sincronización se detendrá
+  </Step>
+</Steps>
+
+### Reanudar Sincronización
+
+Para reanudar después de pausar:
+
+<Steps>
+  <Step title="Abre Configuración">
+    Ve a **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Selecciona frecuencia">
+    Elige una frecuencia como "Diaria" o "Cada 6 horas"
+  </Step>
+  <Step title="Guarda los cambios">
+    La sincronización automática se reanudará
+  </Step>
+</Steps>
+
+### Cancelar Sincronización en Curso
+
+Si una sincronización está en progreso y deseas detenerla:
+
+<Steps>
+  <Step title="Abre Sincronización">
+    Ve a **Tokko Plugins** → **Sincronización**
+  </Step>
+  <Step title="Busca el botón Cancelar">
+    Si hay una sincronización activa, verás **Cancelar Sincronización**
+  </Step>
+  <Step title="Haz clic para cancelar">
+    El proceso se detendrá (puede tomar unos segundos)
+  </Step>
+</Steps>
+
+<Warning>
+Cancelar una sincronización en curso podría dejar la base de datos en estado inconsistente. Solo hace esto si es absolutamente necesario.
+</Warning>
+
+---
+
+## Comportamiento de Archivo
+
+Cuando una propiedad es eliminada o desactivada en Tokko Broker:
+
+1. **No se borra inmediatamente** - La propiedad permanece visible en WordPress
+2. **Se marca como archivada** - El estado de la propiedad cambia a "Archivada"
+3. **Se oculta en listados** - Por defecto, las propiedades archivadas no aparecen en búsquedas
+4. **Es recuperable** - Si reactivas la propiedad en Tokko Broker, se sincroniza nuevamente
+
+<Info>
+Las propiedades archivadas no se eliminan permanentemente. Pueden ser recuperadas en cualquier momento.
+</Info>
+
+---
+
+## Reportes de Sincronización
+
+Después de cada sincronización, Tokko Plugins genera un reporte detallado:
+
+### Acceder a Reportes
+
+<Steps>
+  <Step title="Abre Tokko Plugins">
+    Ve a **Tokko Plugins** → **Sincronización** → **Reportes**
+  </Step>
+  <Step title="Revisa el reporte más reciente">
+    Verás el reporte de la última sincronización
+  </Step>
+  <Step title="Expande detalles">
+    Haz clic para ver información detallada de cada propiedad
+  </Step>
+</Steps>
+
+### Información en el Reporte
+
+Cada reporte incluye:
+
+| Métrica | Descripción |
+|---------|------------|
+| Propiedades sincronizadas | Cantidad de propiedades procesadas exitosamente |
+| Imágenes descargadas | Total de imágenes importadas |
+| Errores detectados | Cantidad de errores durante la sincronización |
+| Tiempo total | Duración de la sincronización |
+| Timestamp | Fecha y hora de ejecución |
+| Detalles por propiedad | Estado individual de cada una |
+
+### Detalles de Propiedades
+
+Para cada propiedad sincronizada, verás:
+
+- ✓ **Exitosa** - Sincronización completada sin problemas
+- ⚠ **Con advertencias** - Se sincronizó pero con algunos datos parciales (ej: imágenes faltantes)
+- ✗ **Fallida** - No se pudo sincronizar (revisa los logs para detalles)
+
+---
+
+## Sincronización de Desarrollos
+
+Los desarrollos (emprendimientos) se sincronizan si está habilitada la opción **Sincronizar Emprendimientos**:
+
+<Steps>
+  <Step title="Abre Configuración">
+    Ve a **Tokko Plugins** → **Configuración** → **Sincronización**
+  </Step>
+  <Step title="Habilita Desarrollos">
+    Marca la casilla **Sincronizar Emprendimientos**
+  </Step>
+  <Step title="Guarda los cambios">
+    Los desarrollos se sincronizarán en la próxima ejecución
+  </Step>
+</Steps>
+
+<Info>
+Los desarrollos incluyen información del proyecto, etapas, planos y propiedades incluidas. Se sincronizan como un tipo especial de propiedad.
+</Info>
+
+---
+
+## Sincronización de Agentes
+
+Si habilitaste **Sincronizar Información de Agentes**:
+
+- Los datos del agente asignado a cada propiedad se sincronizan automáticamente
+- Se crea un perfil de agente en WordPress (si no existe)
+- Las imágenes de agentes se descargan si está habilitada esa opción
+- Los contactos de WhatsApp se formatan automáticamente
+
+<Warning>
+Asegúrate de que tu API Key tenga permisos de lectura de agentes antes de habilitar esta opción.
+</Warning>
+
+---
+
+## Límites por Plan
+
+### Plan Gratis
+
+- Máximo **100 propiedades** que se pueden sincronizar
+- Máximo **2 desarrollos**
+- Sincronización automática limitada a frecuencia **diaria**
+- Integraciones de contactos limitadas
+
+### Plan Premium
+
+- **Propiedades ilimitadas**
+- **Desarrollos ilimitados**
+- Sincronización automática cada **hora**
+- Integraciones de contactos **ilimitadas**
+- Soporte prioritario para sincronización
+
+<Tip>
+Consulta [precios y planes](https://tokkoplugins.com/pricing) para más información sobre las diferencias entre planes.
+</Tip>
+
+---
+
+## Solucionar Problemas de Sincronización
+
+### "Sincronización no inicia"
+
+**Causas posibles:**
+- API Key inválida o sin permisos
+- No hay propiedades en Tokko Broker
+- Problemas de conexión al servidor
+
+**Soluciones:**
+1. Verifica que la conexión con Tokko Broker funcione
+2. Revisa que existan propiedades activas
+3. Intenta sincronizar manualmente
+4. Revisa los logs de error
+
+### "La sincronización es muy lenta"
+
+**Causas posibles:**
+- Servidor con recursos limitados
+- Cantidad muy grande de propiedades
+- Muchas imágenes de alta resolución
+- Otros procesos consumiendo recursos
+
+**Soluciones:**
+1. Aumenta el intervalo de sincronización
+2. Reduce el tamaño de imágenes en Tokko Broker
+3. Optimiza tu servidor WordPress
+4. Contacta a tu proveedor de hosting para aumentar recursos
+
+### "Las imágenes no se descargan"
+
+**Causas posibles:**
+- Opción "Generar Miniaturas" causando error
+- Permiso de escritura insuficiente en carpeta de uploads
+- Servidor sin espacio en disco
+
+**Soluciones:**
+1. Verifica permisos de carpeta `wp-content/uploads`
+2. Deshabilita "Generar Miniaturas" temporalmente
+3. Libera espacio en disco
+4. Aumenta límite de memoria de PHP
+
+### "Errores de timeout"
+
+**Causas posibles:**
+- Sincronización de demasiadas propiedades en paralelo
+- Servidor lento o sobrecargado
+- Problemas de conexión de red
+
+**Soluciones:**
+1. Reduce el número de propiedades procesadas en paralelo
+2. Incrementa el tiempo de timeout en configuración avanzada
+3. Intenta sincronizar en horarios de menor actividad
+4. Contacta a tu proveedor de hosting
+
+---
+
+## Contactar al Soporte
+
+Si experimentas problemas de sincronización que no puedes resolver:
+
+<Steps>
+  <Step title="Reúne información">
+    Ten listo el reporte de sincronización más reciente y los logs de error
+  </Step>
+  <Step title="Accede al soporte">
+    Ve a [soporte.tokkoplugins.com](https://soporte.tokkoplugins.com)
+  </Step>
+  <Step title="Describe el problema">
+    Proporciona detalles de qué pasó y qué intentaste
+  </Step>
+  <Step title="Comparte recursos">
+    Adjunta el reporte de sincronización y cualquier captura de pantalla relevante
+  </Step>
+</Steps>
+
+<Tip>
+La sincronización es el corazón de Tokko Plugins. Si está funcionando correctamente, tu sitio siempre tendrá datos actualizados de Tokko Broker.
+</Tip>

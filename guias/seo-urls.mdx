@@ -1,0 +1,333 @@
+---
+title: "SEO y URLs Personalizadas"
+description: "Configura URLs amigables y redirecciones para mejorar el SEO"
+---
+
+# SEO y URLs Personalizadas
+
+Optimiza la estructura de URLs de tus propiedades para mejorar el posicionamiento en buscadores y crear una experiencia de usuario superior.
+
+## URLs Secundarias
+
+### Habilitar URLs Secundarias
+
+Las URLs secundarias permiten crear URLs alternativas y personalizadas para acceder a propiedades:
+
+**Opción:** `thi_enable_secondary_url`
+
+```php
+// Habilitada: Crea URLs adicionales para cada propiedad
+// Por defecto: /property/codigo-referencia/
+// O personalizada: /p/{id}-prop/
+```
+
+<Note>
+Las URLs secundarias no reemplazan la URL principal de WordPress, sino que actúan como alias que redirigen automáticamente.
+</Note>
+
+### Ventajas de URLs Secundarias
+
+| Ventaja | Descripción |
+|---------|------------|
+| Compatibilidad | Mantén URLs antiguas funcionando |
+| Flexibilidad | Crea múltiples URLs para la misma propiedad |
+| Branding | Usa estructura de URLs con tu marca |
+| Análisis | Rastrear tráfico desde diferentes fuentes |
+
+### Estructura Personalizada
+
+Puedes definir tu propio patrón de URL secundaria:
+
+<CodeGroup>
+```php Por ID de Tokko
+/p/{id}-prop/
+// Ejemplo: /p/12345-prop/
+```
+
+```php Por Código de Referencia
+/propiedad/{ref-code}/
+// Ejemplo: /propiedad/TR-2024-001/
+```
+
+```php Por Dirección
+/ubicacion/{city}/{address}/
+// Ejemplo: /ubicacion/buenos-aires/av-corrientes-1234/
+```
+</CodeGroup>
+
+## Redirección TokkoBroker
+
+### Compatibilidad hacia Atrás
+
+Mantén redirecciones desde URLs antiguas de Tokko Broker:
+
+**Opción:** `thi_enable_tokko_broker_url`
+
+```
+Estructura de redirección:
+/p/{id}-prop → /property/codigo-referencia/ (WordPress)
+```
+
+Esto permite que:
+- URLs antiguas sigan siendo funcionales
+- Los buscadores actualicen automáticamente sus índices
+- Los visitantes con enlaces antiguos no vean errores 404
+
+<Tip>
+Las redirecciones son 301 (permanentes), lo que mantiene tu autoridad SEO.
+</Tip>
+
+### Configuración Paso a Paso
+
+<Steps>
+  <Step title="Accede a Configuración">
+    Ve a WordPress > Tokko Plugins > Configuración
+  </Step>
+  <Step title="Busca SEO y URLs">
+    Desplázate hasta la sección "SEO y URLs Personalizadas"
+  </Step>
+  <Step title="Habilita Tokko Broker URL">
+    Marca la opción `thi_enable_tokko_broker_url`
+  </Step>
+  <Step title="Guarda Cambios">
+    Haz clic en "Guardar cambios"
+  </Step>
+  <Step title="Actualiza Permalinks">
+    Ve a Configuración > Enlaces permanentes y guarda sin cambios
+  </Step>
+</Steps>
+
+## URLs de Emprendimientos
+
+### Estructura Específica para Desarrollos
+
+Los emprendimientos (desarrollos inmobiliarios) tienen su propia estructura de URL:
+
+```
+/emprendimiento/{nombre-desarrollo}/
+// Ejemplo: /emprendimiento/torres-del-lago/
+```
+
+<Note>
+Las URLs de emprendimientos se generan automáticamente cuando habilitas la sincronización de desarrollos. Ver [Emprendimientos](./emprendimientos) para más detalles.
+</Note>
+
+## Uso de Dirección como Título
+
+### Mejora SEO con Títulos Direccionales
+
+Habilita el uso de la dirección como título de propiedad para mejorar el SEO:
+
+**Opción:** `thi_use_address_as_title`
+
+```php
+// Deshabilitado (por defecto):
+// Título: "Departamento 3 Ambientes"
+//
+// Habilitado:
+// Título: "Av. Santa Fe 1234, Buenos Aires"
+```
+
+### Impacto en SEO
+
+<Tabs>
+  <Tab title="Con Dirección">
+    ✅ Mejora ubicación local
+    ✅ Palabras clave geográficas
+    ✅ Búsquedas por zona
+    ❌ Títulos menos descriptivos
+  </Tab>
+  <Tab title="Sin Dirección">
+    ✅ Títulos más descriptivos
+    ✅ Información del tipo de propiedad
+    ❌ Menos palabras clave geográficas
+    ❌ Búsquedas locales reducidas
+  </Tab>
+</Tabs>
+
+<Tip>
+Combina ambas estrategias: usa la dirección en la URL y el tipo de propiedad en el título. El plugin permite personalizar esto en el tema.
+</Tip>
+
+## Reglas de Reescritura
+
+### Cómo Funcionan
+
+El plugin registra reglas de reescritura en WordPress durante la inicialización:
+
+```php
+// Se agregan al flujo de WordPress
+add_action('init', 'register_custom_rewrite_rules');
+
+// Las reglas se guardan en la base de datos
+// como parte de la estructura de permalinks
+```
+
+### Actualización de Permalinks
+
+Después de habilitar/deshabilitar opciones de SEO, **siempre debes actualizar los permalinks**:
+
+<Steps>
+  <Step title="Ve a Configuración">
+    WordPress > Configuración > Enlaces permanentes
+  </Step>
+  <Step title="Verifica tu Estructura">
+    Selecciona la estructura que desees (por defecto: Nombre de la entrada)
+  </Step>
+  <Step title="Guarda Cambios">
+    Haz clic en "Guardar cambios"
+  </Step>
+</Steps>
+
+WordPress regenerará automáticamente las reglas de reescritura.
+
+<Warning>
+Si no actualizas los permalinks, las nuevas URL pueden no funcionar correctamente y recibirás errores 404.
+</Warning>
+
+## Impacto en Enlaces Existentes
+
+### Consideraciones Importantes
+
+Cuando cambias la estructura de URLs:
+
+| Aspecto | Impacto |
+|--------|--------|
+| Enlaces existentes | Las redirecciones 301 mantienen funcionando |
+| SEO | Mantiene autoridad de página (si usas 301) |
+| Usuarios | Los links antiguos redirigen automáticamente |
+| Analíticos | Puedes necesitar actualizar tracking |
+
+### Migración Segura
+
+Si ya tienes propiedades indexadas en Google:
+
+<Steps>
+  <Step title="Habilita Redirecciones">
+    Activa `thi_enable_tokko_broker_url` antes de cambiar URLs
+  </Step>
+  <Step title="Actualiza Permalinks">
+    WordPress regenerará las reglas de reescritura
+  </Step>
+  <Step title="Verifica en Search Console">
+    Usa Google Search Console para monitorear redirecciones
+  </Step>
+  <Step title="Monitorea 404s">
+    Busca errores en Search Console
+  </Step>
+</Steps>
+
+## Mejores Prácticas de SEO
+
+### URL Amigables
+
+✅ **Buenas prácticas:**
+- Incluye palabras clave relevantes: `/departamento-3-ambientes-recoleta/`
+- Cortas pero descriptivas: `/propiedad/casa-venta-zona-norte/`
+- Guiones para separar palabras (no guiones bajos)
+- Minúsculas y sin caracteres especiales
+
+❌ **Evita:**
+- URLs con parámetros numéricos: `/property?id=12345`
+- Caracteres especiales o acentos: `/propiedad-españa/`
+- URLs demasiado largas: `/departamento-3-ambientes-con-balcon-terraza-vista-rio/`
+
+### Meta Descripciones
+
+El plugin genera automáticamente meta descripciones basadas en:
+- Tipo de propiedad
+- Ubicación
+- Precio
+- Características principales
+
+<Tip>
+Las meta descripciones aparecen en resultados de búsqueda. Asegúrate de que sean atractivas y contengan información clave.
+</Tip>
+
+### Datos Estructurados
+
+El plugin incluye automáticamente schema.org markup para propiedades:
+
+```json
+{
+  "@context": "https://schema.org/",
+  "@type": "Property",
+  "name": "Departamento 3 ambientes",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Av. Santa Fe 1234",
+    "addressLocality": "Buenos Aires"
+  },
+  "price": "USD 250000"
+}
+```
+
+Esto mejora cómo los buscadores entienden tus propiedades.
+
+## Validación y Testing
+
+### Herramientas Recomendadas
+
+**Google Search Console**
+- Monitorea indexación
+- Identifica problemas de crawl
+- Revisa keywords
+
+**Google PageSpeed Insights**
+- Velocidad de carga (afecta SEO)
+- Core Web Vitals
+- Optimizaciones sugeridas
+
+**Schema.org Validator**
+- Verifica datos estructurados
+- Identifica errores de markup
+
+### Prueba Local
+
+Antes de activar cambios:
+
+```bash
+# Verifica que las URLs redirigen correctamente
+curl -I https://tudominio.com/p/12345-prop/
+
+# Debe retornar 301 o 302
+# Location: https://tudominio.com/property/codigo-referencia/
+```
+
+## Solución de Problemas
+
+### URLs Generan 404
+
+<Steps>
+  <Step title="Actualiza Permalinks">
+    Ve a Configuración > Enlaces permanentes y guarda
+  </Step>
+  <Step title="Verifica .htaccess">
+    Asegúrate que tiene permisos de lectura (644)
+  </Step>
+  <Step title="Habilita mod_rewrite">
+    Si usas Apache, comprueba que mod_rewrite está activo
+  </Step>
+</Steps>
+
+### Redirecciones No Funcionan
+
+```php
+// Verifica en wp-config.php que tienes:
+define('WP_HOME', 'https://tudominio.com');
+define('WP_SITEURL', 'https://tudominio.com');
+
+// Ambas deben coincidir con tu dominio real
+```
+
+### Conflictos con Otros Plugins
+
+Si experimentas conflictos:
+
+1. Desactiva plugins de SEO (Yoast, Rank Math, etc.)
+2. Verifica que no usen sus propias reglas de reescritura
+3. Contacta al soporte técnico si persisten
+
+---
+
+**Próximos pasos:** Aprende sobre [Emprendimientos](./emprendimientos) para sincronizar desarrollos inmobiliarios.

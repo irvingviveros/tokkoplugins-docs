@@ -1,0 +1,385 @@
+---
+title: "Instalación"
+description: "Requisitos del sistema e instrucción paso a paso para instalar el plugin"
+---
+
+# Instalación y requisitos
+
+Esta guía te ayudará a instalar Tokko Plugins en tu sitio WordPress con todas las verificaciones necesarias.
+
+## Requisitos del sistema
+
+Antes de instalar, asegúrate de cumplir con los siguientes requisitos:
+
+### Tabla de requisitos
+
+| Componente | Requisito | Recomendado | Estado |
+|-----------|----------|------------|--------|
+| **WordPress** | 6.0 o superior | 6.4+ | Verificar en **Información del sitio** |
+| **PHP** | 8.0 o superior | 8.2+ | Verificar en **Herramientas** → **Salud del sitio** |
+| **Tema** | Houzez (activo) | Última versión | Debe estar activo en **Apariencia** |
+| **Extensión cURL** | Habilitada | Incluida en PHP 8+ | Verificar en **Herramientas** → **Salud del sitio** |
+| **Memoria PHP** | 256 MB | 512 MB+ | Ver `wp-config.php` o contactar hosting |
+| **Almacenamiento** | 2 GB libres | 5 GB+ | Importante para imágenes de propiedades |
+
+### Verificar requisitos
+
+<Tabs>
+  <Tab title="Opción 1: Panel WordPress">
+    1. Ve a **Herramientas** → **Salud del sitio**
+    2. Verifica que todos los items sean ✓ **Bien**
+    3. Busca específicamente:
+       - PHP version (debe ser 8.0+)
+       - Extensiones recomendadas
+       - Memoria disponible
+  </Tab>
+  <Tab title="Opción 2: phpinfo()">
+    1. Crea un archivo temporal `phpinfo.php` en la raíz de tu sitio
+    2. Contenido:
+       ```php
+       <?php
+       phpinfo();
+       ?>
+       ```
+    3. Visita `www.tudominio.com/phpinfo.php`
+    4. Busca:
+       - PHP Version (debe ser 8.0+)
+       - "curl" en la lista de extensiones
+    5. **Elimina el archivo después** de verificar (¡por seguridad!)
+  </Tab>
+  <Tab title="Opción 3: Contactar hosting">
+    Si no puedes verificar por tu cuenta:
+    - Abre un ticket de soporte con tu proveedor
+    - Pregunta por PHP version, extensión cURL y límite de memoria
+  </Tab>
+</Tabs>
+
+<Warning>
+**Si no cumples los requisitos:** El plugin no funcionará. Contacta a tu proveedor de hosting para actualizar PHP, habilitar cURL o aumentar memoria.
+</Warning>
+
+## Métodos de instalación
+
+### Método 1: Desde el directorio oficial de WordPress
+
+Esta es la forma más simple y segura.
+
+<Steps>
+
+<Step title="Accede al panel de WordPress">
+Inicia sesión en tu sitio WordPress como administrador.
+</Step>
+
+<Step title="Ve a Plugins">
+En el menú izquierdo, haz clic en **Plugins** → **Añadir nuevo**.
+</Step>
+
+<Step title="Busca Tokko Plugins">
+En la barra de búsqueda, escribe "Tokko Plugins" y presiona Enter.
+</Step>
+
+<Step title="Instala el plugin">
+Localiza **Tokko Plugins - TokkoBroker Integration Professional** y haz clic en **Instalar ahora**.
+</Step>
+
+<Step title="Activa el plugin">
+Una vez instalado, verás el botón **Activar**. Haz clic para activar el plugin.
+</Step>
+
+<Step title="Verifica la activación">
+Deberías ver el mensaje: "**✓ Plugin activado correctamente**" y un nuevo elemento de menú **Tokko Plugins** en la barra de navegación.
+</Step>
+
+</Steps>
+
+### Método 2: Descarga desde Freemius (clientes con licencia)
+
+Si descargaste Tokko Plugins a través de Freemius:
+
+<Steps>
+
+<Step title="Descarga el archivo ZIP">
+1. Ve a tu [Freemius Dashboard](https://freemius.com/dashboard)
+2. Localiza Tokko Plugins
+3. Haz clic en **Descargar**
+4. Se descargará `tokko-plugins.zip`
+</Step>
+
+<Step title="Ve a Plugins en WordPress">
+En el panel de WordPress: **Plugins** → **Añadir nuevo**
+</Step>
+
+<Step title="Sube el archivo">
+Haz clic en **Subir plugin** (en la parte superior)
+</Step>
+
+<Step title="Selecciona el ZIP">
+Haz clic en **Elegir archivo** y selecciona `tokko-plugins.zip` que descargaste
+</Step>
+
+<Step title="Instala">
+Haz clic en **Instalar ahora**. Espera a que se complete la instalación.
+</Step>
+
+<Step title="Activa">
+Haz clic en **Activar plugin**
+</Step>
+
+</Steps>
+
+### Método 3: Instalación manual vía FTP (avanzado)
+
+Solo recomendado si tienes experiencia con FTP:
+
+<Steps>
+
+<Step title="Descarga el archivo">
+Obtén `tokko-plugins.zip` desde el directorio de WordPress o Freemius
+</Step>
+
+<Step title="Extrae el contenido">
+Descomprime el ZIP. Verás una carpeta llamada `tokko-plugins`
+</Step>
+
+<Step title="Conecta vía FTP">
+Usa un cliente FTP (FileZilla, Cyberduck, etc.) para conectar a tu servidor
+</Step>
+
+<Step title="Copia la carpeta">
+Sube la carpeta `tokko-plugins` a: `/wp-content/plugins/`
+</Step>
+
+<Step title="Activa en WordPress">
+Ve a **Plugins** y busca Tokko Plugins. Haz clic en **Activar**
+</Step>
+
+</Steps>
+
+## Verificación post-instalación
+
+Después de activar el plugin, realiza estas verificaciones:
+
+### ✓ Verifica el menú de Tokko Plugins
+
+1. En el menú izquierdo de WordPress, deberías ver **Tokko Plugins**
+2. Expande el menú y verás opciones como:
+   - Sincronización
+   - Configuración
+   - Dashboard
+   - Propiedades
+
+<Tip>
+Si no ves el menú, recarga la página (F5) o borra el caché del navegador.
+</Tip>
+
+### ✓ Revisa la página de estado
+
+1. Ve a **Tokko Plugins** → **Dashboard** (o **Estado**)
+2. Deberías ver una sección **Estado del sistema** con:
+   - ✓ WordPress versión
+   - ✓ PHP versión
+   - ✓ Tema Houzez (activo)
+   - ✓ Extensión cURL
+   - Memoria disponible
+
+<Info>
+Si algún item muestra una advertencia (⚠️) o error (❌), mira la sección **Problemas comunes** más abajo.
+</Info>
+
+### ✓ Verifica que Houzez esté activo
+
+El plugin requiere Houzez. Compruébalo:
+
+1. Ve a **Apariencia** → **Temas**
+2. Busca **Houzez** en la lista
+3. Debe decir **Activo** o estar en primer lugar
+
+Si Houzez no está activo:
+1. Encuentra el tema Houzez
+2. Haz clic en **Activar**
+3. Vuelve a Tokko Plugins y recarga
+
+## Activación y configuración de licencia
+
+El plugin utiliza **Freemius** para gestionar licencias. El proceso es automático:
+
+### Plan Starter (Gratuito)
+
+El plan Starter se activa automáticamente:
+1. Instala y activa el plugin
+2. Aceptas los términos de uso (si es la primera vez)
+3. Listo, ya puedes sincronizar hasta 100 propiedades
+
+<Note>
+No necesitas registrarte en Freemius para el plan Starter.
+</Note>
+
+### Planes Professional y PRO+ (De pago)
+
+Para usar planes de pago:
+
+1. Ve a **Tokko Plugins** → **Planes y precios** (o **Upgrade**)
+2. Selecciona el plan que deseas
+3. Serás redirigido a Freemius
+4. Completa el registro y pago
+5. Recibirás un email con tu licencia
+6. El plugin se actualizará automáticamente a tu plan
+
+<Tip>
+Si ya tienes una licencia Freemius, en **Tokko Plugins** → **Licencia** puedes ingresar tu clave de licencia manualmente.
+</Tip>
+
+## Problemas comunes durante la instalación
+
+### ❌ "PHP version no cumple con requisitos"
+
+**Problema:** Ves un mensaje que dice que necesitas PHP 8.0+
+
+**Solución:**
+1. Contacta a tu proveedor de hosting
+2. Solicita una actualización a PHP 8.2 o superior
+3. Mientras esperas, no puedes usar el plugin
+
+<Warning>
+PHP 7.4 y versiones anteriores **no son soportadas**. Algunos hosting permiten elegir la versión en el panel de control (cPanel, Plesk, etc.).
+</Warning>
+
+### ❌ "Extensión cURL no disponible"
+
+**Problema:** El estado del sistema muestra que cURL no está habilitado
+
+**Solución:**
+1. Abre un ticket con tu hosting
+2. Pide que habiliten la extensión `php-curl`
+3. La mayoría de proveedores lo hace en minutos
+
+**Para cPanel/Plesk:**
+- Accede al panel de control
+- Ve a PHP Extensions o módulos
+- Asegúrate de que `curl` esté marcado
+
+### ❌ "Tema Houzez no está activo"
+
+**Problema:** El plugin dice que Houzez no está instalado o activo
+
+**Solución:**
+1. Ve a **Apariencia** → **Temas**
+2. Si Houzez no aparece, debes instalarlo primero:
+   - Ve a **Temas** → **Añadir nuevo**
+   - Busca "Houzez"
+   - Haz clic en **Instalar**
+   - Luego **Activar**
+3. Si Houzez está instalado pero inactivo, actívalo
+4. Recarga la página de Tokko Plugins
+
+<Warning>
+Tokko Plugins **solo funciona con Houzez**. Si usas otro tema, el plugin no sincronizará propiedades.
+</Warning>
+
+### ❌ "Error 500 al instalar"
+
+**Problema:** Ves un error de servidor al intentar instalar
+
+**Solución:**
+1. Aumenta el límite de memoria PHP:
+   - Edita `wp-config.php` (vía FTP)
+   - Busca esta línea: `define('WP_MEMORY_LIMIT', '256M');`
+   - Cámbiala a: `define('WP_MEMORY_LIMIT', '512M');`
+   - Guarda el archivo
+2. Intenta la instalación nuevamente
+
+3. Si sigue sin funcionar, usa FTP (Método 3 más arriba)
+
+### ⚠️ "Freemius no se conecta"
+
+**Problema:** No puedes ver los planes de precio o se pide actualizar
+
+**Solución:**
+1. Verifica tu conexión a internet
+2. Asegúrate de que tu servidor pueda acceder a `api.freemius.com`
+3. Contacta a tu hosting si bloquean conexiones externas
+
+## Actualización del plugin
+
+### Actualizaciones automáticas
+
+WordPress comprueba automáticamente nuevas versiones:
+
+1. Ve a **Panel de control** → **Actualizaciones**
+2. Si hay una nueva versión de Tokko Plugins, verás un aviso
+3. Haz clic en **Actualizar ahora**
+
+<Tip>
+Las actualizaciones son automáticas y no requieren configuración adicional.
+</Tip>
+
+### Actualización manual
+
+Si prefieres actualizar manualmente:
+
+1. Descarga la nueva versión desde WordPress.org o Freemius
+2. Ve a **Plugins** → **Instalar plugin**
+3. Sube el nuevo ZIP (sobrescribirá la versión anterior)
+4. El plugin conservará tu configuración
+
+<Warning>
+**Siempre haz una copia de seguridad** antes de actualizar. Si algo falla, podrás restaurar tu sitio.
+</Warning>
+
+## Desinstalación
+
+Si necesitas desinstalar Tokko Plugins:
+
+<Tabs>
+  <Tab title="Desinstalación segura">
+    1. Ve a **Plugins**
+    2. Busca Tokko Plugins
+    3. Haz clic en **Desactivar**
+    4. Luego en **Eliminar**
+    5. Se te pedirá confirmación. Haz clic en **Sí, eliminar estos archivos**
+
+    **Nota:** Esto elimina el plugin pero conserva tus propiedades y datos en WordPress.
+  </Tab>
+  <Tab title="Eliminación completa">
+    Si quieres eliminar también todas las propiedades:
+
+    1. Desactiva y elimina el plugin (ver arriba)
+    2. Ve a **Propiedades** en WordPress
+    3. Selecciona todas las propiedades
+    4. En **Acciones en lote**, elige **Mover a papelera**
+    5. Vacía la papelera
+
+    **Advertencia:** Esta acción **no se puede deshacer**.
+  </Tab>
+</Tabs>
+
+---
+
+## Siguientes pasos
+
+Ahora que está instalado:
+
+<CardGroup cols={2}>
+  <Card
+    title="Inicio Rápido"
+    icon="rocket"
+    href="/inicio-rapido"
+    description="Configura en 5 minutos y sincroniza tus propiedades"
+  />
+  <Card
+    title="Configuración detallada"
+    icon="gear"
+    href="/configuracion"
+    description="Personaliza el comportamiento del plugin"
+  />
+  <Card
+    title="Troubleshooting"
+    icon="tools"
+    href="/troubleshooting"
+    description="Soluciona problemas de sincronización"
+  />
+</CardGroup>
+
+---
+
+**¿Necesitas ayuda?** Contacta a support@tokkoplugins.com o visita nuestra comunidad.

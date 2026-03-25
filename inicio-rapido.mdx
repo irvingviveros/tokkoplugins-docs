@@ -1,0 +1,174 @@
+---
+title: "Inicio Rápido"
+description: "Configura el plugin en 5 minutos y sincroniza tus primeras propiedades"
+---
+
+# Inicio Rápido — 5 Minutos
+
+¿Quieres empezar a sincronizar propiedades de inmediato? Sigue estos pasos sencillos para tener Tokko Plugins funcionando en tu sitio WordPress.
+
+<Steps>
+
+<Step title="Instala y activa el plugin">
+
+**Opción A: Desde el panel de WordPress**
+1. Ve a **Plugins** → **Añadir nuevo**
+2. Busca "Tokko Plugins" en el directorio oficial
+3. Haz clic en **Instalar ahora**
+4. Haz clic en **Activar**
+
+**Opción B: Descarga manual desde Freemius**
+1. Ve a [Freemius Dashboard](https://freemius.com)
+2. Descarga el archivo ZIP de Tokko Plugins
+3. En **Plugins** → **Añadir nuevo**, selecciona **Subir plugin**
+4. Carga el archivo ZIP y activa
+
+<Tip>
+Si no ves el plugin en el directorio oficial, probablemente uses el plan Starter. Accede a través de Freemius o contacta soporte.
+</Tip>
+
+</Step>
+
+<Step title="Verifica que Houzez esté activo">
+
+El plugin funciona **solo con el tema Houzez**. Compruébalo:
+
+1. Ve a **Apariencia** → **Temas**
+2. Busca **Houzez** en la lista
+3. Si no está activo, haz clic en **Activar**
+
+<Warning>
+Si no tienes instalado el tema Houzez, el plugin mostrará una advertencia. Instala y activa Houzez primero, luego vuelve a Tokko Plugins.
+</Warning>
+
+</Step>
+
+<Step title="Accede a la configuración del plugin">
+
+1. En el menú de WordPress, ve a **Tokko Plugins**
+2. Selecciona **Configuración** (o **Settings**)
+3. Verás la sección **Conexión con Tokko Broker**
+
+</Step>
+
+<Step title="Obtén tu API Key de Tokko Broker">
+
+Tu **API Key** es la credencial que conecta WordPress con tu CRM:
+
+1. Inicia sesión en **Tokko Broker** (tu CRM)
+2. Ve a **Configuración** → **Integraciones** (o **Webhooks/API**)
+3. Busca la sección **API Key** o **Token de acceso**
+4. Copia la clave (es una cadena larga de caracteres)
+5. Si no ves una clave, contacta al administrador de tu cuenta Tokko
+
+<Info>
+**¿Dónde encontrar el API Key?** En Tokko Broker, normalmente está en:
+- Panel de administrador → Configuración → Integraciones
+- O directamente en tu perfil → API/Webhooks
+
+Si tienes dudas, consulta la documentación oficial de Tokko Broker o contacta a soporte@tokkobroker.com
+</Info>
+
+</Step>
+
+<Step title="Ingresa el API Key en Tokko Plugins">
+
+1. En la página de **Configuración** de Tokko Plugins, encuentra el campo **API Key de Tokko Broker**
+2. Pega la clave que copiaste
+3. Haz clic en **Probar conexión** (si está disponible)
+4. Verás un mensaje de **✓ Conexión exitosa** si todo es correcto
+
+<Tip>
+Si ves un error de conexión, verifica que:
+- La clave sea completa (sin espacios al inicio/final)
+- Tu servidor tenga cURL habilitado
+- Tokko Broker esté activo y accesible
+</Tip>
+
+</Step>
+
+<Step title="Ejecuta la primera sincronización">
+
+Ahora es el momento de traer tus propiedades a WordPress:
+
+1. En **Tokko Plugins** → **Sincronización** (o **Sync**)
+2. Haz clic en el botón **Sincronizar Ahora** (o **Sync Now**)
+3. Verás un indicador de progreso: "Descargando propiedades..."
+
+<Warning>
+**Primera sincronización:** Dependiendo de cuántas propiedades tengas, puede tardar:
+- Menos de 100 propiedades: **1-2 minutos**
+- 100-500 propiedades: **5-10 minutos**
+- Más de 500 propiedades: **15-30 minutos** (o más)
+
+**No cierres el navegador** ni recargues la página. Puedes ver el progreso en el dashboard.
+</Warning>
+
+</Step>
+
+<Step title="Verifica que las propiedades se sincronizaron">
+
+Cuando termine la sincronización:
+
+1. Ve a **WordPress** → **Propiedades** (o **Properties**)
+2. Deberías ver una lista con tus propiedades de Tokko Broker
+3. Abre una propiedad para verificar que contenga:
+   - ✓ Título y descripción
+   - ✓ Imágenes/galería
+   - ✓ Precio y detalles
+   - ✓ Ubicación en mapa
+
+Si ves tus propiedades, **¡felicitaciones!** Tokko Plugins está funcionando correctamente.
+
+<Tip>
+Si no ves propiedades:
+- Asegúrate de que Tokko Broker tenga propiedades activas
+- Verifica que el API Key sea válido (paso 5)
+- Mira la sección **Troubleshooting** si necesitas ayuda
+</Tip>
+
+</Step>
+
+</Steps>
+
+## Próximos pasos
+
+Ahora que tu sitio sincroniza propiedades, considera:
+
+<CardGroup cols={2}>
+  <Card
+    title="Personaliza la configuración"
+    icon="palette"
+    href="/configuracion"
+    description="Ajusta URLs, imágenes, campos adicionales y más"
+  />
+  <Card
+    title="Configura sincronización automática"
+    icon="clock"
+    href="/configuracion#sincronizacion-automatica"
+    description="Haz que se actualice cada hora, día, etc."
+  />
+  <Card
+    title="Mapea campos personalizados"
+    icon="list"
+    href="/configuracion#campos-personalizados"
+    description="Sincroniza campos específicos de tu Tokko"
+  />
+  <Card
+    title="Soluciona problemas"
+    icon="bug"
+    href="/troubleshooting"
+    description="Si encuentras errores, mira aquí"
+  />
+</CardGroup>
+
+## ¿Tienes dudas?
+
+- 📖 Lee la **[Instalación detallada](/instalacion)** para información técnica
+- 🔧 Consulta **[Troubleshooting](/troubleshooting)** para errores comunes
+- 💬 Pregunta en nuestra **[comunidad](https://community.tokkoplugins.com)**
+- 📧 Envía un email a **support@tokkoplugins.com**
+
+---
+
+**¡Listo!** Tu catálogo inmobiliario está vivo y sincronizado. 🎉

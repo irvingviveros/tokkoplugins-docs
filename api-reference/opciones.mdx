@@ -1,0 +1,815 @@
+---
+title: "Opciones de WordPress"
+description: "Todas las opciones (wp_options) utilizadas por el plugin"
+---
+
+# Opciones de WordPress
+
+El plugin Tokko almacena todas sus configuraciones en las opciones de WordPress (`wp_options`). Esta referencia documentan todas las opciones disponibles, sus valores, tipos y cómo accederlas.
+
+## Configuración de API
+
+Estas opciones contienen los detalles de conexión con Tokko Broker.
+
+### thi_api_key
+
+Clave de autenticación para la API de Tokko Broker.
+
+<CodeGroup>
+```php Obtener
+$api_key = get_option('thi_api_key');
+```
+
+```php Establecer
+update_option('thi_api_key', 'tu-clave-api-aqui');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | '' (vacío) |
+| **Requerido** | Sí |
+| **Sensible** | Sí - No mostrar en formularios públicos |
+| **Descripción** | Clave de autenticación de TokkoBroker API. Se obtiene en panel de control de Tokko. |
+
+<Warning>
+Esta es una clave sensible. No la expongas en código público o repositorios Git.
+</Warning>
+
+---
+
+### thi_language
+
+Idioma de la API de Tokko.
+
+<CodeGroup>
+```php Obtener
+$language = get_option('thi_language', 'es');
+```
+
+```php Establecer
+update_option('thi_language', 'es');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | 'es' |
+| **Valores válidos** | 'es', 'en', 'pt', 'fr' |
+| **Descripción** | Idioma de respuesta de la API de Tokko. |
+
+---
+
+### thi_plugin_language
+
+Idioma de la interfaz del plugin.
+
+<CodeGroup>
+```php Obtener
+$lang = get_option('thi_plugin_language', 'es_ES');
+```
+
+```php Establecer
+update_option('thi_plugin_language', 'es_ES');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | 'es_ES' |
+| **Descripción** | Código de idioma para traducción del plugin en WordPress. |
+
+---
+
+## Configuración de sincronización
+
+### thi_sync_option
+
+Tipo de sincronización configurado.
+
+<CodeGroup>
+```php Obtener
+$sync_type = get_option('thi_sync_option', 'horariu');
+```
+
+```php Establecer
+update_option('thi_sync_option', 'hourly');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | 'hourly' |
+| **Valores válidos** | 'hourly', 'twicedaily', 'daily', 'custom' |
+| **Descripción** | Frecuencia de sincronización automática. |
+
+---
+
+### thi_custom_interval_value
+
+Valor personalizado en minutos para sincronización custom.
+
+<CodeGroup>
+```php Obtener
+$interval = get_option('thi_custom_interval_value', 60);
+```
+
+```php Establecer
+update_option('thi_custom_interval_value', 120);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | int |
+| **Valor predeterminado** | 60 |
+| **Rango válido** | 10 - 1440 |
+| **Unidad** | Minutos |
+| **Descripción** | Se usa solo cuando `thi_sync_option` es 'custom'. |
+
+---
+
+### thi_sync_developments
+
+Habilita sincronización de desarrollos.
+
+<CodeGroup>
+```php Obtener
+$sync_devs = get_option('thi_sync_developments', false);
+```
+
+```php Establecer
+update_option('thi_sync_developments', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descrición** | Si está habilitado, también sincroniza desarrollos además de propiedades. |
+
+---
+
+## Configuración de visualización
+
+### thi_default_map_enabled
+
+Muestra mapa por defecto en páginas de propiedad.
+
+<CodeGroup>
+```php Obtener
+$map_enabled = get_option('thi_default_map_enabled', true);
+```
+
+```php Establecer
+update_option('thi_default_map_enabled', false);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | true |
+| **Descripción** | Controla si los mapas de ubicación se muestran automáticamente. |
+
+---
+
+### thi_generate_thumbnails
+
+Genera miniaturas de imágenes al sincronizar.
+
+<CodeGroup>
+```php Obtener
+$thumbnails = get_option('thi_generate_thumbnails', true);
+```
+
+```php Establecer
+update_option('thi_generate_thumbnails', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | true |
+| **Descripción** | Si está activo, crea miniaturas de imágenes para mejor rendimiento. |
+
+---
+
+### thi_enable_secondary_url
+
+Habilita URL secundaria para propiedades.
+
+<CodeGroup>
+```php Obtener
+$secondary = get_option('thi_enable_secondary_url', false);
+```
+
+```php Establecer
+update_option('thi_enable_secondary_url', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Permite URLs alternativas para propiedades. |
+
+---
+
+### thi_enable_tokko_broker_url
+
+Enlaza a Tokko Broker en lugar de mostrar en sitio.
+
+<CodeGroup>
+```php Obtener
+$tokko_url = get_option('thi_enable_tokko_broker_url', false);
+```
+
+```php Establecer
+update_option('thi_enable_tokko_broker_url', false);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Si está activo, las propiedades redirigen a Tokko Broker. |
+
+---
+
+### thi_use_address_as_title
+
+Usa dirección como título de propiedad.
+
+<CodeGroup>
+```php Obtener
+$address_title = get_option('thi_use_address_as_title', false);
+```
+
+```php Establecer
+update_option('thi_use_address_as_title', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Si está habilitado, las direcciones se usan como títulos principales. |
+
+---
+
+### thi_hide_property_address
+
+Oculta la dirección completa de propiedades.
+
+<CodeGroup>
+```php Obtener
+$hide_address = get_option('thi_hide_property_address', false);
+```
+
+```php Establecer
+update_option('thi_hide_property_address', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Oculta la dirección completa por privacidad. |
+
+---
+
+## Configuración de búsqueda avanzada
+
+### thi_enhanced_search_enabled
+
+Activa búsqueda mejorada de propiedades.
+
+<CodeGroup>
+```php Obtener
+$search_enabled = get_option('thi_enhanced_search_enabled', false);
+```
+
+```php Establecer
+update_option('thi_enhanced_search_enabled', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Habilita filtros avanzados y búsqueda personalizada. |
+
+---
+
+### thi_enhanced_search_fields
+
+Campos habilitados para búsqueda avanzada.
+
+<CodeGroup>
+```php Obtener
+$fields = get_option('thi_enhanced_search_fields', []);
+```
+
+```php Establecer
+update_option('thi_enhanced_search_fields', [
+    'precio',
+    'dormitorios',
+    'baños',
+    'área',
+    'tipo_propiedad'
+]);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | array |
+| **Valor predeterminado** | [] (vacío) |
+| **Descripción** | Lista de campos disponibles en búsqueda avanzada. |
+
+---
+
+### thi_age_range_slider_color
+
+Color del slider de edad de construcción.
+
+<CodeGroup>
+```php Obtener
+$color = get_option('thi_age_range_slider_color', '#3498db');
+```
+
+```php Establecer
+update_option('thi_age_range_slider_color', '#e74c3c');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | '#3498db' |
+| **Formato** | Código hexadecimal de color |
+| **Descripción** | Color personalizado para rango de años en búsqueda. |
+
+---
+
+### thi_age_range_slider_label
+
+Etiqueta del slider de edad de construcción.
+
+<CodeGroup>
+```php Obtener
+$label = get_option('thi_age_range_slider_label', 'Años de construcción');
+```
+
+```php Establecer
+update_option('thi_age_range_slider_label', 'Antigüedad');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | 'Años de construcción' |
+| **Descripción** | Etiqueta visible para el rango de edad. |
+
+---
+
+### thi_age_range_slider_half_map_enabled
+
+Muestra slider a mitad de mapa.
+
+<CodeGroup>
+```php Obtener
+$half_map = get_option('thi_age_range_slider_half_map_enabled', false);
+```
+
+```php Establecer
+update_option('thi_age_range_slider_half_map_enabled', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Posiciona el slider al lado del mapa en lugar de arriba. |
+
+---
+
+## Configuración de agentes
+
+### thi_enable_agent_sync
+
+Habilita sincronización de agentes desde Tokko.
+
+<CodeGroup>
+```php Obtener
+$agent_sync = get_option('thi_enable_agent_sync', false);
+```
+
+```php Establecer
+update_option('thi_enable_agent_sync', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Si está activo, sincroniza agentes de Tokko como posts en WordPress. |
+
+---
+
+### thi_agent_mobile_is_whatsapp
+
+Trata números móviles de agentes como WhatsApp.
+
+<CodeGroup>
+```php Obtener
+$whatsapp = get_option('thi_agent_mobile_is_whatsapp', false);
+```
+
+```php Establecer
+update_option('thi_agent_mobile_is_whatsapp', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Convierte números móviles a enlaces de WhatsApp. |
+
+---
+
+### thi_download_agent_images
+
+Descarga imágenes de agentes localmente.
+
+<CodeGroup>
+```php Obtener
+$download_imgs = get_option('thi_download_agent_images', true);
+```
+
+```php Establecer
+update_option('thi_download_agent_images', false);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | true |
+| **Descripción** | Si está habilitado, descarga y almacena imágenes de agentes en el servidor. |
+
+---
+
+### thi_auto_assign_agent_id
+
+ID de agente para asignación automática de propiedades.
+
+<CodeGroup>
+```php Obtener
+$agent_id = get_option('thi_auto_assign_agent_id', 0);
+```
+
+```php Establecer
+update_option('thi_auto_assign_agent_id', 123);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | int |
+| **Valor predeterminado** | 0 (ninguno) |
+| **Descripción** | ID de WordPress del agente que recibe propiedades sin agente asignado. |
+
+---
+
+## Configuración de imágenes
+
+### thi_image_quality
+
+Calidad de procesamiento de imágenes.
+
+<CodeGroup>
+```php Obtener
+$quality = get_option('thi_image_quality', 'medium');
+```
+
+```php Establecer
+update_option('thi_image_quality', 'high');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | 'medium' |
+| **Valores válidos** | 'low', 'medium', 'high' |
+| **Descripción** | Determina resolución y calidad de imágenes sincronizadas. |
+| **Impacto** | Afecta tamaño de almacenamiento y velocidad de carga. |
+
+---
+
+## Configuración de contacto
+
+### thi_enable_contact_integration
+
+Habilita integración de formularios de contacto.
+
+<CodeGroup>
+```php Obtener
+$contact_enabled = get_option('thi_enable_contact_integration', false);
+```
+
+```php Establecer
+update_option('thi_enable_contact_integration', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Valor predeterminado** | false |
+| **Descripción** | Si está activo, conecta formularios de contacto con Tokko y CRM. |
+
+---
+
+## Estado y rastreo
+
+Estas opciones son actualizadas automáticamente por el plugin y generalmente no deben modificarse manualmente.
+
+### thi_last_sync_time
+
+Timestamp de la última sincronización completada.
+
+<CodeGroup>
+```php Obtener
+$last_sync = get_option('thi_last_sync_time', null);
+```
+
+```php Solo lectura
+// Esta opción se actualiza automáticamente
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string (ISO 8601) |
+| **Valor predeterminado** | null |
+| **Descripción** | Registro automático de cuándo se completó la última sincronización. |
+
+---
+
+### thi_last_sync_metadata
+
+Información detallada de la última sincronización.
+
+<CodeGroup>
+```php Obtener
+$metadata = get_option('thi_last_sync_metadata', []);
+
+// Estructura típica:
+echo $metadata['properties_created']; // int
+echo $metadata['properties_updated']; // int
+echo $metadata['images_processed'];    // int
+echo $metadata['duration'];            // float (segundos)
+echo $metadata['status'];              // 'success', 'error', 'warning'
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | array |
+| **Estructura** | Array con claves: created, updated, deleted, images_processed, duration, status |
+| **Descripción** | Metadatos detallados de la última sincronización. |
+
+---
+
+### thi_recent_sync_results
+
+Historial de últimas sincronizaciones (máximo 10).
+
+<CodeGroup>
+```php Obtener
+$results = get_option('thi_recent_sync_results', []);
+
+foreach ($results as $sync) {
+    echo $sync['timestamp'] . ': ' . $sync['status'];
+}
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | array |
+| **Descripción** | Array de objetos con resultados de últimas sincronizaciones. |
+
+---
+
+### thi_sync_error_history
+
+Historial de errores de sincronización.
+
+<CodeGroup>
+```php Obtener
+$errors = get_option('thi_sync_error_history', []);
+
+foreach ($errors as $error) {
+    echo 'Fecha: ' . $error['timestamp'];
+    echo 'Error: ' . $error['message'];
+    echo 'Código: ' . $error['code'];
+}
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | array |
+| **Descripción** | Lista de errores ocurridos durante sincronización. |
+| **Retención** | Últimos 50 errores |
+
+---
+
+### thi_intelligent_sync_ready
+
+Indica si sincronización inteligente está lista.
+
+<CodeGroup>
+```php Obtener
+$ready = get_option('thi_intelligent_sync_ready', false);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | bool |
+| **Descripción** | Se establece a true cuando el sistema está listo para detección de cambios. |
+
+---
+
+### thi_plugin_version
+
+Versión actual del plugin instalado.
+
+<CodeGroup>
+```php Obtener
+$version = get_option('thi_plugin_version', '1.0.0');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Descripción** | Versión del plugin. Se actualiza automáticamente al actualizar. |
+
+---
+
+### thi_last_api_connection
+
+Timestamp del último contacto exitoso con API.
+
+<CodeGroup>
+```php Obtener
+$last_api = get_option('thi_last_api_connection', null);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string (ISO 8601) |
+| **Descripción** | Ayuda a detectar problemas de conectividad con Tokko. |
+
+---
+
+### thi_last_api_response_time
+
+Tiempo de respuesta (en ms) de la última llamada API.
+
+<CodeGroup>
+```php Obtener
+$response_time = get_option('thi_last_api_response_time', 0);
+
+echo 'Última respuesta: ' . $response_time . 'ms';
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | int |
+| **Unidad** | Milisegundos |
+| **Descripción** | Útil para monitorear rendimiento de conexión con Tokko. |
+
+---
+
+## Acceso a opciones en código
+
+### Obtener opciones
+
+```php
+// Obtener con valor predeterminado
+$api_key = get_option('thi_api_key', 'default_value');
+
+// Obtener sin valor predeterminado
+$api_key = get_option('thi_api_key');
+
+// Obtener y decodificar JSON
+$fields = json_decode(get_option('thi_enhanced_search_fields', '[]'), true);
+```
+
+### Actualizar opciones
+
+```php
+// Actualizar simple
+update_option('thi_api_key', 'nueva-clave');
+
+// Actualizar con serialización automática
+update_option('thi_enhanced_search_fields', [
+    'precio',
+    'dormitorios'
+]);
+
+// Usar add_option si es nueva
+add_option('thi_custom_option', 'valor', '', 'yes');
+```
+
+### Eliminar opciones
+
+```php
+// Eliminar opción
+delete_option('thi_custom_option');
+```
+
+---
+
+## Mejores prácticas
+
+<Note>
+**No edites directamente en la base de datos.** Siempre usa funciones de WordPress para garantizar sanitización y validación correctas.
+</Note>
+
+<Tip>
+**Usa nombres con prefijo** al crear opciones personalizadas para evitar conflictos:
+
+```php
+// ✅ CORRECTO
+add_option('thi_my_custom_option', $value);
+
+// ❌ INCORRECTO
+add_option('custom_option', $value);
+```
+</Tip>
+
+```php
+// ✅ BUEN EJEMPLO - Actualizar opción con validación
+function update_my_option($value) {
+    // Validar
+    if (!is_array($value)) {
+        return false;
+    }
+
+    // Sanitizar
+    $sanitized = array_map('sanitize_text_field', $value);
+
+    // Actualizar
+    return update_option('thi_my_option', $sanitized);
+}
+```
+
+---
+
+## Exportar/Importar opciones
+
+```php
+// Exportar todas las opciones de Tokko
+$tokko_options = [];
+$all_options = wp_load_alloptions();
+
+foreach ($all_options as $name => $value) {
+    if (strpos($name, 'thi_') === 0) {
+        $tokko_options[$name] = $value;
+    }
+}
+
+echo json_encode($tokko_options);
+
+// Importar opciones
+$backup = json_decode(file_get_contents('backup.json'), true);
+
+foreach ($backup as $name => $value) {
+    update_option($name, $value);
+}
+```

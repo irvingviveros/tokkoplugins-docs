@@ -1,0 +1,135 @@
+---
+title: "Introducción a la API"
+description: "Referencia técnica para desarrolladores que desean extender el plugin"
+---
+
+# Introducción a la API del Plugin Tokko
+
+Bienvenido a la documentación técnica del plugin **Tokko Plugins - TokkoBroker Integration Professional** (v3.0.0). Esta guía está diseñada para desarrolladores que desean extender, personalizar o integrar la funcionalidad del plugin en sus proyectos WordPress.
+
+## ¿Para quién es esta documentación?
+
+Esta referencia de API es para:
+
+- **Desarrolladores de temas personalizados** que necesitan integrar datos de propiedades de Tokko
+- **Desarrolladores de plugins** que desean extender la funcionalidad de sincronización
+- **Integradores CRM** que necesitan conectar Tokko con sistemas externos
+- **Administradores de sitios avanzados** que requieren automatización personalizada
+
+## Vista general de la arquitectura
+
+El plugin Tokko está organizado en los siguientes componentes principales:
+
+### Clases principales
+
+```
+TokkoPlugins/
+├── src/
+│   ├── Sync/          # Motor de sincronización inteligente
+│   ├── API/           # Cliente de API de Tokko
+│   ├── Mapping/       # Mapeo de datos Tokko a Houzez
+│   ├── Images/        # Gestión de imágenes
+│   ├── Agents/        # Sincronización de agentes
+│   ├── Health/        # Monitoreo de salud del servidor
+│   └── Storage/       # Almacenamiento de datos en caché
+```
+
+### Puntos de extensión
+
+El plugin proporciona tres mecanismos principales para extensibilidad:
+
+<CardGroup cols={3}>
+  <Card title="Hooks de Acción" icon="bolt">
+    Ejecutar código en momentos específicos del ciclo de sincronización y eventos del plugin
+  </Card>
+  <Card title="Filtros" icon="filter">
+    Modificar valores y comportamientos antes de que se procesen en el plugin
+  </Card>
+  <Card title="Funciones públicas" icon="function">
+    Acceder a funcionalidad del plugin desde código personalizado
+  </Card>
+</CardGroup>
+
+## Flujo de sincronización
+
+El plugin utiliza un sistema inteligente de sincronización con los siguientes pasos:
+
+<Steps>
+  <Step title="Detección">
+    Se detecta la necesidad de sincronización mediante cron o acción manual
+  </Step>
+  <Step title="Validación">
+    Se valida la salud del servidor (memoria, CPU, espacio en disco)
+  </Step>
+  <Step title="Obtención de datos">
+    Se obtienen propiedades y desarrollos de la API de Tokko
+  </Step>
+  <Step title="Mapeo">
+    Se asignan datos de Tokko al formato compatible con Houzez
+  </Step>
+  <Step title="Sincronización">
+    Se crean, actualizan o eliminan propiedades en la base de datos
+  </Step>
+  <Step title="Procesamiento de imágenes">
+    Se descargan y procesan imágenes en lotes
+  </Step>
+  <Step title="Finalización">
+    Se registran estadísticas y se prepara para la próxima sincronización
+  </Step>
+</Steps>
+
+## Ciclo de vida del plugin
+
+```php
+// 1. Inicialización
+do_action('thi_init');
+
+// 2. Verificación de API
+thi_check_api_key();
+
+// 3. Sincronización programada o manual
+do_action('thi_scheduled_sync');
+
+// 4. Procesamiento de imágenes
+do_action('thi_continue_image_sync');
+
+// 5. Hooks de extensión personalizados
+apply_filters('thi_allow_image_sync_when_unhealthy', false);
+apply_filters('thi_server_health_check_enabled', true);
+```
+
+## Opciones y configuración
+
+Todas las configuraciones del plugin se almacenan en las opciones de WordPress (`wp_options`). Consulta la sección [Opciones de WordPress](/api-reference/opciones) para una lista completa.
+
+## Seguridad
+
+<Note>
+Todos los datos sensibles como claves API se validan en cada uso. Las funciones internas utilizan WordPress nonces y verificación de capacidades cuando es apropiado. Siempre valida y desinfecta entrada del usuario antes de usarla con funciones del plugin.
+</Note>
+
+## Limitaciones de plan
+
+El plugin respeta los límites de sincronización según el plan contratado:
+
+| Característica | Plan Estándar | Plan Profesional |
+|---|---|---|
+| Propiedades | Ilimitadas | Ilimitadas |
+| Desarrollos | 50 | Ilimitados |
+| Sincronización | Cada 6 horas | Cada 1 hora |
+| Agentes | Sincronización básica | Sincronización avanzada |
+
+## Siguientes pasos
+
+- Revisa la sección de [Hooks (Actions)](/api-reference/hooks) para eventos disponibles
+- Explora los [Filtros](/api-reference/filtros) para modificar comportamientos
+- Usa las [Funciones públicas](/api-reference/funciones) para acceder a datos
+- Consulta las [Opciones de WordPress](/api-reference/opciones) para configuración
+
+## Soporte para desarrolladores
+
+Para preguntas, reportes de errores o sugerencias sobre la API, contacta al equipo de Tokko Plugins a través de:
+
+- **Portal de soporte**: https://support.tokkoplugins.com
+- **Documentación**: https://docs.tokkoplugins.com
+- **GitHub Issues**: https://github.com/tokkoplugins/tokko-wordpress

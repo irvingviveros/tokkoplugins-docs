@@ -1,0 +1,562 @@
+---
+title: "Sincronización Automática"
+description: "Configura la sincronización programada con cron y Action Scheduler"
+---
+
+# Sincronización Automática
+
+Tokko Plugins automatiza la sincronización de propiedades mediante un sistema de programación confiable basado en **Action Scheduler**, una librería de WordPress que ejecuta tareas en horarios específicos sin depender de cron jobs externos.
+
+## Cómo Funciona la Sincronización Automática
+
+### Sistema de Programación
+
+El plugin utiliza Action Scheduler para crear y ejecutar tareas programadas:
+
+```
+┌─────────────────────────────────────┐
+│  Sincronización Automática Activada │
+└──────────────┬──────────────────────┘
+               │
+               ├─→ Action Scheduler crea la tarea
+               │
+               ├─→ Verifica si es momento de ejecutar
+               │
+               ├─→ Ejecuta sincronización
+               │   (Detect → Execute → Archive → Finalize)
+               │
+               └─→ Registra resultado y reprograma
+```
+
+### Detección de Cambios
+
+Antes de sincronizar, el sistema verifica:
+
+1. **Conexión a Tokko Broker** - ¿El servidor de Tokko responde?
+2. **Salud del servidor** - ¿Hay recursos suficientes?
+3. **Cambios pendientes** - ¿Hay propiedades modificadas desde la última sincronización?
+
+Si todo es correcto, procede con la sincronización inteligente.
+
+---
+
+## Configurar la Frecuencia de Sincronización
+
+### Opciones Disponibles
+
+Tokko Plugins ofrece múltiples opciones de frecuencia programada:
+
+<Tabs>
+  <Tab title="Frecuencias Predefinidas">
+    | Opción | Intervalo | Caso de Uso |
+    |--------|-----------|-----------|
+    | **Deshabilitada** | N/A | Solo sincronización manual |
+    | **Cada hora** | 60 minutos | Propiedades con cambios frecuentes |
+    | **Cada 6 horas** | 360 minutos | Actualizaciones moderadas |
+    | **Cada 12 horas** | 720 minutos | Actualizaciones diarias parciales |
+    | **Diaria** | 1,440 minutos | Estándar recomendado (se ejecuta 1x al día) |
+    | **Semanal** | 10,080 minutos | Pocos cambios en propiedades |
+    | **Quincenal** | 20,160 minutos | Catálogo muy estable |
+    | **Mensual** | 43,200 minutos | Catálogo prácticamente estático |
+  </Tab>
+  <Tab title="Intervalo Personalizado">
+    Selecciona esta opción si necesitas un intervalo que no está en la lista. Ingresa un valor en minutos (5 a 43,200 minutos).
+
+    **Ejemplos:**
+    - 30 minutos = Sincronización cada media hora
+    - 90 minutos = Sincronización cada 1.5 horas
+    - 180 minutos = Sincronización cada 3 horas
+  </Tab>
+</Tabs>
+
+### Cambiar la Frecuencia
+
+<Steps>
+  <Step title="Accede a Configuración">
+    Ve a **Tokko Plugins** → **Configuración General**
+  </Step>
+  <Step title="Busca Frecuencia de Sincronización">
+    En la sección **Sincronización**, encontrarás **Frecuencia de Sincronización**
+  </Step>
+  <Step title="Selecciona nueva frecuencia">
+    Elige de la lista desplegable o selecciona "Personalizada"
+  </Step>
+  <Step title="Si es personalizada, ingresa minutos">
+    En el campo **Intervalo Personalizado**, ingresa el número de minutos
+  </Step>
+  <Step title="Guarda los cambios">
+    Haz clic en **Guardar Configuración**
+  </Step>
+  <Step title="Verifica la programación">
+    El sistema re-programará la próxima ejecución automáticamente
+  </Step>
+</Steps>
+
+<Info>
+Los cambios de frecuencia entran en efecto inmediatamente. La próxima ejecución se programará según la nueva configuración.
+</Info>
+
+---
+
+## Action Scheduler: La Tecnología Detrás
+
+### ¿Qué es Action Scheduler?
+
+Action Scheduler es una librería de WordPress que:
+
+- **No requiere cron externo** - Funciona dentro de WordPress
+- **Es altamente confiable** - Reintenta tareas fallidas automáticamente
+- **Es escalable** - Maneja miles de tareas sin problemas
+- **Se integra nativamente** - Usa bases de datos estándar de WordPress
+
+### Ventajas de Action Scheduler
+
+<Tabs>
+  <Tab title="Fiabilidad">
+    - Reintentos automáticos en caso de fallos
+    - Registro completo de cada ejecución
+    - Manejo de transacciones para evitar pérdida de datos
+    - Recuperación automática si se interrumpe
+  </Tab>
+  <Tab title="Flexibilidad">
+    - Tareas recurrentes y de una sola ejecución
+    - Timestamps precisos
+    - Editar o cancelar tareas en cualquier momento
+    - Ejecutar tareas inmediatamente si es necesario
+  </Tab>
+  <Tab title="Visibilidad">
+    - Panel de monitoreo integrado
+    - Logs detallados de cada tarea
+    - Historial de ejecuciones
+    - Alertas de errores
+  </Tab>
+</Tabs>
+
+---
+
+## Monitorear Tareas Programadas
+
+### Acceder al Monitor de Tareas
+
+<Steps>
+  <Step title="Abre Tokko Plugins">
+    Ve a **Tokko Plugins** en el menú lateral de WordPress
+  </Step>
+  <Step title="Selecciona Sincronización">
+    Haz clic en **Sincronización** → **Monitor de Tareas**
+  </Step>
+  <Step title="Revisa el estado">
+    Verás una lista de todas las tareas programadas
+  </Step>
+</Steps>
+
+### Información Mostrada
+
+Para cada tarea programada, verás:
+
+| Información | Significado |
+|-------------|------------|
+| **Nombre de tarea** | Identificador único de la tarea |
+| **Estado** | Pendiente, En ejecución, Completada, Fallida |
+| **Próxima ejecución** | Fecha y hora de la próxima sincronización |
+| **Última ejecución** | Cuándo se ejecutó por última vez |
+| **Frecuencia** | Intervalo de repetición |
+| **Acciones** | Botones para ejecutar, editar o eliminar |
+
+### Interpretación del Estado
+
+- **Pendiente (Pending)** - Esperando ser ejecutada
+- **En Ejecución (Running)** - Se está ejecutando en este momento
+- **Completada (Completed)** - Se ejecutó exitosamente
+- **Fallida (Failed)** - Hubo un error durante la ejecución
+- **Cancelada (Cancelled)** - La tarea fue cancelada manualmente
+
+<Info>
+Las tareas fallidas no se eliminan automáticamente. Puedes revisar el error y reintentarlas.
+</Info>
+
+---
+
+## Controlar Tareas Programadas
+
+### Ejecutar Tarea Inmediatamente
+
+Si necesitas sincronizar sin esperar a la próxima ejecución programada:
+
+<Steps>
+  <Step title="Abre el Monitor de Tareas">
+    Ve a **Tokko Plugins** → **Sincronización** → **Monitor de Tareas**
+  </Step>
+  <Step title="Encuentra la tarea">
+    Busca la tarea de sincronización de propiedades
+  </Step>
+  <Step title="Haz clic en Ejecutar Ahora">
+    Se iniciará la sincronización inmediatamente
+  </Step>
+  <Step title="Espera a que complete">
+    Monitorea el progreso en el panel
+  </Step>
+</Steps>
+
+### Pausar Tareas Automáticas
+
+Para detener temporalmente todas las sincronizaciones automáticas:
+
+<Steps>
+  <Step title="Abre Configuración">
+    Ve a **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Cambia Frecuencia a Deshabilitada">
+    Selecciona **Deshabilitada** en "Frecuencia de Sincronización"
+  </Step>
+  <Step title="Guarda los cambios">
+    Todas las tareas automáticas se pausarán
+  </Step>
+</Steps>
+
+<Warning>
+Cuando pausas las tareas automáticas, las propiedades no se actualizarán hasta que habilites la sincronización nuevamente.
+</Warning>
+
+### Reanudar Tareas
+
+Para reactivar la sincronización automática:
+
+<Steps>
+  <Step title="Abre Configuración">
+    Ve a **Tokko Plugins** → **Configuración**
+  </Step>
+  <Step title="Selecciona una frecuencia">
+    Elige cualquier opción excepto "Deshabilitada"
+  </Step>
+  <Step title="Guarda los cambios">
+    Las tareas se reprogramarán automáticamente
+  </Step>
+</Steps>
+
+### Reintentar Tarea Fallida
+
+Si una sincronización falló, puedes intentarla nuevamente:
+
+<Steps>
+  <Step title="Abre el Monitor">
+    Ve a **Tokko Plugins** → **Sincronización** → **Monitor de Tareas**
+  </Step>
+  <Step title="Encuentra la tarea fallida">
+    Busca el estado "Fallida"
+  </Step>
+  <Step title="Haz clic en Reintentar">
+    Se ejecutará nuevamente
+  </Step>
+  <Step title="Revisa el resultado">
+    Si falla de nuevo, consulta los logs para el mensaje de error
+  </Step>
+</Steps>
+
+---
+
+## Expresiones Cron Avanzadas
+
+Si eres desarrollador y necesitas un control más granular, puedes usar expresiones cron estándar:
+
+### Formato de Cron
+
+```
+┌───────────── minuto (0 - 59)
+│ ┌───────────── hora (0 - 23)
+│ │ ┌───────────── día del mes (1 - 31)
+│ │ │ ┌───────────── mes (1 - 12)
+│ │ │ │ ┌───────────── día de la semana (0 - 6) (domingo a sábado)
+│ │ │ │ │
+│ │ │ │ │
+* * * * *
+```
+
+### Ejemplos Útiles
+
+<CodeGroup>
+```cron Diariamente
+# Todos los días a las 9:00 AM (hora local)
+0 9 * * *
+
+# Todos los días a las 6:00 PM (18:00)
+0 18 * * *
+```
+
+```cron Horarios Múltiples
+# Sincroniza cada 6 horas (0:00, 6:00, 12:00, 18:00)
+0 0,6,12,18 * * *
+
+# Sincroniza cada 3 horas
+0 0,3,6,9,12,15,18,21 * * *
+```
+
+```cron Días Específicos
+# Solo lunes y viernes
+0 9 * * 1,5
+
+# Lunes a viernes (días de semana)
+0 9 * * 1-5
+
+# Solo el primer día de cada mes
+0 0 1 * *
+```
+
+```cron Horarios Trabajables
+# Cada 2 horas entre 9 AM y 5 PM
+0 9-17/2 * * *
+
+# Cada 30 minutos
+*/30 * * * *
+```
+</CodeGroup>
+
+<Info>
+Para usar expresiones cron personalizadas, necesitarás acceso al archivo de configuración de Tokko Plugins o código personalizado. Contacta a soporte si necesitas ayuda.
+</Info>
+
+---
+
+## Optimizar la Programación
+
+### Elegir la Mejor Frecuencia
+
+Considera estos factores:
+
+<Tabs>
+  <Tab title="Poco Cambio (Semanal o Mensual)">
+    **Mejor para:**
+    - Catálogo inmobiliario estable
+    - Pocos cambios de precios
+    - Propiedades alquiladas a largo plazo
+
+    **Ventajas:**
+    - Bajo uso de recursos
+    - Servidor más rápido
+    - Facturas de hosting más bajas
+  </Tab>
+  <Tab title="Cambio Moderado (Diaria)">
+    **Mejor para:**
+    - Agencias activas
+    - Propiedades en venta
+    - Cambios ocasionales de información
+
+    **Ventajas:**
+    - Información relativamente fresca
+    - Balance entre actualización y recursos
+    - Estándar recomendado
+  </Tab>
+  <Tab title="Cambio Frecuente (Cada 6 horas o menos)">
+    **Mejor para:**
+    - Catálogos muy activos
+    - Múltiples agentes realizando cambios
+    - Precios que varían constantemente
+
+    **Ventajas:**
+    - Máxima actualización
+    - Datos casi en tiempo real
+
+    **Desventajas:**
+    - Mayor consumo de recursos
+    - Costo de servidor aumenta
+  </Tab>
+</Tabs>
+
+### Horarios Óptimos
+
+Para minimizar impacto en el rendimiento del sitio:
+
+<Steps>
+  <Step title="Sincroniza en horas de bajo tráfico">
+    Si tu sitio es más activo entre 9 AM - 6 PM, sincroniza en madrugada
+  </Step>
+  <Step title="Evita picos de tráfico">
+    No programes durante tus horarios de mayor actividad
+  </Step>
+  <Step title="Considera zonas horarias">
+    Si sirves múltiples zonas horarias, elige una que minimice impacto
+  </Step>
+  <Step title="Monitorea el rendimiento">
+    Revisa la salud del servidor después de cambiar frecuencia
+  </Step>
+</Steps>
+
+---
+
+## Solucionar Problemas de Programación
+
+### "Las tareas no se ejecutan"
+
+**Posibles causas:**
+- Action Scheduler deshabilitado
+- Problemas con el loopback HTTP (localhost)
+- Firewall bloqueando peticiones internas
+- Plugin en conflicto
+
+**Soluciones:**
+1. Verifica que Action Scheduler esté activo en tu WordPress
+2. Intenta ejecutar una tarea manualmente
+3. Revisa los logs de PHP para errores
+4. Desactiva plugins de seguridad temporalmente
+5. Contacta a tu proveedor de hosting
+
+### "Las tareas se ejecutan pero no funcionan"
+
+**Posibles causas:**
+- API Key inválida
+- Permisos insuficientes
+- Timeout durante ejecución
+
+**Soluciones:**
+1. Verifica que la API Key sea válida (intenta sincronizar manualmente)
+2. Aumenta el timeout de PHP (`max_execution_time`)
+3. Revisa los logs de sincronización
+4. Reduce la cantidad de propiedades a sincronizar
+
+### "Las tareas se ejecutan a horarios erráticos"
+
+**Posibles causas:**
+- Reloj del servidor desincronizado
+- Zona horaria incorrecta
+- Action Scheduler tiene tareas pendientes
+
+**Soluciones:**
+1. Verifica que la zona horaria de WordPress sea correcta
+2. Sincroniza el reloj del servidor con `ntpdate`
+3. Intenta ejecutar la tarea manualmente para limpiar la cola
+4. Revisa la base de datos (`wp_actionscheduler_actions`)
+
+### "Recibo errores de timeout frecuentemente"
+
+**Posibles causas:**
+- Sincronización de demasiadas propiedades
+- Servidor lento
+- Imágenes de muy alta resolución
+
+**Soluciones:**
+1. Aumenta `max_execution_time` en php.ini
+2. Incrementa el intervalo de sincronización
+3. Optimiza tamaño de imágenes en Tokko Broker
+4. Considera un hosting más potente
+
+<Warning>
+Si cambias `max_execution_time`, hazlo con cuidado. Un valor muy alto podría causar problemas de memoria.
+</Warning>
+
+---
+
+## Diferencias: Plan Gratis vs Premium
+
+### Plan Gratis
+
+| Función | Disponible |
+|---------|-----------|
+| Sincronización diaria | ✓ |
+| Sincronización cada 6 horas | ✗ |
+| Sincronización cada hora | ✗ |
+| Intervalo personalizado | Limitado (mínimo 24 horas) |
+| Monitor de tareas | Básico |
+| Reintentos automáticos | ✓ |
+
+### Plan Premium
+
+| Función | Disponible |
+|---------|-----------|
+| Sincronización diaria | ✓ |
+| Sincronización cada 6 horas | ✓ |
+| Sincronización cada hora | ✓ |
+| Intervalo personalizado | Ilimitado (5 minutos - 30 días) |
+| Monitor de tareas | Completo |
+| Reintentos automáticos | ✓ |
+| Soporte prioritario | ✓ |
+
+<Info>
+Consulta [planes y precios](https://tokkoplugins.com/pricing) para detalles sobre cómo actualizar.
+</Info>
+
+---
+
+## Logs de Sincronización
+
+### Acceder a los Logs
+
+<Steps>
+  <Step title="Abre Sincronización">
+    Ve a **Tokko Plugins** → **Sincronización**
+  </Step>
+  <Step title="Selecciona Logs">
+    Haz clic en la pestaña **Logs de Sincronización**
+  </Step>
+  <Step title="Filtra por fecha">
+    Selecciona el rango de fechas que deseas revisar
+  </Step>
+  <Step title="Busca errores">
+    Filtra por "Error" para ver solo problemas
+  </Step>
+</Steps>
+
+### Interpretar Logs
+
+Cada entrada de log incluye:
+
+- **Timestamp** - Fecha y hora exacta
+- **Nivel** - INFO, WARNING, ERROR
+- **Mensaje** - Descripción de qué ocurrió
+- **Propiedades afectadas** - Cuáles propiedades se vieron impactadas
+
+### Errores Comunes en Logs
+
+| Error | Significado | Acción |
+|-------|------------|--------|
+| `API_TIMEOUT` | Tokko Broker respondió lentamente | Reintentar más tarde |
+| `INVALID_API_KEY` | API Key incorrecta | Verificar configuración |
+| `DISK_FULL` | Sin espacio en disco | Liberar espacio |
+| `MEMORY_EXHAUSTED` | Sin memoria disponible | Aumentar límite PHP |
+| `IMAGE_DOWNLOAD_FAILED` | Error descargando imagen | Verificar URL, reintentar |
+
+---
+
+## Mejores Prácticas
+
+<Steps>
+  <Step title="Monitorea regularmente">
+    Revisa el Monitor de Tareas al menos semanalmente
+  </Step>
+  <Step title="Mantén logs limpios">
+    Archiva logs antiguos mensualmente para mejor rendimiento
+  </Step>
+  <Step title="Documenta cambios">
+    Registra cuándo cambias la frecuencia y por qué
+  </Step>
+  <Step title="Prueba cambios">
+    Realiza pruebas en staging antes de cambios importantes
+  </Step>
+  <Step title="Recibe alertas">
+    Habilita notificaciones por correo para errores
+  </Step>
+</Steps>
+
+---
+
+## Contactar al Soporte
+
+Si necesitas ayuda configurando o solucionando problemas de programación:
+
+<Steps>
+  <Step title="Prepara información">
+    Ten lista tu configuración actual, logs recientes, y descripción del problema
+  </Step>
+  <Step title="Contacta a soporte">
+    Ve a [soporte.tokkoplugins.com](https://soporte.tokkoplugins.com)
+  </Step>
+  <Step title="Proporciona detalles">
+    Incluye capturas del Monitor de Tareas y cualquier mensaje de error
+  </Step>
+  <Step title="Aguarda respuesta">
+    El equipo de soporte te ayudará a optimizar tu configuración
+  </Step>
+</Steps>
+
+<Tip>
+La sincronización automática bien configurada es la clave para mantener tu catálogo de propiedades siempre actualizado. Tómate tiempo para encontrar la frecuencia correcta para tu negocio.
+</Tip>

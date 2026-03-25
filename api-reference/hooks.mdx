@@ -1,0 +1,383 @@
+---
+title: "Hooks (Actions)"
+description: "Todos los hooks de acción disponibles para extender la funcionalidad"
+---
+
+# Hooks de Acción
+
+Los hooks de acción permiten ejecutar código personalizado en momentos específicos del ciclo de vida del plugin. Utiliza `add_action()` para conectarse a estos hooks.
+
+## Hooks de sincronización
+
+### thi_scheduled_sync
+
+Se dispara durante la sincronización programada del plugin.
+
+<CodeGroup>
+```php Hook
+do_action('thi_scheduled_sync');
+```
+
+```php Ejemplo
+add_action('thi_scheduled_sync', function() {
+    error_log('Iniciando sincronización programada');
+    // Tu código personalizado aquí
+});
+```
+</CodeGroup>
+
+**Parámetros**: Ninguno
+
+**Descripción**: Se ejecuta al iniciar una sincronización programada por cron. Útil para registrar eventos, notificaciones o validaciones previas.
+
+**Ubicación definida**: `/src/Sync/SyncManager.php`
+
+---
+
+### thi_continue_image_sync
+
+Se dispara para continuar el procesamiento de imágenes en lotes.
+
+<CodeGroup>
+```php Hook
+do_action('thi_continue_image_sync', $context);
+```
+
+```php Ejemplo
+add_action('thi_continue_image_sync', function($context) {
+    // Ejecutar lógica adicional después de cada lote de imágenes
+    update_option('custom_image_batch_count',
+        intval(get_option('custom_image_batch_count', 0)) + 1
+    );
+});
+```
+</CodeGroup>
+
+**Parámetros**:
+- `$context` (array) - Contexto de sincronización con información del lote actual
+
+**Descripción**: Se dispara múltiples veces durante el procesamiento de imágenes para permitir procesos adicionales por lote.
+
+**Ubicación definida**: `/src/Images/ImageProcessor.php`
+
+---
+
+### thi_bulk_update_titles_batch
+
+Se dispara durante el procesamiento de un lote de actualización de títulos.
+
+<CodeGroup>
+```php Hook
+do_action('thi_bulk_update_titles_batch', $batch, $total_processed);
+```
+
+```php Ejemplo
+add_action('thi_bulk_update_titles_batch', function($batch, $total) {
+    error_log("Procesados {$total} títulos de {$batch['total']} totales");
+});
+```
+</CodeGroup>
+
+**Parámetros**:
+- `$batch` (array) - Información del lote actual
+- `$total_processed` (int) - Total de elementos procesados hasta ahora
+
+**Descripción**: Permite monitorear o ejecutar acciones durante actualización masiva de títulos.
+
+**Ubicación definida**: `/src/Mapping/PropertyMapper.php`
+
+---
+
+### thi_cron_sync_continue
+
+Se dispara como continuación de una sincronización cron.
+
+<CodeGroup>
+```php Hook
+do_action('thi_cron_sync_continue', $sync_state);
+```
+
+```php Ejemplo
+add_action('thi_cron_sync_continue', function($sync_state) {
+    if ($sync_state['status'] === 'error') {
+        wp_mail(
+            get_option('admin_email'),
+            'Error en sincronización Tokko',
+            'La sincronización falló: ' . $sync_state['error']
+        );
+    }
+});
+```
+</CodeGroup>
+
+**Parámetros**:
+- `$sync_state` (array) - Estado actual de la sincronización
+
+**Descripción**: Se ejecuta cuando se reanuda una sincronización desde cron después de una pausa.
+
+**Ubicación definida**: `/src/Sync/CronScheduler.php`
+
+---
+
+## Hooks de integración
+
+### tp_fs_loaded
+
+Se dispara cuando el SDK de Freemius se ha cargado completamente.
+
+<CodeGroup>
+```php Hook
+do_action('tp_fs_loaded');
+```
+
+```php Ejemplo
+add_action('tp_fs_loaded', function() {
+    // Acceso seguro a funcionalidad de Freemius
+    if (function_exists('tp_fs')) {
+        $user = tp_fs()->get_user();
+        error_log('Usuario Freemius: ' . $user->email);
+    }
+});
+```
+</CodeGroup>
+
+**Parámetros**: Ninguno
+
+**Descripción**: Proporciona un punto seguro para inicializar código dependiente de Freemius después de que se ha cargado el SDK.
+
+**Ubicación definida**: `/tokko-plugins.php`
+
+---
+
+### houzez_after_agent_form_submission
+
+Se dispara después del envío de un formulario de agente en Houzez (usado para CRM).
+
+<CodeGroup>
+```php Hook
+do_action('houzez_after_agent_form_submission', $form_data, $agent_id);
+```
+
+```php Ejemplo
+add_action('houzez_after_agent_form_submission', function($form_data, $agent_id) {
+    // Sincronizar datos del formulario con CRM externo
+    do_post_request('https://crm.example.com/api/agents', [
+        'agent_id' => $agent_id,
+        'form_data' => $form_data
+    ]);
+});
+```
+</CodeGroup>
+
+**Parámetros**:
+- `$form_data` (array) - Datos enviados en el formulario
+- `$agent_id` (int) - ID del agente
+
+**Descripción**: Permite procesar datos de formularios de agentes para integraciones CRM.
+
+**Ubicación definida**: Hook de tema Houzez
+
+---
+
+### tokko_contact_form_submission
+
+Se dispara al enviar un formulario de contacto personalizado de Tokko.
+
+<CodeGroup>
+```php Hook
+do_action('tokko_contact_form_submission', $submission_data, $property_id);
+```
+
+```php Ejemplo
+add_action('tokko_contact_form_submission', function($data, $prop_id) {
+    // Guardar en base de datos personalizada
+    global $wpdb;
+    $wpdb->insert('wp_custom_leads', [
+        'property_id' => $prop_id,
+        'name' => sanitize_text_field($data['name']),
+        'email' => sanitize_email($data['email']),
+        'date' => current_time('mysql')
+    ]);
+});
+```
+</CodeGroup>
+
+**Parámetros**:
+- `$submission_data` (array) - Datos del formulario de contacto
+- `$property_id` (int) - ID de la propiedad asociada
+
+**Descripción**: Se dispara cuando se envía un formulario de contacto de propiedad.
+
+**Ubicación definida**: `/src/Forms/ContactForm.php`
+
+---
+
+## Hooks de AJAX
+
+Estos hooks se disparan mediante acciones AJAX del plugin. Son útiles para extender el comportamiento de sincronización desde el panel de administración.
+
+### thi_unified_sync_detect
+
+Inicia la detección de cambios para sincronización.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_unified_sync_detect');
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_unified_sync_detect', function() {
+    // Validar capacidades de usuario
+    if (!current_user_can('manage_options')) {
+        wp_die('Acceso denegado');
+    }
+    // Código personalizado...
+});
+```
+</CodeGroup>
+
+**Descripción**: Punto de entrada para detección de cambios en sincronización AJAX.
+
+---
+
+### thi_unified_sync_execute_batch
+
+Ejecuta un lote de sincronización.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_unified_sync_execute_batch', $batch_data);
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_unified_sync_execute_batch', function() {
+    // Procesar lote enviado
+    $batch = isset($_POST['batch']) ? json_decode(wp_unslash($_POST['batch']), true) : [];
+    error_log('Procesando lote de ' . count($batch) . ' elementos');
+});
+```
+</CodeGroup>
+
+**Descripción**: Se dispara para ejecutar un lote individual durante sincronización AJAX.
+
+---
+
+### thi_unified_sync_finalize
+
+Finaliza la sincronización AJAX.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_unified_sync_finalize');
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_unified_sync_finalize', function() {
+    // Limpieza final
+    delete_transient('thi_sync_in_progress');
+    wp_cache_flush();
+});
+```
+</CodeGroup>
+
+**Descripción**: Se dispara al finalizar la sincronización AJAX.
+
+---
+
+### thi_sync_single_property
+
+Sincroniza una propiedad individual.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_sync_single_property', $property_id);
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_sync_single_property', function() {
+    $prop_id = isset($_POST['property_id']) ? intval($_POST['property_id']) : 0;
+    if ($prop_id > 0) {
+        // Sincronizar propiedad individual
+    }
+});
+```
+</CodeGroup>
+
+**Descripción**: Permite sincronizar una propiedad específica bajo demanda.
+
+---
+
+### thi_sync_developments_only
+
+Sincroniza únicamente desarrollos.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_sync_developments_only');
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_sync_developments_only', function() {
+    if (!current_user_can('manage_options')) {
+        wp_die('Acceso denegado');
+    }
+    // Sincronizar solo desarrollos
+});
+```
+</CodeGroup>
+
+**Descripción**: Ejecuta sincronización de desarrollos únicamente.
+
+---
+
+### thi_force_reprocess_properties
+
+Fuerza reprocesamiento de todas las propiedades.
+
+<CodeGroup>
+```php Hook
+do_action('wp_ajax_thi_force_reprocess_properties');
+```
+
+```php Ejemplo
+add_action('wp_ajax_thi_force_reprocess_properties', function() {
+    // Limpiar caché de propiedades
+    delete_transient('thi_cached_properties');
+    // Iniciar reprocesamiento
+});
+```
+</CodeGroup>
+
+**Descripción**: Borra el caché de propiedades y reinicia el procesamiento desde cero.
+
+---
+
+## Mejores prácticas
+
+<Note>
+**Siempre valida capacidades de usuario** usando `current_user_can()` en hooks de administración.
+</Note>
+
+<Tip>
+**Usa opciones transitorias** para datos temporales en hooks de sincronización para no sobrecargar la base de datos.
+</Tip>
+
+```php
+// Buen ejemplo
+add_action('thi_scheduled_sync', function() {
+    // Almacenar datos temporales
+    set_transient('thi_custom_sync_log', [
+        'started' => current_time('mysql'),
+        'status' => 'processing'
+    ], 12 * HOUR_IN_SECONDS);
+
+    // Ejecutar lógica personalizada
+    // ...
+});
+```
+
+## Performance
+
+- Mantén hooks ligeros; no ejecutes operaciones pesadas
+- Usa `wp_remote_post()` asincrónico para llamadas externas
+- Aprovecha el sistema de caché de WordPress

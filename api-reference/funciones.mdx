@@ -1,0 +1,883 @@
+---
+title: "Funciones"
+description: "Funciones públicas disponibles para desarrolladores"
+---
+
+# Funciones públicas
+
+Estas funciones están disponibles después de que el plugin Tokko se ha inicializado. Úsalas en tus temas, plugins o código personalizado.
+
+## Funciones de sincronización
+
+### thi_sync_now()
+
+Inicia una sincronización completa de propiedades y desarrollos.
+
+<CodeGroup>
+```php Firma
+function thi_sync_now(): bool
+```
+
+```php Ejemplo
+// Sincronizar propiedades desde administración personalizada
+if (thi_sync_now()) {
+    wp_safe_remote_post(
+        admin_url('admin-ajax.php'),
+        ['sslverify' => false]
+    );
+    echo 'Sincronización iniciada';
+} else {
+    echo 'No se pudo iniciar la sincronización';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | `bool` - true si se inició, false si falló |
+| **Parámetros** | Ninguno |
+| **Lanza excepciones** | No |
+| **Descripción** | Dispara el ciclo completo de sincronización. Realiza chequeos de salud antes de proceder. |
+| **Ubicación** | `/src/Sync/SyncManager.php` |
+
+---
+
+### thi_detect_sync_context()
+
+Obtiene el contexto actual de sincronización.
+
+<CodeGroup>
+```php Firma
+function thi_detect_sync_context(): array
+```
+
+```php Ejemplo
+$context = thi_detect_sync_context();
+
+if ($context['is_syncing']) {
+    echo 'Sincronización en progreso: ' . $context['progress'] . '%';
+} else {
+    echo 'Última sincronización: ' . $context['last_sync_time'];
+}
+```
+</CodeGroup>
+
+**Retorna array con claves**:
+- `is_syncing` (bool) - Si hay sincronización activa
+- `progress` (int) - Porcentaje de progreso (0-100)
+- `last_sync_time` (string) - Timestamp de última sincronización
+- `last_sync_status` (string) - Estado: 'success', 'error', 'warning'
+- `current_batch` (int) - Lote actual procesado
+- `total_batches` (int) - Total de lotes
+- `error_count` (int) - Errores encontrados
+- `warning_count` (int) - Advertencias generadas
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/Sync/SyncManager.php` |
+
+---
+
+### thi_intelligent_sync()
+
+Sincronización inteligente que solo procesa cambios detectados.
+
+<CodeGroup>
+```php Firma
+function thi_intelligent_sync(): array
+```
+
+```php Ejemplo
+$result = thi_intelligent_sync();
+
+echo 'Propiedades actualizadas: ' . $result['updated'];
+echo 'Propiedades nuevas: ' . $result['created'];
+echo 'Propiedades eliminadas: ' . $result['deleted'];
+```
+</CodeGroup>
+
+**Retorna array con**:
+- `success` (bool) - Si la sincronización fue exitosa
+- `created` (int) - Propiedades creadas
+- `updated` (int) - Propiedades actualizadas
+- `deleted` (int) - Propiedades eliminadas
+- `images_processed` (int) - Imágenes procesadas
+- `errors` (array) - Lista de errores ocurridos
+- `execution_time` (float) - Tiempo total en segundos
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | Ninguno |
+| **Descripción** | Analiza cambios desde la última sincronización y solo procesa lo necesario. Más eficiente que `thi_sync_now()`. |
+| **Ubicación** | `/src/Sync/SyncManager.php` |
+
+---
+
+### thi_get_cached_properties()
+
+Obtiene propiedades almacenadas en caché de la API.
+
+<CodeGroup>
+```php Firma
+function thi_get_cached_properties(?int $limit = null): array
+```
+
+```php Ejemplo
+$properties = thi_get_cached_properties(10);
+
+foreach ($properties as $property) {
+    echo $property['title'] . ' - $' . $property['price'];
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$limit` (int\|null) - Máximo de propiedades a retornar, null para todas |
+| **Valor de retorno** | array de propiedades mapeadas a formato Houzez |
+| **Ubicación** | `/src/Storage/PropertyCache.php` |
+
+---
+
+### thi_get_cached_developments()
+
+Obtiene desarrollos almacenados en caché.
+
+<CodeGroup>
+```php Firma
+function thi_get_cached_developments(?int $limit = null): array
+```
+
+```php Ejemplo
+$developments = thi_get_cached_developments(5);
+
+foreach ($developments as $dev) {
+    echo 'Proyecto: ' . $dev['name'];
+    echo 'Propiedades: ' . count($dev['properties']);
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$limit` (int\|null) - Máximo de desarrollos, null para todos |
+| **Valor de retorno** | array de desarrollos con propiedades asociadas |
+| **Ubicación** | `/src/Storage/DevelopmentCache.php` |
+
+---
+
+### thi_detect_changed_properties()
+
+Detecta qué propiedades han cambiado desde la última sincronización.
+
+<CodeGroup>
+```php Firma
+function thi_detect_changed_properties(): array
+```
+
+```php Ejemplo
+$changes = thi_detect_changed_properties();
+
+echo 'Propiedades modificadas: ' . count($changes['modified']);
+echo 'Propiedades nuevas: ' . count($changes['new']);
+echo 'Propiedades para eliminar: ' . count($changes['deleted']);
+```
+</CodeGroup>
+
+**Retorna array con**:
+- `new` (array) - IDs de Tokko para propiedades nuevas
+- `modified` (array) - IDs de Tokko para propiedades modificadas
+- `deleted` (array) - IDs de Tokko para propiedades eliminadas
+- `timestamp` (string) - Momento de detección
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | Ninguno |
+| **Descripción** | Compara estado actual con timestamps guardados para identificar cambios eficientemente. |
+| **Ubicación** | `/src/Sync/ChangeDetector.php` |
+
+---
+
+## Funciones de API
+
+### thi_check_api_key()
+
+Valida la clave API de Tokko configurada.
+
+<CodeGroup>
+```php Firma
+function thi_check_api_key(): bool
+```
+
+```php Ejemplo
+if (!thi_check_api_key()) {
+    wp_die('Error: Clave API de Tokko no configurada o inválida');
+}
+
+// Proceder con operaciones de API
+$properties = thi_get_tokko_properties();
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | bool - true si la clave es válida y conectada |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/API/TokkoBrokerClient.php` |
+
+---
+
+### thi_get_tokko_properties()
+
+Obtiene propiedades de la API de Tokko.
+
+<CodeGroup>
+```php Firma
+function thi_get_tokko_properties(
+    ?int $limit = null,
+    ?int $offset = 0
+): array
+```
+
+```php Ejemplo
+// Obtener primeras 100 propiedades
+$properties = thi_get_tokko_properties(100, 0);
+
+foreach ($properties as $prop) {
+    echo $prop['title'] . ': $' . $prop['price'];
+    echo 'Dormitorios: ' . $prop['bedrooms'];
+}
+
+// Obtener siguiente página
+$next_page = thi_get_tokko_properties(100, 100);
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$limit` (int) - Max propiedades, `$offset` (int) - Posición inicial |
+| **Valor de retorno** | array de propiedades con datos mapeados de Tokko |
+| **Respeta límites** | Sí, según plan contratado |
+| **Ubicación** | `/src/API/TokkoBrokerClient.php` |
+
+<Note>
+El plugin respeta automáticamente los límites de propiedades según tu plan de suscripción.
+</Note>
+
+---
+
+### thi_get_tokko_developments()
+
+Obtiene desarrollos de la API de Tokko.
+
+<CodeGroup>
+```php Firma
+function thi_get_tokko_developments(
+    ?int $limit = null,
+    ?int $offset = 0
+): array
+```
+
+```php Ejemplo
+$developments = thi_get_tokko_developments();
+
+foreach ($developments as $dev) {
+    echo 'Proyecto: ' . $dev['name'];
+    echo 'Constructor: ' . $dev['builder'];
+    echo 'Propiedades en proyecto: ' . count($dev['properties']);
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$limit` (int) - Max desarrollos, `$offset` (int) - Posición |
+| **Valor de retorno** | array de desarrollos con propiedades anidadas |
+| **Plan Estándar** | Máximo 50 desarrollos |
+| **Plan Profesional** | Ilimitados |
+| **Ubicación** | `/src/API/TokkoBrokerClient.php` |
+
+---
+
+### thi_get_development_count()
+
+Obtiene el número total de desarrollos.
+
+<CodeGroup>
+```php Firma
+function thi_get_development_count(): int
+```
+
+```php Ejemplo
+$total = thi_get_development_count();
+echo 'Total de desarrollos: ' . $total;
+
+if ($total > 50) {
+    echo 'Nota: Plan Estándar soporta solo 50';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | int - Total de desarrollos en Tokko |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/API/TokkoBrokerClient.php` |
+
+---
+
+### thi_get_development_sync_limits()
+
+Obtiene información sobre límites de sincronización según plan.
+
+<CodeGroup>
+```php Firma
+function thi_get_development_sync_limits(): array
+```
+
+```php Ejemplo
+$limits = thi_get_development_sync_limits();
+
+echo 'Desarrollos sincronizados: ' . $limits['synced'];
+echo 'Límite de plan: ' . $limits['limit'];
+echo 'Disponibles: ' . ($limits['limit'] - $limits['synced']);
+```
+</CodeGroup>
+
+**Retorna array con**:
+- `limit` (int) - Total permitido por plan
+- `synced` (int) - Desarrollos ya sincronizados
+- `available` (int) - Desarrollos disponibles para sincronizar
+- `plan` (string) - Plan actual ('standard', 'professional')
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/API/TokkoBrokerClient.php` |
+
+---
+
+## Funciones de agentes
+
+### thi_sync_agent()
+
+Sincroniza un agente individual de Tokko a WordPress.
+
+<CodeGroup>
+```php Firma
+function thi_sync_agent(array $data): int|false
+```
+
+```php Ejemplo
+$agent_data = [
+    'tokko_id' => 12345,
+    'name' => 'Juan García',
+    'email' => 'juan@example.com',
+    'phone' => '+34912345678',
+    'image_url' => 'https://...'
+];
+
+$agent_id = thi_sync_agent($agent_data);
+
+if ($agent_id) {
+    echo 'Agente sincronizado con ID: ' . $agent_id;
+} else {
+    echo 'Error al sincronizar agente';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$data` (array) - Datos de agente de Tokko |
+| **Valor de retorno** | int (ID de post de WordPress) o false si falla |
+| **Ubicación** | `/src/Agents/AgentSynchronizer.php` |
+
+---
+
+### thi_delete_agent()
+
+Elimina un agente de WordPress.
+
+<CodeGroup>
+```php Firma
+function thi_delete_agent(
+    int $id,
+    ?int $reassign = null
+): bool
+```
+
+```php Ejemplo
+// Eliminar agente y reasignar propiedades
+$success = thi_delete_agent(456, 789);
+
+if ($success) {
+    echo 'Agente eliminado y propiedades reasignadas';
+}
+
+// Eliminar sin reasignar
+$success = thi_delete_agent(456);
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$id` (int) - ID del agente, `$reassign` (int\|null) - ID del agente nuevo |
+| **Valor de retorno** | bool - true si se eliminó exitosamente |
+| **Ubicación** | `/src/Agents/AgentManager.php` |
+
+---
+
+### thi_update_agent()
+
+Actualiza datos de un agente existente.
+
+<CodeGroup>
+```php Firma
+function thi_update_agent(int $id, array $data): bool
+```
+
+```php Ejemplo
+$update_data = [
+    'name' => 'Juan García Pérez',
+    'phone' => '+34912345679',
+    'email' => 'nuevo@example.com'
+];
+
+if (thi_update_agent(456, $update_data)) {
+    echo 'Agente actualizado';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$id` (int) - ID del agente, `$data` (array) - Campos a actualizar |
+| **Valor de retorno** | bool - true si se actualizó |
+| **Ubicación** | `/src/Agents/AgentManager.php` |
+
+---
+
+### thi_sync_agents_from_properties()
+
+Sincroniza agentes en lote desde propiedades.
+
+<CodeGroup>
+```php Firma
+function thi_sync_agents_from_properties(
+    array $properties
+): array
+```
+
+```php Ejemplo
+$properties = thi_get_tokko_properties(100);
+$result = thi_sync_agents_from_properties($properties);
+
+echo 'Agentes creados: ' . $result['created'];
+echo 'Agentes actualizados: ' . $result['updated'];
+echo 'Errores: ' . count($result['errors']);
+```
+</CodeGroup>
+
+**Retorna array con**:
+- `created` (int) - Agentes nuevos creados
+- `updated` (int) - Agentes actualizados
+- `skipped` (int) - Agentes sin cambios
+- `errors` (array) - Errores ocurridos
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$properties` (array) - Array de propiedades con datos de agentes |
+| **Ubicación** | `/src/Agents/AgentSynchronizer.php` |
+
+---
+
+### thi_get_agent_by_tokko_id()
+
+Encuentra un agente por su ID de Tokko.
+
+<CodeGroup>
+```php Firma
+function thi_get_agent_by_tokko_id(int $id): ?WP_Post
+```
+
+```php Ejemplo
+$agent = thi_get_agent_by_tokko_id(12345);
+
+if ($agent) {
+    echo 'Agente encontrado: ' . $agent->post_title;
+    echo 'URL: ' . get_permalink($agent->ID);
+} else {
+    echo 'Agente no encontrado';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$id` (int) - ID de agente en Tokko |
+| **Valor de retorno** | WP_Post o null si no existe |
+| **Ubicación** | `/src/Agents/AgentRepository.php` |
+
+---
+
+### thi_assign_agent_to_property()
+
+Asigna un agente a una propiedad.
+
+<CodeGroup>
+```php Firma
+function thi_assign_agent_to_property(
+    int $agent_id,
+    int $property_id
+): bool
+```
+
+```php Ejemplo
+if (thi_assign_agent_to_property(456, 789)) {
+    echo 'Agente asignado a propiedad';
+} else {
+    echo 'No se pudo asignar agente';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$agent_id` (int) - ID del agente, `$property_id` (int) - ID de la propiedad |
+| **Valor de retorno** | bool - true si se asignó |
+| **Ubicación** | `/src/Agents/AgentManager.php` |
+
+---
+
+### thi_get_properties_by_agent()
+
+Obtiene todas las propiedades asignadas a un agente.
+
+<CodeGroup>
+```php Firma
+function thi_get_properties_by_agent(int $agent_id): array
+```
+
+```php Ejemplo
+$properties = thi_get_properties_by_agent(456);
+
+echo 'Propiedades del agente: ' . count($properties);
+
+foreach ($properties as $prop) {
+    echo $prop->post_title . ' - ' . get_post_type($prop->ID);
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$agent_id` (int) - ID del agente |
+| **Valor de retorno** | array de objetos WP_Post (propiedades) |
+| **Ubicación** | `/src/Agents/AgentRepository.php` |
+
+---
+
+## Funciones de mapeo
+
+### thi_map_tokko_to_houzez()
+
+Convierte datos de Tokko a formato compatible con Houzez.
+
+<CodeGroup>
+```php Firma
+function thi_map_tokko_to_houzez(
+    array $property
+): array
+```
+
+```php Ejemplo
+$tokko_property = [
+    'id' => '12345',
+    'title' => 'Apartamento céntrico',
+    'price' => 250000,
+    'bedrooms' => 3,
+    'bathrooms' => 2
+];
+
+$houzez_property = thi_map_tokko_to_houzez($tokko_property);
+
+wp_insert_post([
+    'post_title' => $houzez_property['title'],
+    'post_type' => 'property',
+    'meta_input' => $houzez_property['meta']
+]);
+```
+</CodeGroup>
+
+**Retorna array con**:
+- `title` (string) - Título de propiedad
+- `content` (string) - Descripción formateada
+- `meta` (array) - Metadatos para Houzez
+- `status` (string) - Estado del post
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$property` (array) - Datos de propiedad de Tokko |
+| **Ubicación** | `/src/Mapping/PropertyMapper.php` |
+
+---
+
+## Funciones de imágenes
+
+### thi_normalize_image_url()
+
+Corrige extensiones truncadas en URLs de imágenes.
+
+<CodeGroup>
+```php Firma
+function thi_normalize_image_url(string $url): string
+```
+
+```php Ejemplo
+$broken_url = 'https://tokko.com/image.jp';
+$fixed_url = thi_normalize_image_url($broken_url);
+// Resultado: 'https://tokko.com/image.jpg'
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$url` (string) - URL de imagen potencialmente truncada |
+| **Valor de retorno** | string - URL corregida |
+| **Ubicación** | `/src/Images/ImageHandler.php` |
+
+---
+
+### thi_get_quality_aware_image_url()
+
+Obtiene URL de imagen según configuración de calidad.
+
+<CodeGroup>
+```php Firma
+function thi_get_quality_aware_image_url(
+    array $photo
+): string
+```
+
+```php Ejemplo
+$photo = [
+    'url' => 'https://tokko.com/image.jpg',
+    'quality' => 'high'
+];
+
+$image_url = thi_get_quality_aware_image_url($photo);
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$photo` (array) - Datos de foto de Tokko |
+| **Valor de retorno** | string - URL optimizada según calidad configurada |
+| **Ubicación** | `/src/Images/ImageHandler.php` |
+
+---
+
+## Funciones de utilidad
+
+### tp_fs()
+
+Obtiene instancia del SDK de Freemius.
+
+<CodeGroup>
+```php Firma
+function tp_fs(): FS_SDK
+```
+
+```php Ejemplo
+if (function_exists('tp_fs')) {
+    $fs = tp_fs();
+
+    if ($fs->is_premium()) {
+        echo 'Versión Premium activa';
+    }
+
+    $user = $fs->get_user();
+    echo 'Email: ' . $user->email;
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | FS_SDK - Instancia de Freemius SDK |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/tokko-plugins.php` |
+
+---
+
+### thi_log()
+
+Registra mensajes en el log del desarrollador.
+
+<CodeGroup>
+```php Firma
+function thi_log(string $msg, string $type = 'info'): void
+```
+
+```php Ejemplo
+thi_log('Iniciando sincronización de propiedades', 'info');
+thi_log('Se encontró error en API', 'error');
+thi_log('Memoria disponible baja', 'warning');
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$msg` (string) - Mensaje, `$type` (string) - 'info', 'warning', 'error' |
+| **Solo en desarrollo** | Se ignora en producción |
+| **Ubicación** | `/src/Utils/Logger.php` |
+
+---
+
+### thi_is_development_environment()
+
+Verifica si se está en ambiente de desarrollo.
+
+<CodeGroup>
+```php Firma
+function thi_is_development_environment(): bool
+```
+
+```php Ejemplo
+if (thi_is_development_environment()) {
+    thi_log('Modo desarrollo activo');
+    error_reporting(E_ALL);
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | bool - true en desarrollo |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/Utils/Environment.php` |
+
+---
+
+## Funciones de timestamps
+
+### thi_create_timestamps_table()
+
+Crea tabla para rastrear cambios de propiedades.
+
+<CodeGroup>
+```php Firma
+function thi_create_timestamps_table(): bool
+```
+
+```php Ejemplo
+if (!thi_create_timestamps_table()) {
+    wp_die('No se pudo crear tabla de tracking');
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | bool - true si se creó o existe |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `/src/Storage/TimestampStorage.php` |
+
+---
+
+### thi_get_property_timestamp()
+
+Obtiene último timestamp registrado de una propiedad.
+
+<CodeGroup>
+```php Firma
+function thi_get_property_timestamp(
+    string $tokko_id
+): ?string
+```
+
+```php Ejemplo
+$timestamp = thi_get_property_timestamp('12345');
+
+if ($timestamp) {
+    echo 'Última actualización: ' . $timestamp;
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$tokko_id` (string) - ID de propiedad en Tokko |
+| **Valor de retorno** | string (ISO 8601) o null |
+| **Ubicación** | `/src/Storage/TimestampStorage.php` |
+
+---
+
+### thi_update_property_timestamp()
+
+Actualiza timestamp de cambio de una propiedad.
+
+<CodeGroup>
+```php Firma
+function thi_update_property_timestamp(
+    int $post_id,
+    string $tokko_id,
+    string $timestamp,
+    string $status = 'synced'
+): bool
+```
+
+```php Ejemplo
+$success = thi_update_property_timestamp(
+    789,
+    '12345',
+    '2026-03-25T10:30:00Z',
+    'synced'
+);
+
+if ($success) {
+    echo 'Timestamp registrado';
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$post_id` (int) - ID de post, `$tokko_id` (string) - ID de Tokko, `$timestamp` (string) - ISO 8601, `$status` (string) - Estado |
+| **Valor de retorno** | bool - true si se actualizó |
+| **Estados válidos** | 'synced', 'pending', 'error', 'skipped' |
+| **Ubicación** | `/src/Storage/TimestampStorage.php` |
+
+---
+
+## Mejores prácticas
+
+<Note>
+Siempre verifica que las funciones existan antes de usarlas para compatibilidad con versiones antiguas.
+</Note>
+
+```php
+if (function_exists('thi_sync_now')) {
+    thi_sync_now();
+} else {
+    echo 'Plugin Tokko no está activo';
+}
+```
+
+<Tip>
+Usa funciones de caché cuando accedas frecuentemente a datos de API para reducir carga.
+</Tip>
+
+```php
+// ✅ EFICIENTE
+$properties = wp_cache_get('tokko_properties');
+if (!$properties) {
+    $properties = thi_get_cached_properties();
+    wp_cache_set('tokko_properties', $properties, '', 1 * HOUR_IN_SECONDS);
+}
+
+// ❌ INEFICIENTE
+$properties = thi_get_cached_properties(); // En cada llamada
+```

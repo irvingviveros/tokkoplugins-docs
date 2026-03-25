@@ -1,0 +1,322 @@
+---
+title: "Changelog"
+description: "Historial completo de cambios y actualizaciones de Tokko Plugins"
+icon: "history"
+---
+
+import { Note, Warning, Info } from "@mintlify/components";
+
+Aquí encontrarás un historial completo de todas las actualizaciones, mejoras y correcciones de Tokko Plugins.
+
+---
+
+## v3.0.0 (10 de Marzo, 2026)
+
+<Note>
+Esta es la versión actual y la más estable. Incluye una reescritura completa del motor de sincronización y nuevas características profesionales.
+</Note>
+
+### ✨ Nuevas Características
+
+- **Motor de Sincronización Unificado:** Reescrito desde cero con procesamiento por lotes basado en AJAX
+  - Progreso en tiempo real
+  - Pausa/Reanuda/Cancela sincronización
+  - Manejo inteligente de errores con circuit breakers
+
+- **Búsqueda Multi-campo Mejorada:**
+  - Búsqueda por palabra clave avanzada
+  - Filtros simultáneos
+  - Mejor rendimiento en sitios grandes
+
+- **Controles de Búsqueda Nuevos:**
+  - Slider de rango de edad de propiedad
+  - Selector múltiple de cantidades (cuartos, baños, garajes)
+  - Filtros encadenados (cada selección afina más)
+
+- **Auto-asignar Agentes:**
+  - Asigna automáticamente agentes a nuevas propiedades
+  - Basado en región, tipo de propiedad o disponibilidad
+  - Reduce trabajo manual de administración
+
+- **Informe de Sincronización Detallado:**
+  - Detalles por propiedad
+  - Historial de cambios
+  - Identificación de problemas específicos
+  - Exportable a CSV
+
+- **Sincronización de Desarrollos (Emprendimientos):**
+  - Sincronización de desarrollos como entidad separada
+  - Gestión de lotes/unidades
+  - Galería de imágenes del proyecto
+  - Disponible en todos los planes
+
+- **Indicadores de Salud del Sistema:**
+  - Monitoreo en tiempo real de memoria (85%/95%)
+  - Monitoreo de CPU (1.2x/2.0x)
+  - Monitoreo de espacio en disco (5GB/1GB)
+  - Alertas y recomendaciones automáticas
+
+- **Sincronización Inteligente (Smart Sync):**
+  - Detecta cambios mediante timestamps
+  - Solo procesa propiedades modificadas
+  - Sincronizaciones 10x más rápidas
+  - Tabla dedicada: wp_thi_property_timestamps
+
+- **Modo Desarrollo (Dev Mode):**
+  - Prueba con archivos JSON locales
+  - No requiere conexión a Tokko Broker
+  - Perfecto para testing y desarrollo
+
+- **Dashboard Moderno:**
+  - Interfaz con tarjetas (cards)
+  - Iconos SVG modernos
+  - Diseño responsive
+  - Mejor usabilidad en móvil
+
+### 🎯 Plan Starter Mejorado
+
+- **Límite de propiedades aumentado:** De 20 → **100 propiedades**
+- **Mapas y geolocalización:** Ahora **incluidos gratis** (antes era premium)
+- **URLs personalizadas:** Incluidas en plan gratis
+- **Auto-archivado:** Disponible para todos los usuarios
+
+### 🚀 Mejoras de Rendimiento
+
+- **Circuit Breakers para Errores:**
+  - Detiene sincronización después de 5+ errores de API
+  - Pausa después de 10+ fallos de descarga de imágenes
+  - Evita bloqueos de servidor
+
+- **Procesamiento de Imágenes:**
+  - Lotes de 10 imágenes (antes: 5)
+  - GD preferido sobre Imagick (mejor compatibilidad)
+  - Normalización de imágenes (corrige extensiones truncadas)
+  - Mejor manejo de URLs malformadas
+
+- **Optimización de Memoria:**
+  - Liberación agresiva de variables temporales
+  - Caché inteligente de metadatos
+  - Monitoreo proactivo de límites
+
+### 🔧 Correcciones
+
+- **FIX:** Búsqueda numérica ya no genera coincidencias parciales
+- **FIX:** El archivado de desarrollos no afecta a las propiedades asociadas
+- **FIX:** Sincronización de imágenes con URLs truncadas (ej: .jp en lugar de .jpg)
+- **FIX:** Timeout de ejecución en sincronización de propiedades grandes
+- **FIX:** Caché de navegador causaba datos desactualizados después de sincronizar
+- **FIX:** Permalinks rotos después de cambiar URLs personalizadas
+
+### 📊 Cambios en la Plataforma
+
+| Característica | Antes | Ahora |
+|---|---|---|
+| Plan Starter - Propiedades | 20 | 100 |
+| Mapas/Geolocalización | Premium | Gratis |
+| Sincronización Inteligente | No | Sí |
+| Circuit Breakers | No | Sí |
+| Informe de Sincronización | Básico | Detallado |
+| Dashboard | Antiguo | Moderno (v3 design) |
+
+---
+
+## v2.8.1 (15 de Enero, 2026)
+
+<Info>
+Versión de mantenimiento. Recomendamos actualizar a v3.0.0 para nuevas características.
+</Info>
+
+### 🔧 Correcciones
+
+- FIX: Error de conexión en ciertos servidores con cURL desactualizado
+- FIX: Las propiedades no aparecían si el título tenía caracteres especiales
+- FIX: Problema con el mapeo de campos cuando faltaba información en Tokko
+- FIX: Incompatibilidad parcial con PHP 8.2
+
+### 📈 Mejoras Menores
+
+- Mejorada velocidad de carga del dashboard
+- Mejor detección de timeout de red
+- Logging más detallado para debugging
+
+---
+
+## v2.7.0 (20 de Octubre, 2025)
+
+### ✨ Nuevas Características
+
+- Soporte para formularios de contacto mejorado
+- Envío de leads a CRM (Premium+)
+- Exportación de reporte de errores a CSV
+- Dashboard de analítica básica
+
+### 🔧 Correcciones
+
+- FIX: Los agentes sincronizados no aparecían correctamente
+- FIX: Problema con URLs personalizadas en algunas configuraciones de hosting
+- FIX: Las imágenes no se descargaban en algunos casos de red lenta
+
+---
+
+## v2.6.0 (12 de Junio, 2025)
+
+### ✨ Nuevas Características
+
+- Sincronización de desarrollos (fase inicial)
+- Búsqueda por ubicación mejorada
+- Filtro por estado de propiedad
+
+### 🔧 Correcciones
+
+- FIX: Memoria excesiva en sincronización de sitios grandes
+- FIX: Problema con timezone en timestamps de propiedades
+- FIX: Inconsistencia en precios con múltiples monedas
+
+---
+
+## v2.5.0 (20 de Marzo, 2025)
+
+### ✨ Nuevas Características
+
+- Soporte WPML (traducción multi-idioma) - parcial
+- Auto-archivado de propiedades inactivas
+- Búsqueda avanzada por rango de precio
+- Galerías de imágenes mejoradas
+
+### 🔧 Correcciones
+
+- FIX: Error 404 en páginas de propiedades
+- FIX: Las imágenes no se ordenaban correctamente
+- FIX: Problema con Elementor en algunos widgets
+
+---
+
+## v2.4.0 (5 de Diciembre, 2024)
+
+### ✨ Nuevas Características
+
+- Mapas interactivos con geolocalización
+- Sincronización de agentes inmobiliarios
+- URLs personalizadas para propiedades
+- Sistema de reporte de errores
+
+### 🔧 Correcciones
+
+- FIX: Problemas de rendimiento en sitios con 500+ propiedades
+- FIX: Compatibilidad mejorada con temas modificados
+- FIX: Error en la sincronización de propiedades duplicadas
+
+---
+
+## v2.3.0 (1 de Septiembre, 2024)
+
+### ✨ Nuevas Características
+
+- Dashboard con estadísticas de sincronización
+- Historial de errores con búsqueda
+- Configuración granular de campos
+- Soporte para Elementor widgets
+
+### 🔧 Correcciones
+
+- FIX: Crash al sincronizar más de 200 propiedades
+- FIX: Problema con descriptores de archivo abiertos
+
+---
+
+## v2.2.0 (15 de Mayo, 2024)
+
+### ✨ Nuevas Características
+
+- Búsqueda de propiedades por palabra clave
+- Filtros de búsqueda básicos
+- Página de configuración mejorada
+
+### 🔧 Correcciones
+
+- FIX: API Key validation mejorada
+- FIX: Problema con imagenes corrupted
+
+---
+
+## v2.1.0 (10 de Febrero, 2024)
+
+### ✨ Nuevas Características
+
+- Sincronización automática de propiedades
+- Descarga de imágenes
+- Soporte básico de desarrollos
+
+### 🔧 Correcciones
+
+- FIX: Conexión inicial a Tokko Broker
+- FIX: Problema con permisos de archivo
+
+---
+
+## v2.0.0 (1 de Noviembre, 2023)
+
+<Warning>
+Esta versión está deprecada. Actualiza a v3.0.0 lo antes posible.
+</Warning>
+
+### ✨ Características Principales
+
+- Primera versión pública
+- Integración básica con Tokko Broker
+- Sincronización de propiedades
+- Soporte Houzez
+- Sistema de licencias Freemius
+
+---
+
+## Plan de Actualización Recomendado
+
+```
+v2.x → v3.0.0 (RECOMENDADO)
+```
+
+**Ventajas de actualizar a v3.0.0:**
+- 10x más rápido (motor de sincronización reescrito)
+- Nuevas características profesionales
+- Mejor estabilidad y manejo de errores
+- Interfaz moderna
+- Plan Starter mejorado (100 propiedades gratis)
+
+**Compatibilidad:** La actualización es 100% compatible. Todos tus datos se preservan.
+
+---
+
+## Política de Soporte de Versiones
+
+- **v3.0.0:** Soporte completo (actual)
+- **v2.8 - v2.9:** Actualizaciones de seguridad solamente
+- **v2.0 - v2.7:** Sin soporte activo
+
+<Note>
+Recomendamos mantener el plugin actualizado a la última versión para obtener nuevas características, mejoras de seguridad y correcciones de bugs.
+</Note>
+
+---
+
+## Cómo Actualizar
+
+1. Ve a **Plugins > Plugins Instalados** en WordPress
+2. Busca "Tokko Plugins"
+3. Si hay una actualización disponible, verás un botón "Actualizar Ahora"
+4. Haz clic y espera a que se complete
+5. Verifica que todo funcione correctamente
+
+**Respaldo:** Se recomienda hacer un respaldo antes de actualizar.
+
+---
+
+## Historial de Cambios Futuro
+
+Estamos trabajando en:
+- v3.1.0: Sistema de webhooks bidireccional
+- v3.2.0: Sincronización de documentos (hipotecas, seguros)
+- v3.3.0: Integraciones con Lead Gen platforms
+- v4.0.0: Mobile app companion
+
+Mantente atento a las nuevas versiones en tu WordPress.

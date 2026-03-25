@@ -1,0 +1,404 @@
+---
+title: "Emprendimientos"
+description: "Sincronización de desarrollos inmobiliarios y vinculación con propiedades"
+---
+
+# Emprendimientos
+
+Los emprendimientos (desarrollos inmobiliarios) son proyectos de construcción o urbanización que pueden contener múltiples propiedades. Tokko Plugins sincroniza automáticamente tus emprendimientos desde Broker y los vincula con sus propiedades asociadas.
+
+## ¿Qué es un Emprendimiento?
+
+Un emprendimiento es un proyecto inmobiliario que agrupa múltiples unidades o propiedades bajo un mismo desarrollo:
+
+### Ejemplos
+
+- **Torres Comerciales**: Edificio multi-piso con oficinas
+- **Complejos Residenciales**: Barrio privado con varias casas
+- **Shopping Centers**: Centro comercial con múltiples locales
+- **Desarrollos Habitacionales**: Proyecto de viviendas en construcción
+
+### Beneficios
+
+✅ **Organización**: Agrupa propiedades relacionadas
+✅ **Información Centralizada**: Datos del proyecto en un lugar
+✅ **Marketing**: Página dedicada al desarrollo
+✅ **Navegación**: Usuarios encuentran propiedades asociadas
+✅ **SEO**: Páginas específicas para cada desarrollo
+
+## Habilitar Sincronización
+
+### Configuración Inicial
+
+**Opción:** `thi_sync_developments`
+
+<Steps>
+  <Step title="Accede a Configuración">
+    WordPress > Tokko Plugins > Configuración
+  </Step>
+  <Step title="Busca Emprendimientos">
+    Desplázate hasta "Sincronización de Emprendimientos"
+  </Step>
+  <Step title="Habilita Sincronización">
+    Marca la opción `thi_sync_developments`
+  </Step>
+  <Step title="Guarda Cambios">
+    Haz clic en "Guardar cambios"
+  </Step>
+  <Step title="Ejecuta Sincronización Manual">
+    Ve a Tokko Plugins > Dashboard > Sincronizar Emprendimientos
+  </Step>
+</Steps>
+
+<Note>
+La sincronización de emprendimientos es separada de la sincronización de propiedades. Ambas pueden ejecutarse independientemente.
+</Note>
+
+## Sincronización Independiente
+
+### Dos Sistemas de Sincronización
+
+El plugin mantiene dos procesos de sincronización completamente separados:
+
+| Aspecto | Propiedades | Emprendimientos |
+|--------|------------|-----------------|
+| Endpoint de API | `/properties` | `/developments` |
+| Frecuencia | Configurable (por defecto: cada 30 min) | Configurable (por defecto: cada 2 horas) |
+| Mapeo | THI_Property_Mapper | THI_Development_Mapper |
+| Servicio | THI_Sync_Service | THI_Development_Mapper |
+
+### Mapeo de Desarrollos
+
+**Clase:** `THI_Development_Mapper`
+
+```php
+// Mapea campos de Tokko a WordPress
+Tokko Field → WordPress Meta Field
+development_id → fave_development_id
+development_name → post_title
+development_description → post_content
+development_images → fave_synced_images
+developer_name → fave_developer_name
+development_location → fave_development_location
+```
+
+<Tip>
+El mapeo de emprendimientos es similar al de propiedades, pero con campos específicos del desarrollo.
+</Tip>
+
+## Vinculación Propiedad-Emprendimiento
+
+### Vinculación Automática
+
+Cuando sincronizas propiedades y emprendimientos, el plugin automáticamente vincula las propiedades con sus desarrollos:
+
+**Clase:** `THI_Development_Property_Linker`
+
+```php
+// Durante la sincronización de propiedades:
+1. Lee fave_linked_developments de la API
+2. Busca el emprendimiento correspondiente
+3. Vincula la propiedad al emprendimiento
+4. Actualiza relaciones meta
+```
+
+### Campos de Metadatos
+
+**`fave_linked_developments`**
+- Lista de IDs de emprendimientos vinculados
+- Almacena múltiples desarrollos por propiedad
+- Formato: array de IDs
+
+```php
+// Ejemplo:
+fave_linked_developments = [
+  '123', // Torres del Lago
+  '456'  // Centro Comercial Downtown
+];
+```
+
+**`fave_multi_units_ids`**
+- IDs de unidades múltiples en el mismo desarrollo
+- Usado para propiedades con múltiples apartamentos
+- Permite navegación entre unidades
+
+```php
+// Ejemplo (torre con 15 departamentos):
+fave_multi_units_ids = [
+  '101', '102', '103', '104', '105',
+  '201', '202', '203', '204', '205',
+  '301', '302', '303', '304', '305'
+];
+```
+
+## Taxonomía de Emprendimientos
+
+### Estado "Emprendimiento"
+
+El plugin registra automáticamente una taxonomía personalizada:
+
+```
+Taxonomía: emprendimiento
+Tipo: no jerárquica (etiquetas)
+Público: sí
+Mostrable: sí
+```
+
+Cada emprendimiento aparece como:
+- Término en la taxonomía
+- Página dedicada del emprendimiento
+- Filtro en búsqueda avanzada
+
+### Visualización en Frontend
+
+Los usuarios pueden:
+- Ver todas las propiedades de un emprendimiento
+- Filtrar por desarrollo
+- Acceder a la página dedicada del emprendimiento
+
+## URLs de Emprendimientos
+
+### Estructura Automática
+
+Las URLs de emprendimientos se generan automáticamente:
+
+```
+/emprendimiento/{nombre-desarrollo}/
+// Ejemplo:
+/emprendimiento/torres-del-lago/
+/emprendimiento/villa-sol-residencial/
+```
+
+<Note>
+Similar a la estructura de propiedades, las URLs son amigables y contienen palabras clave geográficas.
+</Note>
+
+### Personalización
+
+Puedes cambiar el slug "emprendimiento" en la configuración:
+
+```php
+// Archivo de configuración
+'rewrite' => array('slug' => 'desarrollo')
+
+// Resultado:
+/desarrollo/torres-del-lago/
+```
+
+## Limitaciones por Plan
+
+### Plan Gratuito
+
+❌ **Limitaciones:**
+- Máximo 2 emprendimientos sincronizados
+- Actualización manual solamente
+- Sin búsqueda avanzada de desarrollos
+
+✅ **Incluye:**
+- Sincronización básica de datos
+- Vinculación de propiedades
+- Página del emprendimiento
+
+### Plan Premium
+
+✅ **Ilimitado:**
+- Emprendimientos sin límite
+- Sincronización automática
+- Búsqueda avanzada
+- Analíticas por desarrollo
+- Formularios de contacto personalizados
+
+<Tip>
+Actualiza a Premium si tu portfolio incluye más de 2 desarrollos importantes.
+</Tip>
+
+## Procesamiento por Lotes
+
+### Sincronización de Grandes Portafolios
+
+Si tienes muchos emprendimientos, el plugin procesa en lotes:
+
+```
+MAX_DEVELOPMENTS_PER_BATCH = 5
+```
+
+Para un portafolio con 50 desarrollos:
+- Lote 1: 5 desarrollos
+- Lote 2: 5 desarrollos
+- ... (continúa automáticamente)
+- Lote 10: 5 desarrollos
+
+<Note>
+El procesamiento por lotes previene timeouts en servidores con recursos limitados. Cada lote se procesa en un ciclo de sincronización diferente.
+</Note>
+
+### Monitoreo del Progreso
+
+En el dashboard puedes ver:
+- Total de emprendimientos a sincronizar
+- Emprendimientos completados
+- Tiempo estimado de finalización
+- Errores en la sincronización
+
+## Archivado de Desarrollos
+
+### Marcar como Inactivo
+
+Cuando un emprendimiento finaliza o se descontinúa:
+
+```php
+// Opción 1: Marcar como borrador
+post_status → 'draft'
+
+// Opción 2: Crear página de archivo
+post_status → 'private'
+```
+
+<Steps>
+  <Step title="Accede a Emprendimientos">
+    WordPress > Emprendimientos
+  </Step>
+  <Step title="Selecciona el Desarrollo">
+    Haz clic en el emprendimiento a archivar
+  </Step>
+  <Step title="Cambia Estado">
+    En "Estado" selecciona "Borrador"
+  </Step>
+  <Step title="Guarda Cambios">
+    Actualiza el emprendimiento
+  </Step>
+</Steps>
+
+<Warning>
+Los desarrollos archivados no aparecerán en búsquedas públicas, pero siguen siendo accesibles por URL directa si lo permites en tu configuración.
+</Warning>
+
+## Datos del Emprendimiento
+
+### Campos Sincronizados
+
+| Campo | Descripción |
+|-------|------------|
+| Nombre | Nombre del desarrollo |
+| Descripción | Información del proyecto |
+| Ubicación | Dirección del emprendimiento |
+| Desarrollador | Nombre de la constructora |
+| Imágenes | Galería del proyecto |
+| Amenidades | Servicios y características |
+| Estado | En construcción, completado, etc. |
+| Fecha Inicio | Inicio del proyecto |
+| Fecha Entrega | Entrega estimada |
+
+### Campos Personalizables
+
+Puedes agregar campos meta adicionales:
+
+```php
+// Ejemplo: Permiso de Obra
+fave_development_permit = '12345/2024'
+
+// Ejemplo: Contador de unidades
+fave_development_unit_count = '125'
+
+// Ejemplo: Precio promedio
+fave_development_avg_price = '250000'
+```
+
+## Página Dedicada del Emprendimiento
+
+### Plantilla Automática
+
+El plugin crea automáticamente una página para cada emprendimiento:
+
+```
+/emprendimiento/torres-del-lago/
+├── Título: Torres del Lago
+├── Descripción: Información del proyecto
+├── Galería: Imágenes del emprendimiento
+├── Propiedades: Unidades disponibles
+├── Datos: Ubicación, estado, etc.
+└── Contacto: Formulario para consultas
+```
+
+### Personalización de Plantilla
+
+Puedes crear una plantilla personalizada:
+
+```php
+// archivo: single-development.php
+<?php
+get_header();
+
+while ( have_posts() ) {
+  the_post();
+  echo get_the_title();
+  the_content();
+
+  // Mostrar propiedades vinculadas
+  $linked_props = get_post_meta(get_the_ID(), 'fave_linked_developments');
+  // ... mostrar propiedades
+}
+
+get_footer();
+?>
+```
+
+## Búsqueda y Filtros
+
+### Filtrar por Emprendimiento
+
+Los usuarios pueden filtrar propiedades por emprendimiento:
+
+```
+Búsqueda Avanzada
+├── Ubicación
+├── Tipo de propiedad
+├── Precio
+├── Emprendimiento ← Nuevo filtro
+└── Características
+```
+
+### URL de Búsqueda
+
+```
+/propiedades/?emprendimiento=torres-del-lago
+/propiedades/?desarrollo=villa-sol
+```
+
+## Solución de Problemas
+
+### Los Emprendimientos No Se Sincronizan
+
+<Steps>
+  <Step title="Verifica la Opción">
+    Comprueba que `thi_sync_developments` esté habilitada
+  </Step>
+  <Step title="Revisa API">
+    Verifica que tu API key de Tokko tenga acceso a desarrollos
+  </Step>
+  <Step title="Revisa Logs">
+    Busca errores en WordPress Debug Log
+  </Step>
+</Steps>
+
+### Las Propiedades No Se Vinculan
+
+Comprueba que:
+1. Tanto propiedades como emprendimientos están sincronizados
+2. Las propiedades tienen `fave_linked_developments` poblado en Tokko
+3. Los IDs de emprendimientos coinciden en ambos sistemas
+
+### Página de Emprendimiento No Aparece
+
+```php
+// Verifica que la taxonomía está registrada:
+get_taxonomy('emprendimiento');
+
+// Verifica permisos de post type:
+$post_type = get_post_type_object('development');
+$post_type->public = true; // Debe ser true
+```
+
+---
+
+**Próximos pasos:** Aprende sobre [Agentes](./agentes) para sincronizar tu equipo de ventas.
