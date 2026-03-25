@@ -1,0 +1,112 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Tokko Plugins — Documentación",
+  "colors": {
+    "primary": "#2563EB",
+    "light": "#60A5FA",
+    "dark": "#1E40AF"
+  },
+  "favicon": "/images/favicon.svg",
+  "logo": {
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentación",
+        "groups": [
+          {
+            "group": "Inicio",
+            "pages": [
+              "introduccion",
+              "inicio-rapido",
+              "instalacion"
+            ]
+          },
+          {
+            "group": "Configuración",
+            "pages": [
+              "guias/configuracion-general",
+              "guias/api-key",
+              "guias/sincronizacion",
+              "guias/sincronizacion-automatica"
+            ]
+          },
+          {
+            "group": "Funcionalidades",
+            "pages": [
+              "guias/imagenes-y-medios",
+              "guias/seo-urls",
+              "guias/emprendimientos",
+              "guias/agentes",
+              "guias/leads-crm",
+              "guias/busqueda-avanzada",
+              "guias/dashboard"
+            ]
+          },
+          {
+            "group": "Soporte",
+            "pages": [
+              "troubleshooting",
+              "faq",
+              "changelog",
+              "planes"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Referencia",
+            "pages": [
+              "api-reference/introduccion",
+              "api-reference/hooks",
+              "api-reference/filtros",
+              "api-reference/funciones",
+              "api-reference/opciones"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Changelog",
+          "href": "/changelog",
+          "icon": "clock-rotate-left"
+        },
+        {
+          "anchor": "Planes y Precios",
+          "href": "/planes",
+          "icon": "credit-card"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Soporte",
+        "href": "mailto:soporte@tokkoplugins.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Obtener Plugin",
+      "href": "https://tokkoplugins.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "website": "https://tokkoplugins.com"
+    }
+  },
+  "feedback": {
+    "thumbsRating": true
+  }
+}
