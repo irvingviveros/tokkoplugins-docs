@@ -1,47 +1,23 @@
 ---
 title: "Filtros (Filters)"
-description: "Todos los filtros disponibles para modificar el comportamiento del plugin"
+description: "Puntos de extensión disponibles vía apply_filters para ajustar el comportamiento del plugin"
 ---
 
 # Filtros
 
-Los filtros permiten modificar valores y comportamientos del plugin antes de que se procesen. Utiliza `add_filter()` para interceptar y cambiar datos.
+Los filtros permiten **modificar valores** que el plugin usa internamente sin tocar su código. Se conectan con `add_filter()` y deben **devolver** el valor modificado.
 
-## Filtros de sincronización
+<Info>
+Todos los filtros documentados aquí están verificados contra el código fuente (`apply_filters(...)`). Si un filtro no aparece en esta página, el plugin no lo dispara.
+</Info>
 
-### thi_allow_image_sync_when_unhealthy
+## Chequeos de salud del servidor (health checks)
 
-Permite sincronización de imágenes incluso cuando la salud del servidor es deficiente.
-
-<CodeGroup>
-```php Filtro
-$allow = apply_filters('thi_allow_image_sync_when_unhealthy', false);
-```
-
-```php Ejemplo
-add_filter('thi_allow_image_sync_when_unhealthy', function($allow) {
-    // Permitir siempre, sin importar salud del servidor
-    return true;
-});
-```
-</CodeGroup>
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Valor predeterminado** | `false` |
-| **Tipo de retorno** | boolean |
-| **Descripción** | Por defecto, las imágenes no se sincronizan si hay problemas de memoria o CPU. Usa este filtro para ignorar estas advertencias. |
-| **Ubicación** | `includes/ajax/ajax-handlers.php` |
-
-<Warning>
-Habilitar esto en servidores con recursos limitados puede causar errores o timeout.
-</Warning>
-
----
+Antes de iniciar la sincronización, el plugin verifica memoria, carga (load average) y disco. Estos filtros ajustan los umbrales y permiten desactivar chequeos individuales.
 
 ### thi_server_health_check_enabled
 
-Habilita o deshabilita los chequeos de salud del servidor.
+Habilita o deshabilita por completo los chequeos de salud antes de sincronizar.
 
 <CodeGroup>
 ```php Filtro
@@ -50,7 +26,7 @@ $enabled = apply_filters('thi_server_health_check_enabled', true);
 
 ```php Ejemplo
 add_filter('thi_server_health_check_enabled', function($enabled) {
-    // Deshabilitar en ambiente de desarrollo
+    // Deshabilitar solo en entorno local
     if (defined('WP_DEBUG') && WP_DEBUG) {
         return false;
     }
@@ -63,16 +39,62 @@ add_filter('thi_server_health_check_enabled', function($enabled) {
 |-----------|-------|
 | **Valor predeterminado** | `true` |
 | **Tipo de retorno** | boolean |
-| **Descripción** | Controla si el plugin verifica memoria, CPU y espacio en disco antes de sincronizar. |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
-## Filtros de recursos del servidor
+### thi_allow_image_sync_when_unhealthy
+
+Permite continuar la sincronización de imágenes aun cuando los chequeos detectan presión de recursos.
+
+<CodeGroup>
+```php Filtro
+$allow = apply_filters('thi_allow_image_sync_when_unhealthy', false, $health_result);
+```
+
+```php Ejemplo
+add_filter('thi_allow_image_sync_when_unhealthy', function($allow, $health) {
+    // Permitir si solo el disco está bajo (pero memoria y CPU están OK)
+    if ($health['disk']['status'] === 'warning' && $health['memory']['status'] === 'ok') {
+        return true;
+    }
+    return $allow;
+}, 10, 2);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `false` |
+| **Argumentos** | `$allow` (bool), `$health_result` (array con detalles por sistema) |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
+
+<Warning>
+Devolver `true` en servidores con recursos al límite puede causar timeouts o fallas OOM. Úsalo sólo cuando sepas que los umbrales por defecto son demasiado conservadores para tu entorno.
+</Warning>
+
+---
+
+### thi_server_health_check_memory_enabled
+
+Habilita o deshabilita específicamente el chequeo de **memoria**.
+
+<CodeGroup>
+```php Filtro
+$enabled = apply_filters('thi_server_health_check_memory_enabled', true);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
+
+---
 
 ### thi_memory_warning_threshold
 
-Establece el umbral de porcentaje de memoria para advertencias.
+Porcentaje de memoria a partir del cual el chequeo emite un **warning**.
 
 <CodeGroup>
 ```php Filtro
@@ -80,389 +102,249 @@ $threshold = apply_filters('thi_memory_warning_threshold', 85.0);
 ```
 
 ```php Ejemplo
-add_filter('thi_memory_warning_threshold', function($threshold) {
-    // Más conservador: advertencia a 75%
-    return 75.0;
-});
+add_filter('thi_memory_warning_threshold', fn() => 75.0);
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
-| **Valor predeterminado** | `85.0` |
-| **Tipo de retorno** | float |
-| **Rango válido** | 50.0 - 95.0 |
-| **Descripción** | Porcentaje de memoria utilizada que genera una advertencia. |
+| **Valor predeterminado** | `85.0` (%) |
+| **Tipo** | float |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
 ### thi_memory_critical_threshold
 
-Establece el umbral crítico de porcentaje de memoria.
+Porcentaje de memoria a partir del cual el chequeo bloquea la sincronización.
 
 <CodeGroup>
 ```php Filtro
 $threshold = apply_filters('thi_memory_critical_threshold', 95.0);
 ```
+</CodeGroup>
 
-```php Ejemplo
-add_filter('thi_memory_critical_threshold', function($threshold) {
-    // Detener sincronización a 90%
-    return 90.0;
-});
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `95.0` (%) |
+| **Tipo** | float |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
+
+---
+
+### thi_server_health_check_load_enabled
+
+Habilita o deshabilita el chequeo de **load average**.
+
+<CodeGroup>
+```php Filtro
+$enabled = apply_filters('thi_server_health_check_load_enabled', true);
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
-| **Valor predeterminado** | `95.0` |
-| **Tipo de retorno** | float |
-| **Rango válido** | 80.0 - 99.0 |
-| **Descripción** | Porcentaje de memoria que detiene la sincronización. |
+| **Valor predeterminado** | `true` |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
 ### thi_load_warning_threshold_normalized
 
-Umbral de carga de CPU normalizada para advertencia.
+Umbral de advertencia para el load average **normalizado por CPU** (load average / número de núcleos).
 
 <CodeGroup>
 ```php Filtro
 $threshold = apply_filters('thi_load_warning_threshold_normalized', 1.2);
-```
-
-```php Ejemplo
-add_filter('thi_load_warning_threshold_normalized', function($threshold) {
-    // En sistemas de 8 núcleos, advertencia a carga 8.0
-    return 1.0;
-});
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Valor predeterminado** | `1.2` |
-| **Tipo de retorno** | float |
-| **Descripción** | Se multiplica por el número de núcleos CPU. En servidor de 4 núcleos = carga 4.8. |
+| **Tipo** | float |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
 ### thi_load_critical_threshold_normalized
 
-Umbral crítico de carga de CPU normalizada.
+Umbral crítico para el load average normalizado por CPU.
 
 <CodeGroup>
 ```php Filtro
 $threshold = apply_filters('thi_load_critical_threshold_normalized', 2.0);
-```
-
-```php Ejemplo
-add_filter('thi_load_critical_threshold_normalized', function($threshold) {
-    // Más tolerante: dejar en 2.0
-    return 2.0;
-});
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Valor predeterminado** | `2.0` |
-| **Tipo de retorno** | float |
-| **Descripción** | Carga normalizada que detiene la sincronización. En servidor de 4 núcleos = carga 8.0. |
+| **Tipo** | float |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
-
-<Tip>
-Para contenedores Docker, este límite se fija en 1.5 automáticamente.
-</Tip>
-
----
-
-### thi_disk_warning_gb
-
-Espacio en disco (en GB) que genera advertencia.
-
-<CodeGroup>
-```php Filtro
-$threshold = apply_filters('thi_disk_warning_gb', 5.0);
-```
-
-```php Ejemplo
-add_filter('thi_disk_warning_gb', function($threshold) {
-    // Advertencia más sensible: 2 GB disponibles
-    return 2.0;
-});
-```
-</CodeGroup>
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Valor predeterminado** | `5.0` GB |
-| **Tipo de retorno** | float |
-| **Descripción** | Espacio en disco disponible mínimo recomendado. |
-| **Ubicación** | `includes/ajax/ajax-handlers.php` |
-
----
-
-### thi_disk_critical_gb
-
-Espacio en disco (en GB) que detiene la sincronización.
-
-<CodeGroup>
-```php Filtro
-$threshold = apply_filters('thi_disk_critical_gb', 1.0);
-```
-
-```php Ejemplo
-add_filter('thi_disk_critical_gb', function($threshold) {
-    // Ser más conservador: 500 MB
-    return 0.5;
-});
-```
-</CodeGroup>
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Valor predeterminado** | `1.0` GB |
-| **Tipo de retorno** | float |
-| **Descripción** | Espacio en disco mínimo absoluto requerido para sincronización. |
-| **Ubicación** | `includes/ajax/ajax-handlers.php` |
-
----
-
-## Filtros de verificación de salud
-
-### thi_server_health_check_memory_enabled
-
-Habilita verificación de memoria.
-
-```php
-$enabled = apply_filters('thi_server_health_check_memory_enabled', true);
-```
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Valor predeterminado** | `true` |
-| **Tipo de retorno** | boolean |
-
----
-
-### thi_server_health_check_load_enabled
-
-Habilita verificación de carga de CPU.
-
-```php
-$enabled = apply_filters('thi_server_health_check_load_enabled', true);
-```
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Valor predeterminado** | `true` |
-| **Tipo de retorno** | boolean |
 
 ---
 
 ### thi_server_health_check_load_hard_fail
 
-Detiene completamente sincronización si carga es crítica.
+Indica si superar el umbral crítico de load debe **bloquear** la sincronización (hard fail) o solo advertir.
 
 <CodeGroup>
 ```php Filtro
-$hard_fail = apply_filters('thi_server_health_check_load_hard_fail', true);
-```
-
-```php Ejemplo
-add_filter('thi_server_health_check_load_hard_fail', function($hard_fail) {
-    // Permitir sincronización incluso con carga alta
-    return false;
-});
+$hard_fail = apply_filters('thi_server_health_check_load_hard_fail', !$is_docker);
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
-| **Valor predeterminado** | `true` (excepto Docker: `false`) |
-| **Tipo de retorno** | boolean |
-| **Descripción** | En Docker, la carga se ignora automáticamente. |
+| **Valor predeterminado** | `true` en hosts normales, `false` cuando se detecta Docker (donde el load puede ser engañoso) |
 | **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
 ### thi_server_health_check_disk_enabled
 
-Habilita verificación de espacio en disco.
+Habilita o deshabilita el chequeo de **espacio en disco**.
 
-```php
+<CodeGroup>
+```php Filtro
 $enabled = apply_filters('thi_server_health_check_disk_enabled', true);
 ```
+</CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Valor predeterminado** | `true` |
-| **Tipo de retorno** | boolean |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
-## Filtros de WordPress
+### thi_disk_warning_gb
 
-El plugin utiliza filtros estándar de WordPress para integración:
+GB libres a partir de los cuales el chequeo emite warning de disco.
 
-### wp_image_editors
+<CodeGroup>
+```php Filtro
+$gb = apply_filters('thi_disk_warning_gb', 5.0);
+```
+</CodeGroup>
 
-Modifica editores de imagen disponibles.
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `5.0` GB |
+| **Tipo** | float |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
-```php
-add_filter('wp_image_editors', function($editors) {
-    // Usar ImageMagick en lugar de GD
-    return array_merge(['imagick'], $editors);
-});
+---
+
+### thi_disk_critical_gb
+
+GB libres a partir de los cuales el chequeo falla con error crítico.
+
+<CodeGroup>
+```php Filtro
+$gb = apply_filters('thi_disk_critical_gb', 1.0);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `1.0` GB |
+| **Tipo** | float |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
+
+---
+
+## Notificaciones y reportes
+
+### thi_notifications_enabled
+
+Controla si el plugin envía notificaciones por email (alertas de error + reporte periódico).
+
+<CodeGroup>
+```php Filtro
+$enabled = apply_filters('thi_notifications_enabled', $is_premium);
 ```
 
----
-
-### option_houzez_options
-
-Filtra opciones de Houzez cargadas.
-
-```php
-add_filter('option_houzez_options', function($options) {
-    // Modificar configuración de Houzez antes de uso
-    return $options;
-});
+```php Ejemplo
+// Fuerza-habilitar notificaciones aunque no seas premium (solo para staging)
+add_filter('thi_notifications_enabled', '__return_true');
 ```
+</CodeGroup>
 
----
-
-### get_post_metadata
-
-Filtra metadatos de propiedades.
-
-```php
-add_filter('get_post_metadata', function($value, $post_id, $meta_key) {
-    if (strpos($meta_key, 'tokko_') === 0) {
-        // Procesar metadatos de Tokko
-    }
-    return $value;
-}, 10, 3);
-```
-
----
-
-### houzez_meta_search_filter
-
-Personaliza búsqueda de metadatos en Houzez.
-
-```php
-add_filter('houzez_meta_search_filter', function($filter, $meta_key) {
-    // Extender opciones de búsqueda
-    return $filter;
-}, 10, 2);
-```
-
----
-
-### houzez/search_composer/fields
-
-Modifica campos disponibles en composer de búsqueda.
-
-```php
-add_filter('houzez/search_composer/fields', function($fields) {
-    // Agregar campos personalizados
-    $fields['custom_field'] = [
-        'label' => 'Campo personalizado',
-        'type' => 'text'
-    ];
-    return $fields;
-});
-```
-
----
-
-### posts_where
-
-Modifica cláusula WHERE de consultas de propiedades.
-
-```php
-add_filter('posts_where', function($where, $query) {
-    if ($query->get('post_type') === 'property') {
-        // Agregar condiciones personalizadas
-    }
-    return $where;
-}, 10, 2);
-```
-
----
-
-### posts_results
-
-Filtra resultados de consultas de propiedades.
-
-```php
-add_filter('posts_results', function($posts, $query) {
-    if ($query->get('post_type') === 'property') {
-        // Procesar resultados de propiedades
-    }
-    return $posts;
-}, 10, 2);
-```
-
----
-
-### query_vars
-
-Registra variables de consulta personalizadas.
-
-```php
-add_filter('query_vars', function($vars) {
-    $vars[] = 'tokko_property_id';
-    return $vars;
-});
-```
-
----
-
-## Mejores prácticas
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `true` si el plan tiene premium code, `false` en caso contrario |
+| **Ubicación** | `includes/notifications/notification-functions.php` |
 
 <Note>
-**Retorna siempre el valor filtrado**, incluso si no lo modificas. Los filtros deben ser predecibles.
+En el plan Starter las notificaciones por email están deshabilitadas por defecto porque es una característica premium.
 </Note>
 
-```php
-// ✅ CORRECTO
-add_filter('thi_memory_warning_threshold', function($threshold) {
-    if (some_condition()) {
-        return 80.0;
-    }
-    return $threshold; // Siempre retorna el valor
-});
+---
 
-// ❌ INCORRECTO
-add_filter('thi_memory_warning_threshold', function($threshold) {
-    if (some_condition()) {
-        return 80.0;
-    }
-    // Sin retorno del valor original
-});
+### thi_error_alert_throttle_seconds
+
+Tiempo mínimo (en segundos) entre dos correos de alerta de error consecutivos para evitar spam.
+
+<CodeGroup>
+```php Filtro
+$seconds = apply_filters('thi_error_alert_throttle_seconds', 1800);
 ```
 
+```php Ejemplo
+// Throttle más agresivo: una alerta por hora como máximo
+add_filter('thi_error_alert_throttle_seconds', fn() => HOUR_IN_SECONDS);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `1800` (30 minutos) |
+| **Ubicación** | `includes/notifications/class-thi-error-alert.php` |
+
+---
+
+### thi_sync_reports_retention_days
+
+Días que se conservan los reportes de sincronización antes de ser purgados por el cron diario.
+
+<CodeGroup>
+```php Filtro
+$days = apply_filters('thi_sync_reports_retention_days', 30);
+```
+
+```php Ejemplo
+// Conservar 90 días de reportes
+add_filter('thi_sync_reports_retention_days', fn() => 90);
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Valor predeterminado** | `30` días |
+| **Ejecutado por** | el evento WP-Cron `thi_daily_sync_reports_cleanup` |
+| **Ubicación** | `includes/sync/class-thi-sync-report-store.php` |
+
+---
+
+## Buenas prácticas
+
 <Tip>
-**Verifica validez de datos** al retornar valores filtrados para evitar comportamientos inesperados.
+- **Devuelve siempre el valor** (modificado o no). Un filtro que no retorna dispara advertencias y rompe comportamiento.
+- Usa prioridades distintas a `10` si quieres garantizar que tu filtro se ejecute después del default del plugin (si cambia en el futuro).
+- No llames operaciones pesadas dentro del callback de un filtro: estos se evalúan en cada request relevante.
 </Tip>
 
 ```php
+// ✅ Correcto
 add_filter('thi_memory_warning_threshold', function($threshold) {
-    $new_threshold = floatval($threshold);
+    return 70.0; // retorna el nuevo valor
+});
 
-    // Validar rango
-    if ($new_threshold < 50.0) {
-        $new_threshold = 50.0;
-    }
-    if ($new_threshold > 95.0) {
-        $new_threshold = 95.0;
-    }
-
-    return $new_threshold;
+// ❌ Incorrecto (no retorna nada)
+add_filter('thi_memory_warning_threshold', function($threshold) {
+    $new = 70.0;
+    // missing return
 });
 ```

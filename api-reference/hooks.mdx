@@ -1,292 +1,326 @@
 ---
 title: "Hooks (Actions)"
-description: "Todos los hooks de acción disponibles para extender la funcionalidad"
+description: "Acciones y eventos a los que puedes engancharte con add_action"
 ---
 
-# Hooks de Acción
+# Hooks
 
-Los hooks de acción permiten ejecutar código personalizado en momentos específicos del ciclo de vida del plugin. Utiliza `add_action()` para conectarse a estos hooks.
+Esta página documenta los puntos de extensión **disponibles** del plugin organizados en tres grupos:
 
-## Eventos de sincronización (WP-Cron)
+1. **Acciones disparadas con `do_action`** — las puedes escuchar con `add_action` y se ejecutan en el momento que documentan.
+2. **Eventos WP-Cron / Action Scheduler** — tareas programadas que el plugin registra; puedes engancharte para ejecutar código en paralelo con la rutina del plugin.
+3. **Acciones AJAX** (`wp_ajax_...`) — endpoints del panel de administración; documentados solo como referencia porque sus handlers viven en `includes/ajax/ajax-handlers.php`.
 
 <Info>
-Los siguientes nombres son **eventos WP-Cron** registrados por el plugin, no acciones lanzadas con `do_action()`. Puedes engancharte a ellos con `add_action()` para ejecutar código junto a la rutina del plugin.
+Todas las acciones listadas aquí están verificadas contra el código fuente. Si un hook no aparece aquí, el plugin **no** lo dispara.
 </Info>
 
-### thi_scheduled_sync
+---
 
-Evento programado que dispara la sincronización automática (solo planes premium).
+## Acciones disparadas por el plugin (`do_action`)
+
+### thi_sync_report_saved
+
+Se dispara inmediatamente después de que un reporte de sincronización se guarda en la base de datos.
 
 <CodeGroup>
+```php Firma
+do_action('thi_sync_report_saved', string $sync_id, array $report);
+```
+
 ```php Ejemplo
-add_action('thi_scheduled_sync', function() {
-    error_log('Iniciando sincronización programada');
+add_action('thi_sync_report_saved', function($sync_id, $report) {
+    // Envía el reporte a un webhook externo
+    wp_remote_post('https://monitor.example.com/hook', [
+        'body' => [
+            'sync_id' => $sync_id,
+            'properties_processed' => $report['counters']['properties_synced'] ?? 0,
+            'errors' => count($report['errors'] ?? []),
+        ],
+    ]);
+}, 10, 2);
+```
+</CodeGroup>
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `$sync_id` | Identificador único del reporte guardado |
+| `$report` | Array completo con contadores, errores, warnings, duración, etc. |
+
+**Ubicación**: `includes/sync/class-thi-sync-report-store.php`
+
+---
+
+### tp_fs_loaded
+
+Se dispara cuando el SDK de Freemius se inicializa. Es el punto seguro para leer la licencia del plugin desde tu propio código.
+
+<CodeGroup>
+```php Firma
+do_action('tp_fs_loaded');
+```
+
+```php Ejemplo
+add_action('tp_fs_loaded', function() {
+    if (function_exists('tp_fs') && tp_fs()->can_use_premium_code__premium_only()) {
+        // lógica premium...
+    }
 });
 ```
 </CodeGroup>
 
-**Parámetros**: Ninguno
+**Ubicación**: `tokko-houzez-integration.php`
 
-**Descripción**: WP-Cron registra este evento con la frecuencia configurada en **Tokko Plugins → Configuración → Sincronización**. El plugin lo escucha para ejecutar `thi_premium_property_sync()`.
+---
 
-**Listener definido en**: `tokko-houzez-integration.php`
+## Eventos WP-Cron / Action Scheduler
+
+<Warning>
+Estos no son `do_action` clásicos: son **tareas programadas** registradas con `wp_schedule_event` / `wp_schedule_single_event` / `as_schedule_*`. Puedes engancharte con `add_action` para correr código junto con la tarea del plugin. Usa una prioridad distinta de `10` si quieres ejecutar tu callback antes o después del callback por defecto del plugin.
+</Warning>
+
+### thi_scheduled_sync
+
+Sincronización automática completa programada (feature premium). La frecuencia se controla con la opción `thi_sync_option`.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_scheduled_sync', function() {
+    error_log('Sincronización programada arrancó');
+}, 20);
+```
+</CodeGroup>
+
+**Se dispara por**: evento WP-Cron registrado cuando cambia `thi_sync_option` o `thi_custom_interval_value`.
+**Listener del plugin**: `thi_premium_property_sync()` en `tokko-houzez-integration.php`.
+
+---
+
+### thi_force_background_sync
+
+Sincronización disparada manualmente desde el botón **Force Sync** cuando WP-Cron local está deshabilitado — corre en segundo plano.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_force_background_sync', function() {
+    set_transient('last_force_sync_started', time(), DAY_IN_SECONDS);
+}, 20);
+```
+</CodeGroup>
+
+**Ubicación de programación**: `includes/ajax/ajax-handlers.php`.
+
+---
+
+### thi_cron_sync_continue
+
+Evento que reanuda una sincronización cuando el motor unificado la pausó por timeout, carga alta o para ceder CPU. Se reprograma a sí mismo hasta completar.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_cron_sync_continue', function() {
+    error_log('Reanudando sincronización tras pausa');
+}, 20);
+```
+</CodeGroup>
+
+**Ubicación**: `includes/sync/class-thi-unified-sync-engine.php`, `includes/sync/cron-handler.php`.
 
 ---
 
 ### thi_continue_image_sync
 
-Evento por lotes (WP-Cron / Action Scheduler) que continúa la descarga de imágenes entre lotes.
+Evento por lotes que continúa la descarga y procesamiento de imágenes mientras queden pendientes.
 
 <CodeGroup>
 ```php Ejemplo
 add_action('thi_continue_image_sync', function() {
+    // Registrar métrica por lote
     update_option(
-        'custom_image_batch_count',
-        intval(get_option('custom_image_batch_count', 0)) + 1,
+        'thi_custom_image_batch_count',
+        (int) get_option('thi_custom_image_batch_count', 0) + 1,
         false
     );
 }, 20);
 ```
 </CodeGroup>
 
-**Descripción**: Se dispara repetidamente mientras queden imágenes pendientes por procesar, hasta que termine la sincronización.
+**Ubicación**: `includes/sync/sync-functions.php`.
 
-**Listener definido en**: `includes/sync/sync-functions.php`
+---
+
+### thi_retry_failed_images
+
+Evento recurrente (cada hora) que reintenta la descarga de imágenes que fallaron previamente.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_retry_failed_images', function() {
+    error_log('Intentando recuperar imágenes fallidas');
+}, 20);
+```
+</CodeGroup>
+
+**Programado vía**: Action Scheduler (con fallback a WP-Cron) en `thi_image_sync` group.
+
+---
+
+### thi_regenerate_thumbnails
+
+Tarea de fondo (single event) que regenera miniaturas cuando se cambia la configuración correspondiente.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_regenerate_thumbnails', function() {
+    error_log('Regenerando miniaturas');
+}, 20);
+```
+</CodeGroup>
+
+**Ubicación**: `includes/ajax/ajax-handlers.php`.
+
+---
+
+### thi_delete_thumbnails
+
+Tarea de fondo que elimina miniaturas generadas cuando el usuario desactiva esa función.
+
+<CodeGroup>
+```php Ejemplo
+add_action('thi_delete_thumbnails', function() {
+    error_log('Limpiando miniaturas generadas');
+}, 20);
+```
+</CodeGroup>
+
+**Ubicación**: `includes/ajax/ajax-handlers.php`.
+
+---
+
+### thi_cleanup_orphaned_files
+
+Tarea puntual que borra archivos huérfanos de propiedades que ya no existen.
+
+**Ubicación**: `includes/ajax/ajax-handlers.php`.
 
 ---
 
 ### thi_bulk_update_titles_batch
 
-Evento por lotes para actualizar masivamente títulos de propiedades cuando cambia la configuración "Usar dirección como título".
+Evento por lotes para actualizar masivamente los títulos de propiedades al activar/desactivar "Usar dirección como título".
 
-<CodeGroup>
-```php Ejemplo
-add_action('thi_bulk_update_titles_batch', function() {
-    error_log('Procesando lote de actualización de títulos');
-}, 20);
-```
-</CodeGroup>
-
-**Listener definido en**: `includes/sync/sync-functions.php`
+**Ubicación**: `includes/sync/sync-functions.php`.
 
 ---
 
-### thi_cron_sync_continue
+### thi_daily_sync_reports_cleanup
 
-Evento de continuación de una sincronización cron que se pausó por timeout.
+Evento diario que purga reportes de sincronización viejos. El filtro [`thi_sync_reports_retention_days`](/api-reference/filtros#thi-sync-reports-retention-days) controla cuántos días se conservan.
 
-<CodeGroup>
-```php Ejemplo
-add_action('thi_cron_sync_continue', function() {
-    error_log('Reanudando sincronización después de pausa');
-}, 20);
-```
-</CodeGroup>
-
-**Listener definido en**: `includes/sync/cron-handler.php`
+**Ubicación**: `includes/sync/cron-handler.php`.
 
 ---
 
-## Hooks de integración
+### thi_send_periodic_report
 
-### tp_fs_loaded
+Evento recurrente que envía el resumen periódico por email (feature premium — requiere `thi_email_periodic_enabled`).
 
-Se dispara cuando el SDK de Freemius se ha cargado completamente.
-
-<CodeGroup>
-```php Hook
-do_action('tp_fs_loaded');
-```
-
-```php Ejemplo
-add_action('tp_fs_loaded', function() {
-    // Acceso seguro a funcionalidad de Freemius
-    if (function_exists('tp_fs')) {
-        $user = tp_fs()->get_user();
-        error_log('Usuario Freemius: ' . $user->email);
-    }
-});
-```
-</CodeGroup>
-
-**Parámetros**: Ninguno
-
-**Descripción**: Proporciona un punto seguro para inicializar código dependiente de Freemius después de que se ha cargado el SDK.
-
-**Ubicación definida**: `tokko-houzez-integration.php`
+**Ubicación**: `includes/notifications/notification-functions.php`.
 
 ---
 
-## Hooks de AJAX
+## Acciones AJAX del plugin
 
-Estos hooks se registran vía `wp_ajax_{action}` y son llamados por la interfaz de administración del plugin. Todos los handlers viven en `includes/ajax/ajax-handlers.php`. Puedes engancharte **antes** (vía `add_action` con prioridad baja) o **después** (prioridad alta) para extender el comportamiento.
+Estas acciones se registran con `wp_ajax_<action>` y se invocan desde la interfaz de administración del plugin. Todos los handlers del plugin viven en `includes/ajax/ajax-handlers.php` o `includes/ajax/system-status-handlers.php`.
 
 <Warning>
-El plugin ya registra su propio handler para cada acción. Si agregas otro, asegúrate de usar una prioridad distinta a `10` para no reemplazar el comportamiento del plugin.
+El plugin ya tiene su propio handler registrado para cada acción. Si agregas uno con `add_action('wp_ajax_<accion>', ...)`, usa una prioridad distinta de `10` para no interferir.
 </Warning>
 
-### thi_unified_sync_detect
+### Sincronización unificada
 
-Inicia la detección de cambios para sincronización.
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_unified_sync_detect` | Paso 1: detecta cambios desde el último sync |
+| `thi_unified_sync_execute_batch` | Paso 2: procesa el siguiente lote |
+| `thi_unified_sync_archive` | Paso 3: archiva propiedades que ya no están en Tokko |
+| `thi_unified_sync_finalize` | Paso 4: finaliza el sync y guarda el reporte |
+| `thi_unified_sync_pause` / `thi_unified_sync_resume` / `thi_unified_sync_cancel` | Control del sync en progreso |
+| `thi_sync_heartbeat` | Heartbeat mientras el sync está activo |
 
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_unified_sync_detect');
-```
+### Sincronización puntual
 
-```php Ejemplo
-add_action('wp_ajax_thi_unified_sync_detect', function() {
-    // Validar capacidades de usuario
-    if (!current_user_can('manage_options')) {
-        wp_die('Acceso denegado');
-    }
-    // Código personalizado...
-});
-```
-</CodeGroup>
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_sync_single_property` | Sincroniza una propiedad específica |
+| `thi_sync_single_development` | Sincroniza un emprendimiento específico |
+| `thi_sync_developments_only` | Sincroniza solo emprendimientos |
+| `thi_force_sync_cronjob` | Programa el sync en WP-Cron manualmente |
+| `thi_force_reprocess_properties` | Fuerza reprocesamiento completo |
+| `thi_sync_agents` | Sincroniza sólo agentes |
+| `thi_sync_development_relationships` | Relaciona emprendimientos con propiedades |
+| `thi_sync_property_images_frontend` | Solicita reintento de imágenes desde el frontend |
 
-**Descripción**: Punto de entrada para detección de cambios en sincronización AJAX.
+### Estado y diagnóstico
 
----
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_heartbeat` / `thi_check_session` | Ping ligero del estado de sesión |
+| `thi_check_sync_readiness` / `thi_check_sync_requirements` / `thi_check_sync_status` | Chequeos previos a sincronización |
+| `thi_get_health_indicators` | Indicadores de salud del servidor |
+| `thi_get_api_status_table` | Estado de la conexión con Tokko |
+| `thi_test_api_connection` | Test manual de la API Key |
+| `thi_get_sync_estimation` | Estimación de tiempo del próximo sync |
+| `thi_get_image_sync_status` / `thi_get_title_update_status` | Estado de subprocesos |
+| `thi_get_sync_performance` / `thi_get_sync_timeline` | Métricas históricas |
 
-### thi_unified_sync_execute_batch
+### Dashboard & reports
 
-Ejecuta un lote de sincronización.
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_get_dashboard_stats` / `thi_get_enhanced_stats` | Estadísticas del dashboard |
+| `thi_get_sync_report` / `thi_get_sync_report_by_id` | Lee el reporte del sync actual/histórico |
+| `thi_download_sync_report_csv` | Descarga reportes en CSV |
+| `thi_get_changelog` | Entradas del changelog |
+| `thi_properties_last_report` / `thi_properties_archived_count` | Datos del tab Properties |
 
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_unified_sync_execute_batch', $batch_data);
-```
+### Gestión de datos
 
-```php Ejemplo
-add_action('wp_ajax_thi_unified_sync_execute_batch', function() {
-    // Procesar lote enviado
-    $batch = isset($_POST['batch']) ? json_decode(wp_unslash($_POST['batch']), true) : [];
-    error_log('Procesando lote de ' . count($batch) . ' elementos');
-});
-```
-</CodeGroup>
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_load_properties` / `thi_properties_list` | Listado con paginación |
+| `thi_properties_sync_by_id` / `thi_properties_sync_selected` | Sync selectivo desde el tab Properties |
+| `thi_properties_force_image_resync` / `thi_properties_diagnose` | Diagnóstico y resync de una propiedad |
+| `thi_retry_property_sync` | Reintenta el sync de una propiedad |
+| `thi_delete_all_properties` | Borra todas las propiedades |
+| `thi_cleanup_orphaned_agents` | Limpia agentes huérfanos |
+| `thi_assign_agent_to_properties` / `thi_save_auto_assign_agent` | Auto-asignación de agentes |
+| `thi_save_agent_toggle` | Activa/desactiva sync de agentes |
+| `thi_get_agents_list` | Lista de agentes |
 
-**Descripción**: Se dispara para ejecutar un lote individual durante sincronización AJAX.
+### Sistema & herramientas
 
----
+| Acción AJAX | Propósito |
+|-------------|-----------|
+| `thi_export_support_metrics` | Exporta métricas para soporte |
+| `thi_clear_error_history` | Limpia el historial de errores |
+| `thi_create_timestamps_table` | Crea (o re-crea) la tabla de timestamps |
+| `thi_acquire_sync_lock` / `thi_release_sync_lock` | Locks del motor de sync |
+| `thi_update_last_sync_time` / `thi_update_sync_state` | Actualización explícita de estado |
+| `thi_update_whatsapp_fields` | Migración de campos WhatsApp |
+| `thi_bulk_update_titles` | Dispara la actualización masiva de títulos |
+| `thi_upload_json_test_file` / `thi_remove_json_test_file` / `thi_switch_test_json` | Modo test con JSON local (Dev Mode) |
+| `thi_inject_error` / `thi_clear_injections` / `thi_get_injection_status` | Herramientas de debugging (Dev Mode) |
+| `thi_test_cleanup` / `thi_test_timestamps` | Tests internos (Dev Mode) |
+| `thi_get_properties_for_image_sync` / `thi_get_developments_for_sync` | Lista de candidatos |
+| `thi_record_developments_sync_result` | Registra el resultado del sync de devs |
+| `thi_dismiss_update_notice` | Descarta el aviso de actualización |
 
-### thi_unified_sync_finalize
-
-Finaliza la sincronización AJAX.
-
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_unified_sync_finalize');
-```
-
-```php Ejemplo
-add_action('wp_ajax_thi_unified_sync_finalize', function() {
-    // Limpieza final
-    delete_transient('thi_sync_in_progress');
-    wp_cache_flush();
-});
-```
-</CodeGroup>
-
-**Descripción**: Se dispara al finalizar la sincronización AJAX.
-
----
-
-### thi_sync_single_property
-
-Sincroniza una propiedad individual.
-
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_sync_single_property', $property_id);
-```
-
-```php Ejemplo
-add_action('wp_ajax_thi_sync_single_property', function() {
-    $prop_id = isset($_POST['property_id']) ? intval($_POST['property_id']) : 0;
-    if ($prop_id > 0) {
-        // Sincronizar propiedad individual
-    }
-});
-```
-</CodeGroup>
-
-**Descripción**: Permite sincronizar una propiedad específica bajo demanda.
-
----
-
-### thi_sync_developments_only
-
-Sincroniza únicamente desarrollos.
-
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_sync_developments_only');
-```
-
-```php Ejemplo
-add_action('wp_ajax_thi_sync_developments_only', function() {
-    if (!current_user_can('manage_options')) {
-        wp_die('Acceso denegado');
-    }
-    // Sincronizar solo desarrollos
-});
-```
-</CodeGroup>
-
-**Descripción**: Ejecuta sincronización de desarrollos únicamente.
-
----
-
-### thi_force_reprocess_properties
-
-Fuerza reprocesamiento de todas las propiedades.
-
-<CodeGroup>
-```php Hook
-do_action('wp_ajax_thi_force_reprocess_properties');
-```
-
-```php Ejemplo
-add_action('wp_ajax_thi_force_reprocess_properties', function() {
-    // Limpiar caché de propiedades
-    delete_transient('thi_cached_properties');
-    // Iniciar reprocesamiento
-});
-```
-</CodeGroup>
-
-**Descripción**: Borra el caché de propiedades y reinicia el procesamiento desde cero.
-
----
-
-## Mejores prácticas
-
-<Note>
-**Siempre valida capacidades de usuario** usando `current_user_can()` en hooks de administración.
-</Note>
+## Buenas prácticas
 
 <Tip>
-**Usa opciones transitorias** para datos temporales en hooks de sincronización para no sobrecargar la base de datos.
+- **Mantén los callbacks ligeros**. Los hooks de sincronización pueden ejecutarse muchas veces durante un sync.
+- Para llamadas a sistemas externos, usa `wp_remote_post()` con timeout pequeño o, mejor, encola con Action Scheduler.
+- Si necesitas estado entre invocaciones del mismo hook (por ejemplo `thi_continue_image_sync`), usa `update_option(..., false)` con autoload `false`.
+- Siempre valida capacidades (`current_user_can('manage_options')`) cuando te enganches a acciones AJAX.
 </Tip>
-
-```php
-// Buen ejemplo
-add_action('thi_scheduled_sync', function() {
-    // Almacenar datos temporales
-    set_transient('thi_custom_sync_log', [
-        'started' => current_time('mysql'),
-        'status' => 'processing'
-    ], 12 * HOUR_IN_SECONDS);
-
-    // Ejecutar lógica personalizada
-    // ...
-});
-```
-
-## Performance
-
-- Mantén hooks ligeros; no ejecutes operaciones pesadas
-- Usa `wp_remote_post()` asincrónico para llamadas externas
-- Aprovecha el sistema de caché de WordPress

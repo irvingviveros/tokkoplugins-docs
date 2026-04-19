@@ -130,6 +130,49 @@ echo 'Propiedades modificadas: ' . count($changes['modified_properties']);
 
 ---
 
+### thi_detect_changed_developments()
+
+Versión para emprendimientos de `thi_detect_changed_properties`: identifica cambios en desarrollos desde la última sincronización.
+
+<CodeGroup>
+```php Firma
+function thi_detect_changed_developments(
+    int $max_developments = 0,
+    bool $force_full_check = false
+)
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$max_developments` (int) — límite opcional; `$force_full_check` (bool) |
+| **Ubicación** | `includes/sync/sync-utilities.php` |
+
+---
+
+### thi_count_published_properties()
+
+Cuenta cuántas entradas publicadas existen para un post type dado, normalmente `'property'` o `'emprendimiento'`.
+
+<CodeGroup>
+```php Firma
+function thi_count_published_properties(string $type = 'property'): int
+```
+
+```php Ejemplo
+$total_props = thi_count_published_properties('property');
+$total_devs  = thi_count_published_properties('emprendimiento');
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Parámetros** | `$type` (string) — `'property'` (default) o `'emprendimiento'` |
+| **Valor de retorno** | `int` — cantidad de entradas en estado `publish` |
+| **Ubicación** | `includes/sync/sync-utilities.php` |
+
+---
+
 ## Funciones de API
 
 ### thi_check_api_key()
@@ -157,6 +200,36 @@ if (is_wp_error($result)) {
 | **Valor de retorno** | `string` (nombre de la empresa) si es válida, `WP_Error` si falla |
 | **Parámetros** | Ninguno |
 | **Ubicación** | `includes/api/api-integration.php` |
+
+---
+
+### thi_check_connection_health_detailed()
+
+Ejecuta los chequeos de salud completos del servidor (memoria, load, disco) que el plugin usa antes de iniciar un sync. Ideal para exponer el mismo diagnóstico en dashboards externos.
+
+<CodeGroup>
+```php Firma
+function thi_check_connection_health_detailed(): array
+```
+
+```php Ejemplo
+$health = thi_check_connection_health_detailed();
+
+if ($health['overall']['status'] === 'critical') {
+    error_log('No es seguro sincronizar ahora mismo');
+}
+```
+</CodeGroup>
+
+| Aspecto | Detalles |
+|--------|---------|
+| **Valor de retorno** | `array` con bloques `memory`, `load`, `disk` y `overall` (cada uno con `status`, métrica y umbrales) |
+| **Parámetros** | Ninguno |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
+
+<Tip>
+Los umbrales que usa esta función son personalizables con los filtros de la sección [Health checks](/api-reference/filtros#chequeos-de-salud-del-servidor-health-checks).
+</Tip>
 
 ---
 

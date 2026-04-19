@@ -41,46 +41,46 @@ Esta es una clave sensible. No la expongas en código público o repositorios Gi
 
 ### thi_language
 
-Idioma de la API de Tokko.
+Idioma usado al consumir la API de Tokko Broker. Afecta principalmente a cómo se muestran campos localizables que entrega Tokko (ej. nombres de operaciones).
 
 <CodeGroup>
 ```php Obtener
-$language = get_option('thi_language', 'es');
+$language = get_option('thi_language', 'es_ar');
 ```
 
 ```php Establecer
-update_option('thi_language', 'es');
+update_option('thi_language', 'es_ar');
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | 'es' |
-| **Valores válidos** | 'es', 'en', 'pt', 'fr' |
-| **Descripción** | Idioma de respuesta de la API de Tokko. |
+| **Valor predeterminado** | `'es_ar'` |
+| **Descripción** | Locale que se envía a la API de Tokko Broker. |
 
 ---
 
 ### thi_plugin_language
 
-Idioma de la interfaz del plugin.
+Idioma de la interfaz administrativa del plugin (menús, tabs, mensajes).
 
 <CodeGroup>
 ```php Obtener
-$lang = get_option('thi_plugin_language', 'es_ES');
+$lang = get_option('thi_plugin_language', 'en_US');
 ```
 
 ```php Establecer
-update_option('thi_plugin_language', 'es_ES');
+update_option('thi_plugin_language', 'es_MX');
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | 'es_ES' |
-| **Descripción** | Código de idioma para traducción del plugin en WordPress. |
+| **Valor predeterminado** | `'en_US'` (desde la UI de configuración) |
+| **Valores válidos** | `'en_US'`, `'es_MX'` |
+| **Descripción** | Locale para traducción del panel del plugin (no afecta el frontend de Houzez). |
 
 ---
 
@@ -343,11 +343,11 @@ update_option('thi_enhanced_search_fields', [
 
 ### thi_age_range_slider_color
 
-Color del slider de edad de construcción.
+Color personalizado del control deslizante "Edad de la propiedad".
 
 <CodeGroup>
 ```php Obtener
-$color = get_option('thi_age_range_slider_color', '#3498db');
+$color = get_option('thi_age_range_slider_color', '');
 ```
 
 ```php Establecer
@@ -358,19 +358,19 @@ update_option('thi_age_range_slider_color', '#e74c3c');
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | '#3498db' |
-| **Formato** | Código hexadecimal de color |
-| **Descripción** | Color personalizado para rango de años en búsqueda. |
+| **Valor predeterminado** | `''` (sin override; usa el color del tema) |
+| **Formato** | Código hexadecimal de color (ej. `'#007bff'`) |
+| **Descripción** | Color personalizado del slider de edad; si queda vacío, se usa el color por defecto del tema. |
 
 ---
 
 ### thi_age_range_slider_label
 
-Etiqueta del slider de edad de construcción.
+Etiqueta del slider de edad de la propiedad.
 
 <CodeGroup>
 ```php Obtener
-$label = get_option('thi_age_range_slider_label', 'Años de construcción');
+$label = get_option('thi_age_range_slider_label', 'Edad de la propiedad');
 ```
 
 ```php Establecer
@@ -381,8 +381,8 @@ update_option('thi_age_range_slider_label', 'Antigüedad');
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | 'Años de construcción' |
-| **Descripción** | Etiqueta visible para el rango de edad. |
+| **Valor predeterminado** | `'Edad de la propiedad'` |
+| **Descripción** | Etiqueta visible encima del slider en el formulario de búsqueda. |
 
 ---
 
@@ -502,25 +502,24 @@ update_option('thi_auto_assign_agent_id', 123);
 
 ### thi_image_quality
 
-Calidad de procesamiento de imágenes.
+Perfil de calidad usado para descargar imágenes de propiedades.
 
 <CodeGroup>
 ```php Obtener
-$quality = get_option('thi_image_quality', 'medium');
+$quality = get_option('thi_image_quality', 'optimized');
 ```
 
 ```php Establecer
-update_option('thi_image_quality', 'high');
+update_option('thi_image_quality', 'original');
 ```
 </CodeGroup>
 
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | 'medium' |
-| **Valores válidos** | 'low', 'medium', 'high' |
-| **Descripción** | Determina resolución y calidad de imágenes sincronizadas. |
-| **Impacto** | Afecta tamaño de almacenamiento y velocidad de carga. |
+| **Valor predeterminado** | `'optimized'` |
+| **Descripción** | Controla qué variante de la imagen se baja desde Tokko. Valores soportados por la API típicamente incluyen `original` y `optimized`. |
+| **Impacto** | Afecta directamente el tamaño de disco y la velocidad de carga del frontend. |
 
 ---
 
@@ -545,6 +544,156 @@ update_option('thi_enable_contact_integration', true);
 | **Tipo** | bool |
 | **Valor predeterminado** | false |
 | **Descripción** | Si está activo, conecta formularios de contacto con Tokko y CRM. |
+
+---
+
+## Notificaciones por email
+
+<Note>
+Las notificaciones por email son una característica **premium** (Professional / Pro+). En el plan Starter el filtro [`thi_notifications_enabled`](/api-reference/filtros#thi-notifications-enabled) las desactiva por defecto.
+</Note>
+
+### thi_email_error_alert_enabled
+
+Habilita el envío de alertas por email cuando el plugin registra errores.
+
+<CodeGroup>
+```php Obtener
+$enabled = get_option('thi_email_error_alert_enabled', 'yes');
+```
+
+```php Establecer
+update_option('thi_email_error_alert_enabled', 'no');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string (`'yes'` / `'no'`) |
+| **Valor predeterminado** | `'yes'` |
+| **Descripción** | Conmutador principal de alertas por email. |
+
+---
+
+### thi_email_error_alert_level
+
+Nivel mínimo de severidad para disparar una alerta por email.
+
+<CodeGroup>
+```php Obtener
+$level = get_option('thi_email_error_alert_level', 'critical');
+```
+
+```php Establecer
+update_option('thi_email_error_alert_level', 'warning');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | `'critical'` |
+| **Valores típicos** | `'warning'`, `'error'`, `'critical'` |
+| **Descripción** | Solo los errores iguales o superiores a este nivel disparan email. |
+
+---
+
+### thi_email_error_alert_recipients
+
+Destinatarios de las alertas de error (uno o varios, separados por comas o saltos de línea).
+
+<CodeGroup>
+```php Obtener
+$recipients = get_option('thi_email_error_alert_recipients', '');
+```
+
+```php Establecer
+update_option('thi_email_error_alert_recipients', "admin@example.com\nops@example.com");
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | `''` (vacío) |
+| **Formato** | Una dirección por línea o separadas por coma. |
+
+---
+
+### thi_email_periodic_enabled
+
+Habilita el reporte periódico por email (resumen de sincronización).
+
+<CodeGroup>
+```php Obtener
+$enabled = get_option('thi_email_periodic_enabled', 'no');
+```
+
+```php Establecer
+update_option('thi_email_periodic_enabled', 'yes');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string (`'yes'` / `'no'`) |
+| **Valor predeterminado** | `'no'` |
+
+---
+
+### thi_email_periodic_frequency
+
+Frecuencia del reporte periódico.
+
+<CodeGroup>
+```php Obtener
+$frequency = get_option('thi_email_periodic_frequency', 'weekly');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | `'weekly'` |
+| **Valores válidos** | `'daily'`, `'weekly'`, `'monthly'` |
+
+---
+
+### thi_email_periodic_recipients
+
+Destinatarios del reporte periódico (mismo formato que las alertas).
+
+<CodeGroup>
+```php Obtener
+$recipients = get_option('thi_email_periodic_recipients', '');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | `''` |
+
+---
+
+### thi_email_from_name
+
+Nombre que aparece como remitente en los emails enviados por el plugin.
+
+<CodeGroup>
+```php Obtener
+$from_name = get_option('thi_email_from_name', '');
+```
+
+```php Establecer
+update_option('thi_email_from_name', 'Inmobiliaria Ejemplo');
+```
+</CodeGroup>
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Tipo** | string |
+| **Valor predeterminado** | `''` (usa el default de WordPress) |
 
 ---
 
