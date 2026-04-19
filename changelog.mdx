@@ -10,10 +10,93 @@ Aquí encontrarás un historial completo de todas las actualizaciones, mejoras y
 
 ---
 
+## v3.3.0 (19 de Abril, 2026)
+
+<Note>
+Versión actual. El tab **Propiedades** se transformó en una consola operativa: lista paginada con sincronización selectiva, re-sync forzado de imágenes, diagnóstico en vivo y reporte por propiedad.
+</Note>
+
+### ✨ Nuevas Características
+
+- **Tab "Propiedades" como consola operativa:** Tabla paginada con todas las propiedades de Tokko (ID, título, estado de sync, última acción, imágenes, fecha de última sync, acciones). Incluye búsqueda por título/ID/dirección, filtros por estado y acción, ordenamiento por columna y paginación. Reemplaza los widgets anteriores de "Propiedades por área" y "Análisis de precios" por herramientas operativas.
+- **Sincronización selectiva por checkboxes:** Selector múltiple en la tabla con barra de acción flotante **Sincronizar seleccionadas (N)**. Crea una sesión de sync limitada a los IDs elegidos, respetando el lock global y reutilizando el motor unificado.
+- **Sincronización por ID de Tokko:** Campo en la toolbar para pegar uno o más IDs de Tokko separados por coma y sincronizar solo esas propiedades sin tenerlas en la vista actual. Útil para troubleshooting de propiedades específicas reportadas por vendedores.
+- **Re-sync forzado de imágenes:** Botón **Imágenes** en cada fila que marca la propiedad con `_thi_force_image_resync` y dispara un sync selectivo para esa propiedad. El siguiente sync borra las imágenes existentes y las vuelve a descargar.
+- **Modal "Último reporte":** Acción por fila que abre el reporte completo de la última sincronización donde participó esa propiedad, sin tener que navegar al historial.
+- **Diagnóstico "¿Por qué no veo esta propiedad?":** Acción por fila que verifica en vivo si la propiedad existe en Tokko, si está publicada en WordPress, si tiene imágenes, si está archivada y si tiene errores registrados. Devuelve un semáforo con hallazgos y un hint de próximo paso.
+- **Link "Abrir en Tokko" con fallback "Copiar ID":** Si se configuró `tokkoBackofficeBase`, abre el detalle en el backoffice de Tokko. Si no, el botón se reemplaza por **Copiar ID** usando la Clipboard API.
+- **KPI "Archivadas recientemente por Tokko":** Tarjeta con el conteo de propiedades archivadas por Tokko (`status=archived`) en los últimos 7 días. Permite detectar borrados masivos en Tokko que impacten el sitio.
+
+---
+
+## v3.2.0 (19 de Abril, 2026)
+
+### ✨ Nuevas Características
+
+- **Highlights mensuales en el email periódico:** Cuando la frecuencia del reporte por correo está en **Mensual**, el email incluye dos secciones nuevas:
+  - **Resumen del mes:** peso promedio por imagen, total descargado en el período, ritmo diario promedio, imágenes y propiedades sincronizadas.
+  - **Proyección:** estimación de consumo a 30, 90 y 365 días basada en el ritmo de descarga actual.
+  - Si la frecuencia no es mensual, el correo sale igual que antes sin el bloque nuevo.
+- **Bloque "Consumo y Proyección" en el dashboard:** El tab **Sincronización** muestra al final un bloque con cuatro tarjetas de los últimos 30 días (peso promedio por imagen, total descargado, ritmo diario, propiedades sincronizadas) y una tabla de proyección a 30, 90 y 365 días. Visible solo en licencias Pro/trial.
+- **Indicador de confianza de la proyección:** Badge **Confianza: alta / media / baja** en el dashboard y aviso equivalente en el email. Basado en los días con actividad dentro de la ventana de 30 días (20+ alta, 7–19 media, <7 baja).
+- **Vista previa mensual real en "Probar correo":** Cuando la frecuencia es **Mensual**, el botón **Probar correo** envía una previsualización con datos reales del sitio en lugar de datos ficticios, para ver exactamente lo que vas a recibir.
+
+### 🔧 Técnico
+
+- Nueva agregación `THI_Sync_Report_Store::storage_summary()` con base UTC consistente.
+- Filtro de estados por defecto: incluye `success`, `success_with_warnings` y `error`; excluye `aborted` y `cancelled`.
+- Suite de regresión de 33 casos en `tests/test-storage-summary.php`.
+
+---
+
+## v3.1.0 (17 de Abril, 2026)
+
+<Note>
+Versión enfocada en observabilidad: historial persistente de reportes y endurecimiento del lock de sincronización.
+</Note>
+
+### ✨ Nuevas Características
+
+- **Historial persistente de reportes de sincronización:** Cada ejecución (manual o cron) se guarda en tablas MySQL propias (`thi_sync_reports` + `thi_sync_report_items`) con **30 días de retención**. Los reportes sobreviven recargas de página y pueden consultarse en cualquier momento.
+- **Botón "Ver reporte" en el timeline:** Cada entrada de **Actividad Reciente** abre un modal con el reporte completo de esa sync: resumen de totales, estado general y detalle por propiedad.
+- **Detalle por propiedad en el modal:** Para cada propiedad procesada se muestra la acción (nueva, actualizada, omitida, archivada, reactivada), estado, imágenes sincronizadas, MB descargados, advertencias, errores y enlaces al editor y a la URL pública.
+- **Descarga CSV del reporte:** Cada reporte puede exportarse a CSV (UTF-8, separador coma) con el resumen general y el detalle por propiedad.
+- **Captura de syncs canceladas y abortadas:** Al cancelar desde el panel o ante un error fatal que termina el proceso, el reporte parcial se persiste con el estado correcto en lugar de perderse.
+- **Limpieza automática diaria:** Un evento de WP-Cron elimina cada día los reportes con más de 30 días de antigüedad, manteniendo la base de datos acotada.
+- **Desinstalación limpia:** Al eliminar el plugin, las tablas de reportes se eliminan automáticamente.
+- **Tracking de bytes descargados:** Se registran los MB de imágenes por propiedad y por sync, sentando la base de los highlights mensuales de v3.2.
+
+### 🔧 Correcciones
+
+- **Cancelar o pausar ya no libera el lock de otra sincronización:** El servidor verifica que la petición venga de la sesión dueña del lock.
+- **Errores fatales no tumban locks ajenos:** El shutdown handler solo libera el lock si el error vino de la sesión que lo sostenía.
+- **Cron sin cambios ya no deja el lock pegado:** Cuando el cron detecta que no hay propiedades nuevas ni actualizadas, el lock se libera correctamente al finalizar.
+- **Adquisición atómica del lock:** El candado se adquiere atómicamente vía `wp_options` con UNIQUE en `option_name`.
+- **Tiempos de expiración unificados a 5 minutos:** Umbral de stale, TTL del transient y abort del cliente ahora coinciden (antes había desfases que dejaban locks zombie hasta 10 minutos).
+- **Syncs largas ya no son reclamables después de 5 minutos:** Cada heartbeat refresca también el mutex atómico.
+- **Cron sin placeholder transitorio:** Se eliminó el `session_id='cron'` que podía confundir otros flujos durante la fase de detección.
+
+---
+
+## v3.0.1 (15 de Abril, 2026)
+
+### 🔧 Correcciones
+
+- **Propiedades con imágenes faltantes tras syncs interrumpidas:** Si una sincronización larga se corta después de crear o actualizar la propiedad pero antes de terminar sus imágenes, la siguiente sync vuelve a detectar esa propiedad y descarga las fotos pendientes en lugar de marcarla como "sin cambios".
+- **Historial de sync ya no muestra éxito en resultados parciales:** Las syncs con errores o cierre parcial ya no quedan registradas como exitosas ni actualizan la fecha de última sincronización correcta.
+- **Sesión de datos más robusta:** Fallback seguro entre archivo y transient para reducir errores `session_expired` cuando el payload no puede persistirse.
+
+### 🔧 Técnico
+
+- Estados de timestamp más precisos: las propiedades permanecen en `pending` o `error` mientras queden imágenes o fallos de media, y sólo pasan a `synced` cuando todo termina completo.
+- Verificación local de media incompleta comparando `fave_image_urls` con `fave_property_images`.
+
+---
+
 ## v3.0.0 (10 de Marzo, 2026)
 
 <Note>
-Esta es la versión actual y la más estable. Incluye una reescritura completa del motor de sincronización y nuevas características profesionales.
+Reescritura completa del motor de sincronización y salto importante de la versión Free (100 propiedades, mapas y URLs personalizadas).
 </Note>
 
 ### ✨ Nuevas Características
@@ -273,25 +356,26 @@ Esta versión está deprecada. Actualiza a v3.0.0 lo antes posible.
 ## Plan de Actualización Recomendado
 
 ```
-v2.x → v3.0.0 (RECOMENDADO)
+v2.x → v3.3.0 (RECOMENDADO)
 ```
 
-**Ventajas de actualizar a v3.0.0:**
-- 10x más rápido (motor de sincronización reescrito)
-- Nuevas características profesionales
-- Mejor estabilidad y manejo de errores
-- Interfaz moderna
-- Plan Starter mejorado (100 propiedades gratis)
+**Ventajas de mantenerte en la rama 3.x:**
+- Motor de sincronización unificado con procesamiento por lotes y heartbeat.
+- Consola operativa de Propiedades con sync selectiva y diagnóstico en vivo (v3.3).
+- Historial persistente de reportes con exportación CSV y 30 días de retención (v3.1).
+- Highlights mensuales de consumo y proyección de storage en dashboard y email (v3.2).
+- Plan Starter mejorado: 100 propiedades, mapas y URLs personalizadas incluidos gratis (v3.0).
 
-**Compatibilidad:** La actualización es 100% compatible. Todos tus datos se preservan.
+**Compatibilidad:** La actualización es 100% compatible. Todos tus datos se preservan; las tablas nuevas de reportes se crean al activar y se eliminan limpiamente al desinstalar.
 
 ---
 
 ## Política de Soporte de Versiones
 
-- **v3.0.0:** Soporte completo (actual)
-- **v2.8 - v2.9:** Actualizaciones de seguridad solamente
-- **v2.0 - v2.7:** Sin soporte activo
+- **v3.3.x:** Soporte completo (actual).
+- **v3.0 – v3.2:** Actualizaciones de seguridad y correcciones críticas.
+- **v2.8 – v2.12:** Sólo actualizaciones de seguridad.
+- **v2.0 – v2.7:** Sin soporte activo.
 
 <Note>
 Recomendamos mantener el plugin actualizado a la última versión para obtener nuevas características, mejoras de seguridad y correcciones de bugs.
@@ -314,9 +398,8 @@ Recomendamos mantener el plugin actualizado a la última versión para obtener n
 ## Historial de Cambios Futuro
 
 Estamos trabajando en:
-- v3.1.0: Sistema de webhooks bidireccional
-- v3.2.0: Sincronización de documentos (hipotecas, seguros)
-- v3.3.0: Integraciones con Lead Gen platforms
-- v4.0.0: Mobile app companion
+- **v3.4.x:** Panel de notificaciones dentro del plugin (además del email) y filtros avanzados en el tab Propiedades.
+- **v3.5.x:** Webhooks desde Tokko hacia el sitio para disparar syncs sin depender de WP-Cron.
+- **v4.0.0:** Rediseño del flujo de onboarding y utilidades de migración entre cuentas de Tokko Broker.
 
 Mantente atento a las nuevas versiones en tu WordPress.

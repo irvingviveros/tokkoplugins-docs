@@ -205,24 +205,67 @@ Si necesitas sincronizar inmediatamente sin esperar a la próxima ejecución pro
   </Step>
 </Steps>
 
-### Sincronizar Propiedad Específica
+### Sincronización Selectiva (desde el tab Propiedades)
 
-Para sincronizar una propiedad individual:
+A partir de la v3.3.0 puedes sincronizar únicamente un subconjunto de propiedades desde el tab **Propiedades** del plugin, sin forzar una pasada completa.
 
-<Steps>
-  <Step title="Ve a Propiedades">
-    En el menú de WordPress, abre **Propiedades**
-  </Step>
-  <Step title="Selecciona la propiedad">
-    Encuentra la propiedad que deseas sincronizar
-  </Step>
-  <Step title="Busca el botón de sincronización">
-    Debajo del editor, verás **Sincronizar con Tokko**
-  </Step>
-  <Step title="Haz clic para sincronizar">
-    Los datos se actualizarán desde Tokko Broker
-  </Step>
-</Steps>
+<Tabs>
+  <Tab title="Seleccionar desde la tabla">
+    <Steps>
+      <Step title="Abre Tokko Plugins → Propiedades">
+        Verás la consola operativa con la tabla paginada de todas las propiedades.
+      </Step>
+      <Step title="Filtra y marca las filas">
+        Usa la búsqueda por título/ID/dirección o los filtros por estado de sync y última acción para encontrar las propiedades objetivo, luego marca sus checkboxes.
+      </Step>
+      <Step title='Dispara "Sincronizar seleccionadas"'>
+        La barra flotante muestra cuántas propiedades están seleccionadas. Al confirmar, se crea una sesión selectiva limitada a esos IDs.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Por ID de Tokko">
+    <Steps>
+      <Step title="Copia los IDs de Tokko">
+        Por ejemplo, los IDs que te reportó un vendedor o que aparecen en Tokko Broker.
+      </Step>
+      <Step title="Pégalos en la toolbar">
+        En la toolbar del tab Propiedades hay un campo **Sincronizar por ID** que acepta uno o varios IDs separados por coma.
+      </Step>
+      <Step title="Ejecuta el sync">
+        El motor trae esos IDs directamente desde la API y los sincroniza aunque no estén visibles en la vista actual.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Re-sync forzado de imágenes">
+    <Steps>
+      <Step title="Ubica la propiedad en la tabla">
+        Usa la búsqueda o el filtro "Con imágenes incompletas".
+      </Step>
+      <Step title='Haz clic en "Imágenes"'>
+        El botón marca la propiedad con `_thi_force_image_resync` y dispara un sync selectivo.
+      </Step>
+      <Step title="Espera el siguiente sync">
+        El siguiente ciclo borra las imágenes existentes y las vuelve a descargar desde Tokko. Útil cuando hay fotos rotas o con dimensiones incorrectas.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Info>
+La sync selectiva respeta el mismo **lock global** que una sync completa: si hay una sync en curso, la selectiva entra en cola o es rechazada con un mensaje claro. Los reportes quedan marcados con el trigger **Selectivo** en el historial.
+</Info>
+
+### Diagnóstico por propiedad
+
+Si una propiedad no aparece en el sitio o se ve "rara", en el tab Propiedades puedes usar la acción **"¿Por qué no veo esta propiedad?"**. Verifica en vivo:
+
+- Si la propiedad existe en Tokko Broker.
+- Si está publicada en WordPress.
+- Si tiene imágenes sincronizadas.
+- Si está archivada por Tokko.
+- Si tiene errores registrados en el último sync.
+
+El resultado viene con un semáforo (OK / Atención / Error) y un hint del siguiente paso recomendado.
 
 ---
 
@@ -299,42 +342,97 @@ Las propiedades archivadas no se eliminan permanentemente. Pueden ser recuperada
 
 ## Reportes de Sincronización
 
-Después de cada sincronización, Tokko Plugins genera un reporte detallado:
+Desde la v3.1.0 cada sincronización —manual, selectiva o por cron— queda registrada de forma **persistente** en las tablas `thi_sync_reports` y `thi_sync_report_items` con **30 días de retención**. Los reportes sobreviven a recargas de página y puedes consultarlos en cualquier momento.
 
 ### Acceder a Reportes
 
 <Steps>
-  <Step title="Abre Tokko Plugins">
-    Ve a **Tokko Plugins** → **Sincronización** → **Reportes**
+  <Step title="Abre el tab Sincronización">
+    Ve a **Tokko Plugins → Sincronización**. En la sección **Actividad Reciente** verás la línea de tiempo con las últimas ejecuciones.
   </Step>
-  <Step title="Revisa el reporte más reciente">
-    Verás el reporte de la última sincronización
+  <Step title='Haz clic en "Ver reporte"'>
+    Cada entrada tiene un botón **Ver reporte** que abre un modal con el detalle completo de esa sincronización específica.
   </Step>
-  <Step title="Expande detalles">
-    Haz clic para ver información detallada de cada propiedad
+  <Step title="Explora el detalle">
+    El modal incluye el resumen general, los totales acumulados y el detalle por propiedad. Puedes filtrar, buscar por ID/título y exportar.
   </Step>
 </Steps>
 
-### Información en el Reporte
+### Información en el reporte
 
-Cada reporte incluye:
+Cada reporte guarda:
 
 | Métrica | Descripción |
 |---------|------------|
-| Propiedades sincronizadas | Cantidad de propiedades procesadas exitosamente |
-| Imágenes descargadas | Total de imágenes importadas |
-| Errores detectados | Cantidad de errores durante la sincronización |
-| Tiempo total | Duración de la sincronización |
-| Timestamp | Fecha y hora de ejecución |
-| Detalles por propiedad | Estado individual de cada una |
+| Disparo (`trigger`) | **Manual**, **Cron** o **Selectivo** |
+| Estado general | Éxito, Con advertencias, Error, Cancelada o Abortada |
+| Propiedades procesadas | Nuevas, actualizadas, omitidas, archivadas, reactivadas |
+| Imágenes sincronizadas | Total de imágenes descargadas |
+| Bytes descargados | MB acumulados en la ejecución (base de los highlights mensuales) |
+| Tiempo total | Duración real del ciclo |
+| Detalles por propiedad | Estado, imágenes, advertencias, errores y enlaces al editor y a la URL pública |
 
-### Detalles de Propiedades
+### Estados por propiedad
 
-Para cada propiedad sincronizada, verás:
+Dentro del modal, cada fila muestra el resultado individual:
 
-- ✓ **Exitosa** - Sincronización completada sin problemas
-- ⚠ **Con advertencias** - Se sincronizó pero con algunos datos parciales (ej: imágenes faltantes)
-- ✗ **Fallida** - No se pudo sincronizar (revisa los logs para detalles)
+- **Nueva** — la propiedad fue creada en WordPress en este sync.
+- **Actualizada** — existía y se actualizaron datos o imágenes.
+- **Omitida** — no tenía cambios detectados por el motor inteligente.
+- **Archivada** — Tokko la marcó como inactiva y se ocultó en WordPress.
+- **Reactivada** — estaba archivada y volvió a estar activa en Tokko.
+- **Error** — no se pudo sincronizar; el reporte incluye el mensaje de error y las URLs de imágenes fallidas.
+
+### Exportar a CSV
+
+Cada reporte puede descargarse como CSV (UTF-8, separador coma) desde el botón **Descargar CSV** dentro del modal. El archivo contiene el resumen general, los totales acumulados y el detalle completo por propiedad, ideal para compartir con el equipo o adjuntar a un ticket de soporte.
+
+### Capturar syncs canceladas y abortadas
+
+- **Canceladas:** si cancelas una sync desde el panel, el reporte parcial se persiste con estado **Cancelada** en lugar de perderse.
+- **Abortadas:** ante un error fatal (memory limit, timeout), el shutdown handler persiste el reporte parcial con estado **Abortada** para que puedas ver exactamente hasta dónde llegó el proceso.
+
+### Limpieza automática
+
+Un evento de WP-Cron corre cada día y elimina los reportes con más de **30 días** de antigüedad, incluyendo todos sus items. Si desinstalas el plugin, las tablas de reportes se eliminan limpiamente.
+
+---
+
+## Consumo y Proyección de Storage
+
+Desde la v3.2.0, el tab **Sincronización** muestra al final un bloque **Consumo y Proyección** con los últimos 30 días de actividad de descarga de imágenes. Este bloque es visible solo en licencias **Pro / trial**; en Free el resto del tab sigue intacto.
+
+### Qué muestra el bloque
+
+Cuatro tarjetas con métricas de los últimos 30 días:
+
+| Tarjeta | Qué mide |
+|---------|----------|
+| **Peso promedio por imagen** | KB / MB promedio por foto descargada |
+| **Total descargado** | MB o GB acumulados en la ventana |
+| **Ritmo diario** | Bytes promedio descargados por día (`/día`) |
+| **Propiedades sincronizadas** | Total de propiedades distintas en la ventana |
+
+Debajo, una **tabla de proyección** estima cuánto storage consumirás a **30, 90 y 365 días** al ritmo actual.
+
+### Indicador de confianza
+
+El encabezado del bloque incluye un badge **Confianza: alta / media / baja** que refleja cuántos días con actividad hay dentro de la ventana:
+
+- **Alta** — 20 o más días con actividad (proyección sólida).
+- **Media** — 7 a 19 días (proyección razonable).
+- **Baja** — menos de 7 días (se muestra el aviso "Datos limitados — proyección aproximada basada en pocos días de actividad").
+
+### Highlights mensuales en el email
+
+Si configuras la **frecuencia del reporte por correo** en **Mensual**, el email incluye dos secciones extra:
+
+- **Resumen del mes:** peso promedio por imagen, total descargado, ritmo diario, imágenes y propiedades sincronizadas.
+- **Proyección:** estimación a 30, 90 y 365 días, con el mismo badge de confianza.
+
+<Info>
+Si quieres ver exactamente qué vas a recibir el día que se envíe el email mensual, usa el botón **Probar correo** desde **Tokko Plugins → Notificaciones**: cuando la frecuencia está en Mensual, la vista previa se arma con datos reales del sitio en lugar de datos ficticios.
+</Info>
 
 ---
 
