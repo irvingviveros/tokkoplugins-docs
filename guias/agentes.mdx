@@ -448,14 +448,14 @@ Los emails de agentes se hacen públicos cuando sincronizas. Asegúrate que todo
 ### Los Agentes No Se Sincronizan
 
 <Steps>
-  <Step title="Verifica Opción">
-    Comprueba que `thi_enable_agent_sync` esté habilitada
+  <Step title="Verifica la opción">
+    Confirma que **Enable Agent Sync** (`thi_enable_agent_sync`) esté activada en la sección de **Agents** del plugin.
   </Step>
-  <Step title="Verifica API">
-    Comprueba que tu API key de Tokko incluya acceso a productores
+  <Step title="Verifica la API Key">
+    Ejecuta **Test Connection** en **Tokko Plugins → Configuration → API Connection**. Si la conexión falla, revisa la [guía de API Key](/guias/api-key) para regenerarla.
   </Step>
-  <Step title="Revisa Permisos">
-    En Tokko Broker, asegúrate que los productores estén asignados al usuario API
+  <Step title="Confirma que haya productores en Tokko">
+    En Tokko Broker, revisa que tus propiedades tengan un productor asignado. Sólo los agentes vinculados a propiedades sincronizadas aparecen en WordPress.
   </Step>
 </Steps>
 

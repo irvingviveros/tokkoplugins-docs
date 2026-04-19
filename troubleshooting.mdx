@@ -15,11 +15,11 @@ Esta guía te ayudará a diagnosticar y resolver los problemas más comunes que 
     **Síntomas:** El plugin no puede conectarse con Tokko Broker, error de autenticación.
 
     **Soluciones:**
-    1. Verifica que tu API Key sea correcta en **Tokko Plugins > Configuración > API**
-    2. Asegúrate de copiar la clave completa sin espacios adicionales
-    3. Verifica que la clave no haya sido revocada en tu cuenta Tokko Broker
-    4. Intenta regenerar la API Key desde el panel Tokko Broker
-    5. Limpia la caché del navegador y vuelve a intentar
+    1. Verifica la clave en **Tokko Plugins → Configuration → API Connection** y ejecuta **Test Connection**.
+    2. Asegúrate de copiar la cadena completa sin espacios adicionales (pégala en un editor de texto plano primero si tienes dudas).
+    3. Confirma en **Mi Empresa → Permisos** de Tokko Broker que la clave sigue vigente. Si alguien la regeneró, la anterior deja de funcionar de inmediato.
+    4. Si sigues sin conectar, regenera la clave desde Tokko Broker (ver [guía de API Key](/guias/api-key)) y vuelve a pegarla en WordPress.
+    5. Limpia la caché de tu plugin de caché/navegador y reintenta.
   </AccordionItem>
 
   <AccordionItem title="Error de conexión con Tokko Broker (timeout, SSL)">
@@ -53,12 +53,12 @@ Esta guía te ayudará a diagnosticar y resolver los problemas más comunes que 
     **Síntomas:** El botón "Iniciar Sincronización" no responde, nada sucede.
 
     **Checklist de diagnóstico:**
-    - [ ] ¿Está el tema Houzez activo? Verifica en **Apariencia > Temas**
-    - [ ] ¿Es válida la API Key? Prueba la conexión en **Configuración > Herramientas**
-    - [ ] ¿Está habilitado WP-Cron? Ejecuta `wp cron test` o verifica en **Tokko Plugins > Estado del Sistema**
-    - [ ] ¿Hay permisos suficientes en tu cuenta Tokko Broker?
-    - [ ] Desactiva plugins que conflictúen (cache, firewall, security)
-    - [ ] Revisa los logs en **Tokko Plugins > Historial de Errores**
+    - [ ] ¿Está el tema Houzez activo? Verifica en **Apariencia → Temas**.
+    - [ ] ¿Es válida la API Key? Pulsa **Test Connection** en **Tokko Plugins → Configuration → API Connection**.
+    - [ ] ¿Está habilitado WP-Cron? Ejecuta `wp cron test` o revisa **Tokko Plugins → Estado del Sistema**.
+    - [ ] ¿Tu usuario de Tokko Broker tiene rol Administrador? Sin él, la API Key no se puede generar o renovar.
+    - [ ] Desactiva plugins que puedan conflictuar (caché, firewall, seguridad).
+    - [ ] Revisa el **reporte de la última sincronización** desde el timeline de actividad reciente.
   </AccordionItem>
 
   <AccordionItem title="La sincronización se detiene a mitad de camino">
