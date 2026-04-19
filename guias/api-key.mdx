@@ -110,13 +110,13 @@ El idioma de la API (`api-lang`) se determina por la configuración de tu cuenta
 
 #### Error: "No autorizado (401)"
 
-**Causa:** La API Key existe pero no tiene permisos suficientes.
+**Causa:** La API Key ya no es reconocida por Tokko Broker. Lo más común es que alguien la regeneró en **Mi Empresa → Permisos** y la clave que tiene el sitio quedó obsoleta.
 
 **Solución:**
-- Verifica en Tokko Broker que la clave tenga permisos de lectura y escritura
-- Algunos permisos pueden estar deshabilitados (ej: solo lectura)
-- Contacta a tu administrador de Tokko Broker para aumentar los permisos
-- Crea una nueva clave con todos los permisos necesarios
+- Entra a **Mi Empresa → Permisos** en Tokko Broker y verifica cuál es la clave actual.
+- Copia la cadena actual y pégala en **Tokko Plugins → Configuration → API Connection**, luego ejecuta **Test Connection**.
+- Si no puedes ver la sección Permisos, tu usuario no tiene rol Administrador; pídele la clave a alguien con ese rol.
+- Si el error persiste con una clave válida, contacta al soporte de Tokko Broker desde el chat del [Centro de ayuda](https://dudas.tokkobroker.com/).
 
 #### Error: "Servidor no encontrado"
 
@@ -215,16 +215,14 @@ Del lado del plugin, la API Key es suficiente para sincronizar propiedades, imá
   </Step>
 </Steps>
 
-### Auditoría de API
+### Auditoría de uso
 
-Tokko Broker mantiene un registro de todas las llamadas realizadas con tu API Key. Puedes revisar:
+Para revisar cómo se está usando la clave puedes:
 
-- Número de solicitudes realizadas
-- Datos accedidos
-- Errores o intentos fallidos
-- Horarios de acceso
+- **Desde Tokko Plugins:** abrir el **historial de reportes** del tab Sincronización. Cada reporte indica qué sincronizaciones se hicieron (manuales, por cron o selectivas), cuántas propiedades e imágenes se procesaron y si hubo errores de autenticación.
+- **Desde Tokko Broker:** si sospechas de uso indebido, contacta al soporte de Tokko desde el chat del [Centro de ayuda](https://dudas.tokkobroker.com/) para revisar la actividad de la clave y, si hace falta, regenerarla.
 
-Revisa estos registros regularmente para detectar accesos no autorizados.
+Si detectas accesos que no reconoces, regenera la API Key en **Mi Empresa → Permisos** y actualízala en todos los sitios/integraciones que la usen.
 
 ---
 

@@ -27,13 +27,13 @@ Para acceder a las opciones del plugin:
 
 ### API Key de Tokko Broker
 - **Opción:** `thi_api_key`
-- **Descripción:** Clave de autenticación para conectar con tu CRM de Tokko Broker
-- **Obligatorio:** Sí
-- **Valor por defecto:** Vacío
-- **Instrucciones:** Obtén tu clave desde Tokko Broker y pégala aquí. Consulta la [guía de API Key](./api-key.mdx) para más detalles.
+- **Descripción:** Clave de autenticación para conectar con tu CRM de Tokko Broker.
+- **Obligatorio:** Sí.
+- **Valor por defecto:** Vacío.
+- **Instrucciones:** Obtén la clave en Tokko Broker desde **Mi Empresa → Permisos → Api Key** (requiere rol Administrador) y pégala en la tarjeta **API Connection** de la sección **Configuration**. Paso a paso completo en la [guía de API Key](/guias/api-key).
 
 <Tip>
-Prueba la conexión haciendo clic en el botón "Probar Conexión" después de ingresar tu API Key.
+Pulsa **Test Connection** junto al campo de API Key para validar la conexión en vivo. El badge de la tarjeta pasa a **Connected** (verde) cuando la clave responde correctamente.
 </Tip>
 
 ### Idioma del Plugin
@@ -188,9 +188,9 @@ Obtén el ID del agente desde tu panel de Tokko Broker.
 - **Valores:** Habilitado / Deshabilitado
 - **Valor por defecto:** Deshabilitado
 
-<Warning>
-Asegúrate de que tu API Key tenga permisos para crear contactos en Tokko Broker antes de habilitar esta opción.
-</Warning>
+<Info>
+Al activarla, los contactos enviados desde los formularios del sitio se crean automáticamente como leads en Tokko Broker usando la misma API Key que sincroniza las propiedades. No necesitas una credencial adicional.
+</Info>
 
 ---
 

@@ -53,36 +53,35 @@ Si no tienes instalado el tema Houzez, el plugin mostrará una advertencia. Inst
 
 <Step title="Obtén tu API Key de Tokko Broker">
 
-Tu **API Key** es la credencial que conecta WordPress con tu CRM:
+Tu **API Key** es la credencial que conecta WordPress con tu CRM. Para obtenerla necesitas tener rol **Administrador** en tu cuenta de Tokko Broker.
 
-1. Inicia sesión en **Tokko Broker** (tu CRM)
-2. Ve a **Configuración** → **Integraciones** (o **Webhooks/API**)
-3. Busca la sección **API Key** o **Token de acceso**
-4. Copia la clave (es una cadena larga de caracteres)
-5. Si no ves una clave, contacta al administrador de tu cuenta Tokko
+1. Inicia sesión en [tokkobroker.com](https://www.tokkobroker.com/) con tu usuario Administrador.
+2. Entra a **Mi Empresa** → [tokkobroker.com/company](https://www.tokkobroker.com/company/).
+3. Haz clic en la pestaña **Permisos** → [tokkobroker.com/company/permissions](https://www.tokkobroker.com/company/permissions).
+4. En el apartado **Api Key**, selecciona el código y cópialo.
 
 <Info>
-**¿Dónde encontrar el API Key?** En Tokko Broker, normalmente está en:
-- Panel de administrador → Configuración → Integraciones
-- O directamente en tu perfil → API/Webhooks
-
-Si tienes dudas, consulta la documentación oficial de Tokko Broker o contacta a soporte@tokkobroker.com
+**Guía oficial de Tokko Broker:** [¿Cómo saber cuál es la API KEY de mi cuenta?](https://dudas.tokkobroker.com/es/articles/432304-como-saber-cual-es-la-api-key-de-mi-cuenta) — incluye el video explicativo paso a paso.
 </Info>
+
+<Warning>
+Si no ves la sección **Permisos** o el campo **Api Key**, tu usuario no tiene rol de Administrador. Pide la clave a alguien con ese rol o que te asignen los permisos correspondientes.
+</Warning>
 
 </Step>
 
 <Step title="Ingresa el API Key en Tokko Plugins">
 
-1. En la página de **Configuración** de Tokko Plugins, encuentra el campo **API Key de Tokko Broker**
-2. Pega la clave que copiaste
-3. Haz clic en **Probar conexión** (si está disponible)
-4. Verás un mensaje de **✓ Conexión exitosa** si todo es correcto
+1. En **Tokko Plugins → Configuration**, localiza la tarjeta **API Connection**.
+2. Pega la clave completa que copiaste desde Mi Empresa → Permisos.
+3. Haz clic en **Test Connection** para validar la conexión en vivo.
+4. El badge de la tarjeta pasará a **Connected** (verde) si todo es correcto.
 
 <Tip>
-Si ves un error de conexión, verifica que:
-- La clave sea completa (sin espacios al inicio/final)
-- Tu servidor tenga cURL habilitado
-- Tokko Broker esté activo y accesible
+Si ves un error, verifica que:
+- La clave esté completa, sin espacios al inicio o final.
+- Tu servidor WordPress tenga cURL habilitado.
+- La cuenta de Tokko Broker esté activa y no haya sido regenerada recientemente (al regenerarla, la clave anterior deja de funcionar inmediatamente).
 </Tip>
 
 </Step>
