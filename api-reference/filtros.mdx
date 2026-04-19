@@ -31,7 +31,7 @@ add_filter('thi_allow_image_sync_when_unhealthy', function($allow) {
 | **Valor predeterminado** | `false` |
 | **Tipo de retorno** | boolean |
 | **Descripción** | Por defecto, las imágenes no se sincronizan si hay problemas de memoria o CPU. Usa este filtro para ignorar estas advertencias. |
-| **Ubicación** | `/src/Images/ImageProcessor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 <Warning>
 Habilitar esto en servidores con recursos limitados puede causar errores o timeout.
@@ -64,7 +64,7 @@ add_filter('thi_server_health_check_enabled', function($enabled) {
 | **Valor predeterminado** | `true` |
 | **Tipo de retorno** | boolean |
 | **Descripción** | Controla si el plugin verifica memoria, CPU y espacio en disco antes de sincronizar. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -93,7 +93,7 @@ add_filter('thi_memory_warning_threshold', function($threshold) {
 | **Tipo de retorno** | float |
 | **Rango válido** | 50.0 - 95.0 |
 | **Descripción** | Porcentaje de memoria utilizada que genera una advertencia. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -120,7 +120,7 @@ add_filter('thi_memory_critical_threshold', function($threshold) {
 | **Tipo de retorno** | float |
 | **Rango válido** | 80.0 - 99.0 |
 | **Descripción** | Porcentaje de memoria que detiene la sincronización. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -146,7 +146,7 @@ add_filter('thi_load_warning_threshold_normalized', function($threshold) {
 | **Valor predeterminado** | `1.2` |
 | **Tipo de retorno** | float |
 | **Descripción** | Se multiplica por el número de núcleos CPU. En servidor de 4 núcleos = carga 4.8. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -172,7 +172,7 @@ add_filter('thi_load_critical_threshold_normalized', function($threshold) {
 | **Valor predeterminado** | `2.0` |
 | **Tipo de retorno** | float |
 | **Descripción** | Carga normalizada que detiene la sincronización. En servidor de 4 núcleos = carga 8.0. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 <Tip>
 Para contenedores Docker, este límite se fija en 1.5 automáticamente.
@@ -202,7 +202,7 @@ add_filter('thi_disk_warning_gb', function($threshold) {
 | **Valor predeterminado** | `5.0` GB |
 | **Tipo de retorno** | float |
 | **Descripción** | Espacio en disco disponible mínimo recomendado. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -228,7 +228,7 @@ add_filter('thi_disk_critical_gb', function($threshold) {
 | **Valor predeterminado** | `1.0` GB |
 | **Tipo de retorno** | float |
 | **Descripción** | Espacio en disco mínimo absoluto requerido para sincronización. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 
@@ -286,7 +286,7 @@ add_filter('thi_server_health_check_load_hard_fail', function($hard_fail) {
 | **Valor predeterminado** | `true` (excepto Docker: `false`) |
 | **Tipo de retorno** | boolean |
 | **Descripción** | En Docker, la carga se ignora automáticamente. |
-| **Ubicación** | `/src/Health/HealthMonitor.php` |
+| **Ubicación** | `includes/ajax/ajax-handlers.php` |
 
 ---
 

@@ -11,20 +11,15 @@ description: "Configura el plugin en 5 minutos y sincroniza tus primeras propied
 
 <Step title="Instala y activa el plugin">
 
-**Opción A: Desde el panel de WordPress**
-1. Ve a **Plugins** → **Añadir nuevo**
-2. Busca "Tokko Plugins" en el directorio oficial
-3. Haz clic en **Instalar ahora**
-4. Haz clic en **Activar**
+Tokko Plugins se distribuye como archivo ZIP a través de Freemius. **No está disponible en el directorio oficial de WordPress.**
 
-**Opción B: Descarga manual desde Freemius**
-1. Ve a [Freemius Dashboard](https://freemius.com)
-2. Descarga el archivo ZIP de Tokko Plugins
-3. En **Plugins** → **Añadir nuevo**, selecciona **Subir plugin**
-4. Carga el archivo ZIP y activa
+1. Ve a [Freemius Dashboard](https://freemius.com) y descarga el ZIP de Tokko Plugins.
+2. En WordPress, ve a **Plugins** → **Añadir nuevo** → **Subir plugin**.
+3. Carga el archivo ZIP y haz clic en **Instalar ahora**.
+4. Cuando termine, haz clic en **Activar plugin**.
 
 <Tip>
-Si no ves el plugin en el directorio oficial, probablemente uses el plan Starter. Accede a través de Freemius o contacta soporte.
+Si prefieres la instrucción completa con capturas, revisa la guía de [Instalación](/instalacion).
 </Tip>
 
 </Step>
@@ -95,12 +90,12 @@ Ahora es el momento de traer tus propiedades a WordPress:
 3. Verás un indicador de progreso: "Descargando propiedades..."
 
 <Warning>
-**Primera sincronización:** Dependiendo de cuántas propiedades tengas, puede tardar:
-- Menos de 100 propiedades: **1-2 minutos**
-- 100-500 propiedades: **5-10 minutos**
-- Más de 500 propiedades: **15-30 minutos** (o más)
+**La primera sincronización puede tardar bastante.** Antes de empezar, el dashboard muestra una **estimación de tiempo** basada en la cantidad de propiedades que Tokko Broker te reporta. En la práctica hemos visto que catálogos de ~100 propiedades tardan aproximadamente una hora, y catálogos de 500 o más pueden tardar varias horas, dependiendo del tamaño y cantidad de imágenes, tu hosting y la red.
 
-**No cierres el navegador** ni recargues la página. Puedes ver el progreso en el dashboard.
+Recomendaciones:
+- Deja la sincronización correr en segundo plano; no necesitas mantener el navegador abierto (Tokko Plugins usa Action Scheduler / WP-Cron).
+- Revisa el avance desde **Tokko Plugins → Dashboard**.
+- Las sincronizaciones siguientes solo descargan cambios, así que son mucho más rápidas.
 </Warning>
 
 </Step>
@@ -165,7 +160,6 @@ Ahora que tu sitio sincroniza propiedades, considera:
 
 - 📖 Lee la **[Instalación detallada](/instalacion)** para información técnica
 - 🔧 Consulta **[Troubleshooting](/troubleshooting)** para errores comunes
-- 💬 Pregunta en nuestra **[comunidad](https://community.tokkoplugins.com)**
 - 📧 Envía un email a **support@tokkoplugins.com**
 
 ---
