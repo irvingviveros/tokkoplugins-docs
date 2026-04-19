@@ -73,48 +73,49 @@ Total: 1,234
 
 Cada tarjeta es clickeable y abre un filtro automático en el listado de propiedades.
 
-## Analítica de Propiedades
+## Tab Propiedades: consola operativa
 
-### Gráficos de Distribución
+<Note>
+Desde la **v3.3.0**, el tab **Propiedades** dejó de ser un panel de analítica (se quitaron los widgets de *Propiedades por área* y *Análisis de precios*) y pasó a ser una **consola operativa** centrada en troubleshooting y control fino del sync.
+</Note>
 
-**Por Tipo:**
+### Columnas de la tabla
 
-```
-Departamento     ████████████ 45%
-Casa             ███████ 26%
-Oficina          ██ 8%
-Comercio         ██ 7%
-Terreno          ██ 5%
-Otros            █ 9%
-```
+La tabla paginada lista todas las propiedades sincronizadas con las columnas:
 
-Haz clic en cualquier segmento para filtrar ese tipo.
+| Columna | Detalle |
+|---------|---------|
+| **ID** | ID de Tokko de la propiedad |
+| **Título** | Título publicado en WordPress |
+| **Estado de sync** | `synced`, `pending`, `error` o `archived` |
+| **Última acción** | Nueva, actualizada, omitida, archivada o reactivada |
+| **Imágenes** | Total descargado vs. total esperado |
+| **Última sync** | Fecha/hora de la última participación en un sync |
+| **Acciones** | Menú por fila (ver detalle abajo) |
 
-**Por Ubicación:**
+Puedes **ordenar por columna**, **filtrar por estado y última acción**, y **buscar** por título, ID o dirección.
 
-```
-Buenos Aires     ██████████████████ 72%
-CABA             ████████ 28%
-Otro             - 0%
-```
+### Acciones por fila
 
-**Por Rango de Precio:**
+Cada propiedad ofrece un menú rápido con:
 
-```
-$0-100k          ██ 8%
-$100k-250k       ██████ 22%
-$250k-500k       ████████ 29%
-$500k-1M         █████ 19%
-$1M+             ███ 22%
-```
+- **Último reporte** — abre el modal con el reporte completo del último sync en que participó esa propiedad (sin navegar al historial).
+- **¿Por qué no veo esta propiedad?** — diagnóstico en vivo: existencia en Tokko, publicación en WordPress, imágenes, archivado, errores registrados.
+- **Imágenes** — marca la propiedad con `_thi_force_image_resync` y dispara un sync selectivo para volver a descargar todas las fotos.
+- **Abrir en Tokko** — abre el detalle en el backoffice de Tokko Broker si configuraste `tokkoBackofficeBase`. Si no, el botón se reemplaza por **Copiar ID** (usa Clipboard API para dejar el `tokko_id` listo para pegar).
 
-### Interpretación
+### Sincronización selectiva
 
-Usa estos gráficos para:
-- Identificar tipos de propiedades más comunes
-- Analizar distribución geográfica
-- Detectar vacíos de mercado
-- Evaluar estrategia de precios
+La consola soporta dos formas de sync selectiva, que **respetan el mismo lock global** que la sync completa:
+
+1. **Por checkboxes:** selecciona una o varias filas y usa la barra flotante **Sincronizar seleccionadas (N)**.
+2. **Por IDs de Tokko:** pega uno o más IDs (separados por coma) en el campo de la toolbar; no necesitan estar en la vista actual.
+
+Los reportes resultantes quedan marcados con el trigger **Selectivo** en el historial.
+
+### KPI "Archivadas recientemente por Tokko"
+
+Una tarjeta destacada muestra el conteo de propiedades que Tokko marcó como archivadas (`status = archived`) en los últimos **7 días**. Es la forma más rápida de detectar borrados masivos en el lado de Tokko que impacten en el sitio.
 
 ## Cronograma de Sincronización
 
@@ -182,6 +183,27 @@ Próxima sincronización: en 14m 32s
 Duración estimada: 2m 45s
 Basado en: 1,234 propiedades
 ```
+
+## Consumo y Proyección de Storage
+
+En el tab **Sincronización** del dashboard, al final, aparece un bloque **Consumo y Proyección** (solo en licencias Pro/trial) con cuatro tarjetas y una tabla de proyección:
+
+- **Peso promedio por imagen** en los últimos 30 días.
+- **Total descargado** en la ventana.
+- **Ritmo diario** promedio (`/día`).
+- **Propiedades sincronizadas** distintas.
+
+La **tabla de proyección** estima el consumo a **30, 90 y 365 días** al ritmo actual. El encabezado del bloque incluye un badge **Confianza: alta / media / baja** según cuántos días con actividad tengas dentro de la ventana de 30 días:
+
+- Alta: 20+ días con actividad.
+- Media: 7–19 días.
+- Baja: menos de 7 días (muestra aviso de "Datos limitados").
+
+<Tip>
+Este mismo bloque aparece como **Highlights mensuales** en el reporte por correo cuando configuras la frecuencia en **Mensual**. Más detalle en la guía de [Sincronización](/guias/sincronizacion).
+</Tip>
+
+---
 
 ## Salud del Sistema
 
