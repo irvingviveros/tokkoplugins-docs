@@ -110,15 +110,14 @@ Encuentra respuestas a las preguntas más frecuentes sobre el plugin Tokko Plugi
   </AccordionItem>
 
   <AccordionItem title="¿Cuánto tarda la primera sincronización?">
-    La duración depende de:
-    - **Número de propiedades:** 5-10 segundos por propiedad en promedio
-    - **Cantidad de imágenes:** Descarga en lotes de 10
-    - **Recursos del servidor:** Memoria y CPU disponibles
-    - **Conexión a Internet:** Velocidad de descarga
+    Depende principalmente del tamaño del catálogo, la cantidad y peso de las imágenes, el hosting y la red. Como referencia, en producción hemos visto:
 
-    **Ejemplo:** 50 propiedades con 20 imágenes cada una pueden tardar 15-30 minutos en completarse.
+    - **~100 propiedades:** alrededor de **1 hora**
+    - **500 o más propiedades:** **varias horas** (hasta 6 en catálogos con muchas imágenes pesadas)
 
-    Puedes cancelar o pausar la sincronización en cualquier momento.
+    Antes de empezar, el dashboard muestra una **estimación de tiempo** basada en la cantidad de propiedades reportadas por Tokko. Las sincronizaciones siguientes son mucho más rápidas porque solo procesan cambios.
+
+    Puedes dejar la sincronización corriendo en segundo plano (usa Action Scheduler / WP-Cron) y consultar el avance desde el dashboard.
   </AccordionItem>
 
   <AccordionItem title="¿Qué es 'Sincronización Inteligente'?">
@@ -276,20 +275,19 @@ Encuentra respuestas a las preguntas más frecuentes sobre el plugin Tokko Plugi
 
   <AccordionItem title="¿Cuál es la diferencia entre Professional y PRO+?">
     **Plan Professional ($9.99/mes o $94.99/año):**
-    - Propiedades ilimitadas
-    - Envío de leads a Tokko CRM
-    - Email support (máximo 2 días de respuesta)
+    - Propiedades y desarrollos ilimitados
+    - Sincronización automática programada
+    - Sincronización de agentes
+    - Envío de leads al CRM de Tokko
+    - Email support
     - Todos los features del Starter
 
     **Plan PRO+ ($299.99 de una sola vez - Lifetime):**
-    - TODO lo de Professional
-    - **Soporte prioritario** (respuesta en horas, no días)
-    - **Acceso anticipado** a nuevas características
-    - **Consultoría con especialista Houzez** incluida
-    - **Descuentos** en futuros addons y extensiones
-    - Una sola compra: uso de por vida
+    - Todas las características de Professional
+    - Una sola compra, uso de por vida
+    - Sin renovaciones anuales
 
-    PRO+ es ideal si quieres soporte premium y planeas usar el plugin a largo plazo.
+    PRO+ es ideal si planeas usar el plugin a largo plazo y prefieres un único pago sobre una suscripción.
   </AccordionItem>
 
   <AccordionItem title="¿Hay diferencia en el precio mensual vs anual?">
@@ -434,6 +432,4 @@ Encuentra respuestas a las preguntas más frecuentes sobre el plugin Tokko Plugi
 Si tu pregunta no está respondida aquí, consulta:
 1. **Guía completa:** Ve a [Documentación Principal](/docs)
 2. **Solución de Problemas:** Ve a [Troubleshooting](/docs/troubleshooting)
-3. **Contacta Soporte:** En **Tokko Plugins > Soporte**
-   - Plan Professional: Email (máximo 2 días)
-   - Plan PRO+: Prioritario (respuesta en horas)
+3. **Contacta Soporte:** support@tokkoplugins.com (disponible para planes Professional y Pro+)

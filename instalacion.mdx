@@ -60,39 +60,11 @@ Antes de instalar, asegúrate de cumplir con los siguientes requisitos:
 
 ## Métodos de instalación
 
-### Método 1: Desde el directorio oficial de WordPress
+<Info>
+Tokko Plugins se distribuye como archivo ZIP a través de Freemius. **No está disponible en el directorio oficial de WordPress**, así que siempre instalarás el plugin subiendo el ZIP manualmente.
+</Info>
 
-Esta es la forma más simple y segura.
-
-<Steps>
-
-<Step title="Accede al panel de WordPress">
-Inicia sesión en tu sitio WordPress como administrador.
-</Step>
-
-<Step title="Ve a Plugins">
-En el menú izquierdo, haz clic en **Plugins** → **Añadir nuevo**.
-</Step>
-
-<Step title="Busca Tokko Plugins">
-En la barra de búsqueda, escribe "Tokko Plugins" y presiona Enter.
-</Step>
-
-<Step title="Instala el plugin">
-Localiza **Tokko Plugins - TokkoBroker Integration Professional** y haz clic en **Instalar ahora**.
-</Step>
-
-<Step title="Activa el plugin">
-Una vez instalado, verás el botón **Activar**. Haz clic para activar el plugin.
-</Step>
-
-<Step title="Verifica la activación">
-Deberías ver el mensaje: "**✓ Plugin activado correctamente**" y un nuevo elemento de menú **Tokko Plugins** en la barra de navegación.
-</Step>
-
-</Steps>
-
-### Método 2: Descarga desde Freemius (clientes con licencia)
+### Método 1: Descarga desde Freemius (recomendado)
 
 Si descargaste Tokko Plugins a través de Freemius:
 
@@ -127,30 +99,30 @@ Haz clic en **Activar plugin**
 
 </Steps>
 
-### Método 3: Instalación manual vía FTP (avanzado)
+### Método 2: Instalación manual vía FTP (avanzado)
 
-Solo recomendado si tienes experiencia con FTP:
+Solo recomendado si tienes experiencia con FTP o si la subida del ZIP desde WordPress falla por límites de tamaño:
 
 <Steps>
 
 <Step title="Descarga el archivo">
-Obtén `tokko-plugins.zip` desde el directorio de WordPress o Freemius
+Obtén `tokko-plugins.zip` desde tu cuenta de Freemius.
 </Step>
 
 <Step title="Extrae el contenido">
-Descomprime el ZIP. Verás una carpeta llamada `tokko-plugins`
+Descomprime el ZIP. Verás una carpeta con los archivos del plugin.
 </Step>
 
 <Step title="Conecta vía FTP">
-Usa un cliente FTP (FileZilla, Cyberduck, etc.) para conectar a tu servidor
+Usa un cliente FTP (FileZilla, Cyberduck, etc.) para conectar a tu servidor.
 </Step>
 
 <Step title="Copia la carpeta">
-Sube la carpeta `tokko-plugins` a: `/wp-content/plugins/`
+Sube la carpeta del plugin a `/wp-content/plugins/`.
 </Step>
 
 <Step title="Activa en WordPress">
-Ve a **Plugins** y busca Tokko Plugins. Haz clic en **Activar**
+Ve a **Plugins** y busca Tokko Plugins. Haz clic en **Activar**.
 </Step>
 
 </Steps>
@@ -288,7 +260,7 @@ Tokko Plugins **solo funciona con Houzez**. Si usas otro tema, el plugin no sinc
    - Guarda el archivo
 2. Intenta la instalación nuevamente
 
-3. Si sigue sin funcionar, usa FTP (Método 3 más arriba)
+3. Si sigue sin funcionar, usa FTP (Método 2 más arriba)
 
 ### ⚠️ "Freemius no se conecta"
 
@@ -317,10 +289,10 @@ Las actualizaciones son automáticas y no requieren configuración adicional.
 
 Si prefieres actualizar manualmente:
 
-1. Descarga la nueva versión desde WordPress.org o Freemius
-2. Ve a **Plugins** → **Instalar plugin**
-3. Sube el nuevo ZIP (sobrescribirá la versión anterior)
-4. El plugin conservará tu configuración
+1. Descarga la nueva versión desde tu cuenta de Freemius.
+2. Ve a **Plugins** → **Añadir nuevo** → **Subir plugin**.
+3. Sube el nuevo ZIP (sobrescribirá la versión anterior).
+4. El plugin conservará tu configuración.
 
 <Warning>
 **Siempre haz una copia de seguridad** antes de actualizar. Si algo falla, podrás restaurar tu sitio.
@@ -382,4 +354,4 @@ Ahora que está instalado:
 
 ---
 
-**¿Necesitas ayuda?** Contacta a support@tokkoplugins.com o visita nuestra comunidad.
+**¿Necesitas ayuda?** Contacta a support@tokkoplugins.com.

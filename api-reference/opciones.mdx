@@ -92,7 +92,7 @@ Tipo de sincronización configurado.
 
 <CodeGroup>
 ```php Obtener
-$sync_type = get_option('thi_sync_option', 'horariu');
+$sync_type = get_option('thi_sync_option', 'daily');
 ```
 
 ```php Establecer
@@ -103,9 +103,9 @@ update_option('thi_sync_option', 'hourly');
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | string |
-| **Valor predeterminado** | 'hourly' |
-| **Valores válidos** | 'hourly', 'twicedaily', 'daily', 'custom' |
-| **Descripción** | Frecuencia de sincronización automática. |
+| **Valor predeterminado** | `'daily'` |
+| **Valores válidos** | `'disabled'`, `'hourly'`, `'every_6_hours'`, `'every_12_hours'`, `'daily'`, `'weekly'`, `'biweekly'`, `'monthly'`, `'custom'` |
+| **Descripción** | Frecuencia de sincronización automática (feature premium). En plan Starter permanece en `disabled` y sólo soporta sincronización manual. |
 
 ---
 
@@ -126,10 +126,10 @@ update_option('thi_custom_interval_value', 120);
 | Propiedad | Valor |
 |-----------|-------|
 | **Tipo** | int |
-| **Valor predeterminado** | 60 |
-| **Rango válido** | 10 - 1440 |
+| **Valor predeterminado** | `60` |
+| **Rango válido** | 5 – 43200 (minutos) |
 | **Unidad** | Minutos |
-| **Descripción** | Se usa solo cuando `thi_sync_option` es 'custom'. |
+| **Descripción** | Se usa solo cuando `thi_sync_option` es `'custom'`. Va desde 5 minutos (máxima frecuencia) hasta 30 días (43200 minutos). |
 
 ---
 
@@ -641,23 +641,6 @@ foreach ($errors as $error) {
 | **Tipo** | array |
 | **Descripción** | Lista de errores ocurridos durante sincronización. |
 | **Retención** | Últimos 50 errores |
-
----
-
-### thi_intelligent_sync_ready
-
-Indica si sincronización inteligente está lista.
-
-<CodeGroup>
-```php Obtener
-$ready = get_option('thi_intelligent_sync_ready', false);
-```
-</CodeGroup>
-
-| Propiedad | Valor |
-|-----------|-------|
-| **Tipo** | bool |
-| **Descripción** | Se establece a true cuando el sistema está listo para detección de cambios. |
 
 ---
 
